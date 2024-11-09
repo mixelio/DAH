@@ -1,6 +1,7 @@
-import {Visibility, VisibilityOff} from "@mui/icons-material"
-import {Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from "@mui/material"
-import {FormEvent, useState} from "react";
+import {Visibility, VisibilityOff} from '@mui/icons-material'
+import {Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
+import {FormEvent, useState} from 'react'
+import sentRegistrateData from '../../utils/fetchClient';
 
 export const SingUpInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +40,7 @@ export const SingUpInForm = () => {
         emailError: false,
         passwordError: false,
       })
+      sentRegistrateData(JSON.stringify(registerData));
     }
   }
 
@@ -54,7 +56,7 @@ export const SingUpInForm = () => {
 
   return (
       <Box
-        component="form"
+        component='form'
         sx={{ '& > :not(style)': { m: 1 } }}
         noValidate
         autoComplete="off"
