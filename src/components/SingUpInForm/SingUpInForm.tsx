@@ -4,6 +4,10 @@ import {FormEvent, useState} from "react";
 
 export const SingUpInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [hasError, setHasError] = useState({
+    emailError: false,
+    passwordError: false,
+  })
   const [registerData, setRegisterData] = useState({
     email: '',
     password: '',
@@ -11,17 +15,31 @@ export const SingUpInForm = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = event.target;
-    
+    setHasError({
+      emailError: false,
+      passwordError: false,
+    })
     setRegisterData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }))
+        ...prevState,
+        [name]: value,
+      }))
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(registerData)
     
+    console.log(registerData)
+    if (!registerData.email.trim()) {
+      setHasError({
+        emailError: true,
+        passwordError: false,
+      })
+    } else {
+      setHasError({
+        emailError: false,
+        passwordError: false,
+      })
+    }
   }
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -44,14 +62,24 @@ export const SingUpInForm = () => {
         onSubmit={handleSubmit}
       >
         <TextField
-          error={false}
+          error={hasError.emailError}
+          required
           name="email"
-          id="outlined-basic" 
+          id="outlined-basic"
           label="E-mail" 
           variant="outlined"
           sx={{margin: "0 auto"}}
           className="sing-up-in-form__login"
           onChange={handleChange}
+          onBlur={() => {
+            console.log('onBlure', registerData.email.trim());
+            if(!registerData.email.trim()) {
+              setHasError(prevState => ({
+                ...prevState,
+                emailError: true,
+              }))
+            }
+          }}
         />
         <FormControl sx={{ m: 1 }} variant="outlined" className="sing-up-in-form__password">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
