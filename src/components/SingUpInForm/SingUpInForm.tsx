@@ -28,8 +28,7 @@ export const SingUpInForm = () => {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
-    console.log(registerData)
+
     if (!registerData.email.trim()) {
       setHasError({
         emailError: true,
@@ -40,7 +39,7 @@ export const SingUpInForm = () => {
         emailError: false,
         passwordError: false,
       })
-      sentRegistrateData(JSON.stringify(registerData));
+      sentRegistrateData(registerData);
     }
   }
 
@@ -65,7 +64,6 @@ export const SingUpInForm = () => {
       >
         <TextField
           error={hasError.emailError}
-          required
           name="email"
           id="outlined-basic"
           label="E-mail" 
