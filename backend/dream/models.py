@@ -25,7 +25,7 @@ class Dream(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
     status = models.BooleanField(default=False)
-    category = models.CharField(choices=Category.choices)
+    category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=200)
     likes = models.PositiveIntegerField(default=0)
