@@ -1,0 +1,21 @@
+.sing-up-in-form {
+  width: 300px;
+  margin: 0 auto;
+  border: 2px solid cornflowerblue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__login {
+    display: block;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  &__password {
+    width: 90%;
+    margin: 0 auto;
+  }
+
+
+}
