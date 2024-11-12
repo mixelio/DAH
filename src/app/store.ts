@@ -1,15 +1,15 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import postsReducer from '../features/posts';
-import usersReducer from '../features/users';
-import currentUserReducer from '../features/currentUser';
-import currentPostReducer from '../features/currentPost';
+// import postsReducer from '../features/posts';
+// import usersReducer from '../features/users';
+// import currentUserReducer from '../features/currentUser';
+// import currentPostReducer from '../features/currentPost';
 
 export const store = configureStore({
   reducer: {
-    posts: postsReducer,
-    users: usersReducer,
-    currentUser: currentUserReducer,
-    currentPost: currentPostReducer,
+    // posts: postsReducer,
+    // users: usersReducer,
+    // currentUser: currentUserReducer,
+    // currentPost: currentPostReducer,
   },
 });
 

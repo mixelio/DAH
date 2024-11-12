@@ -23,6 +23,6 @@ const usersSlice = createSlice({
 
 export default usersSlice.reducer;
 
-export const userInit = crerateAsyncThunk('users/fetch', () => {
-  return getUsers();
-})
+// export const userInit = crerateAsyncThunk('users/fetch', () => {
+//   return getUsers();
+// })
