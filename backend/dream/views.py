@@ -2,13 +2,18 @@ from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from dream.models import Comment, Dream
-from dream.serializers import CommentSerializer, DreamSerializer, DreamReadSerializer
+from dream.serializers import (
+    CommentSerializer,
+    DreamSerializer,
+    DreamReadSerializer,
+    CommentReadSerializer
+)
 
 
 class CommentListCreateView(APIView):
     def get(self, request, dream_id):
         comments = Comment.objects.filter(dream__id=dream_id)
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentReadSerializer(comments, many=True)
         return Response(serializer.data)
 
     def post(self, request, dream_id):
@@ -38,6 +43,17 @@ class DreamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'post':
+        if self.action == 'create':
             return DreamSerializer
         return DreamReadSerializer
+
+
+class LikeDreamView(APIView):
+    def post(self, request, dream_id):
+        try:
+            dream = Dream.objects.get(id=dream_id)
+            dream.likes += 1
+            dream.save()
+            return Response({'likes': dream.likes}, status=status.HTTP_200_OK)
+        except Dream.DoesNotExist:
+            return Response({'error': 'Dream not found'}, status=status.HTTP_404_NOT_FOUND)
