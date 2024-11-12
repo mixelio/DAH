@@ -1,0 +1,67 @@
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__links {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  &__link {
+    position: relative;
+    font-size: 16px;
+    text-transform: uppercase;
+    color: cadetblue;
+    transition-duration: 300ms;
+    z-index: 2;
+
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 50%;
+      height: 2px;
+      background-color: #87bdcfd7;
+      opacity: 0;
+      border-radius: 50%;
+      bottom: 0;
+      left: 0;
+      transform: translate(-20%, -50%);
+      z-index: 0;
+      transition-duration: 300ms;
+    }
+
+    &:hover {
+      color: #476671e0;
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &.is-active {
+      font-size: 18px;
+      color: rgb(63, 105, 107);
+      text-shadow: 0px 0px 5px #87bdcfd7;
+
+      &::before {
+        width: 100%;
+        transform: translate(0, -50%);
+        opacity: 0.3;
+      }
+    }
+  }
+
+  &__logo {
+    margin-right: 10px;
+    display: block;
+    width: 32px;
+    height: 32px;
+
+    background-image: url('https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/external-true-dating-app-flaticons-lineal-color-flat-icons.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+}

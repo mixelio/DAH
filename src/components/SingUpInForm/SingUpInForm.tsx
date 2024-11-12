@@ -1,7 +1,7 @@
 import {Visibility, VisibilityOff} from '@mui/icons-material'
 import {Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
 import {FormEvent, useState} from 'react'
-import sentRegistrateData from '../../utils/fetchClient';
+import sentRegistrateData from '../../utils/axiosClient';
 
 export const SingUpInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +72,6 @@ export const SingUpInForm = () => {
           className="sing-up-in-form__login"
           onChange={handleChange}
           onBlur={() => {
-            console.log('onBlure', registerData.email.trim());
             if(!registerData.email.trim()) {
               setHasError(prevState => ({
                 ...prevState,
@@ -107,6 +106,7 @@ export const SingUpInForm = () => {
           />
         </FormControl>
         <Button variant="contained" type="submit">Sing Up</Button>
+        <p>{}</p>
       </Box>
   )
 }

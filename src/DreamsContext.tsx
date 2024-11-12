@@ -6,7 +6,7 @@ type Props = {
 
 type ContextType = {
   loader: boolean;
-  setLoader: (value: boolean) => void
+  setLoader: (value: boolean) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

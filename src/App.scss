@@ -1,2 +1,9 @@
+@use './assets/styles/utils/nullstyle';
+@use './assets/styles/utils/fonts';
+@use './assets/styles/utils/vars';
+@use './assets/styles/utils/mixins';
+@use './assets/styles/page.module';
 
 @use './components/SingUpInForm/SingUpInForm.module';
+@use './components/Header/Header.module';
+@use './components/NavMenu/NavMenu.module';

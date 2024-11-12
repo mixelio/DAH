@@ -14,6 +14,7 @@ async function sentRegistrateData(data: {
       }
     });
     console.log('Response from server:', response.data);
+    return response.data
   } catch (error) {
     console.error('Error sending data:', error);
   }

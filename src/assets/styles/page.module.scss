@@ -1,0 +1,33 @@
+.page {
+  &__body {
+    
+    overflow-y: scroll;
+    & .container {
+      max-width: 1440px;
+      padding: 0 16px;
+      margin: 0 auto;
+
+      @mixin on-tablet {
+        padding: 0 $container-padding--tablet;
+      }
+
+      @mixin on-desktop {
+        padding: 0 $container-padding--desktop;
+      }
+
+      @mixin on-design {
+        padding: 0;
+      }
+    }
+
+    & .wrapper {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    & .main {
+      flex-grow: 1;
+    }
+  }
+}
