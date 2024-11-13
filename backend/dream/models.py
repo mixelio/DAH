@@ -19,12 +19,18 @@ class Dream(models.Model):
         MONEY = "Money donation"
         SERVICES = "Volunteer services"
         GIFTS = "Gifts"
+
+    class Status(models.TextChoices):
+        NEW = "New"
+        PENDING = "Pending"
+        COMPLETED = "Completed"
+
     name = models.CharField(max_length=200)
     description = models.TextField()
-    image = models.ImageField(upload_to=dream_image_file_path)
+    image = models.ImageField(upload_to=dream_image_file_path, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.CharField(choices=Status.choices, default=Status.NEW, max_length=15)
     category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=200)
