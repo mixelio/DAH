@@ -37,6 +37,7 @@ export const Footer = () => {
             >
               {actions.map((action) => (
                 <SpeedDialAction
+                  sx={{zIndex: 2}}
                   icon={action.icon}
                   tooltipTitle={action.name}
                   onClick={() => window.open(action.path, '_blank')}

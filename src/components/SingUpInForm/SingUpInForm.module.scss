@@ -2,7 +2,7 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0);
   width: 300px;
   margin: 0 auto;
   display: flex;
@@ -12,6 +12,44 @@
   border-radius: 20px;
   background-color: azure;
   transition-duration: 300ms;
+  z-index: 5;
+
+  &.active {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  & &__close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(100%, -100%);
+    background-color: azure;
+    border-radius: 50%;
+    transition-duration: 300ms;
+
+    &:hover {
+      background-color: azure;
+      box-shadow: 1px 1px 8px #777;
+    }
+  }
+
+  &__background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    opacity: 0.3;
+    transform: scale(0);
+    transition-delay: 100ms;
+    transition-duration: 300ms;
+
+    &.active {
+      transform: scale(1);
+    }
+  }
 
   &__login {
     display: block;

@@ -15,11 +15,12 @@
     align-items: center;
   }
 
-  &__speed-dial {
+  & &__speed-dial {
     position: absolute;
     bottom: -5px;
     right: calc($container-padding--mobile - 5px);
     transform: scale(0.8);
+    z-index: 0;
 
     @include on-tablet {
       bottom: 20px;
