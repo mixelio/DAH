@@ -1,10 +1,17 @@
 .sing-up-in-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 300px;
   margin: 0 auto;
-  border: 2px solid cornflowerblue;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  border-radius: 20px;
+  background-color: azure;
+  transition-duration: 300ms;
 
   &__login {
     display: block;
