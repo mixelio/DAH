@@ -30,7 +30,7 @@ class Dream(models.Model):
     image = models.ImageField(upload_to=dream_image_file_path, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
-    accumulated = models.PositiveIntegerField(null=True, blank=True)
+    accumulated = models.PositiveIntegerField(null=True, blank=True, default=0)
     status = models.CharField(choices=Status.choices, default=Status.NEW, max_length=15)
     category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateTimeField(auto_now_add=True)
