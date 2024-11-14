@@ -30,6 +30,7 @@ class Dream(models.Model):
     image = models.ImageField(upload_to=dream_image_file_path, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
+    accumulated = models.PositiveIntegerField(null=True, blank=True)
     status = models.CharField(choices=Status.choices, default=Status.NEW, max_length=15)
     category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -49,3 +50,13 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return self.text
+
+
+class Contribution(models.Model):
+    dream = models.ForeignKey(Dream, on_delete=models.CASCADE, related_name="contributions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    description = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.dream.name}"
