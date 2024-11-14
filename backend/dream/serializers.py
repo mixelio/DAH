@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from dream.models import Dream, Comment
+from dream.models import Dream, Comment, Contribution
+
+
+class ContributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contribution
+        fields = ['dream', 'user', 'description', 'date']
 
 
 class DreamSerializer(serializers.ModelSerializer):
@@ -20,6 +26,7 @@ class DreamReadSerializer(DreamSerializer):
             'image',
             'user',
             'cost',
+            'accumulated',
             'status',
             'category',
             'date_added',
