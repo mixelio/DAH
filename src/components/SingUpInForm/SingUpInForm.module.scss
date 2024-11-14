@@ -14,8 +14,13 @@
   transition-duration: 300ms;
   z-index: 5;
 
+  visibility: hidden;
+  opacity: 0;
+
   &.active {
     transform: translate(-50%, -50%) scale(1);
+    visibility: visible;
+    opacity: 1;
   }
 
   & &__close {
@@ -41,13 +46,15 @@
     width: 100vw;
     height: 100vh;
     background-color: #000;
-    opacity: 0.3;
-    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+
     transition-delay: 100ms;
     transition-duration: 300ms;
 
     &.active {
-      transform: scale(1);
+      opacity: 0.3;
+      visibility: visible;
     }
   }
 

@@ -13,17 +13,33 @@
     display: flex;
     column-gap: 20px;
     align-items: center;
+    position: relative;
+  }
+
+  &__navigation {
+    display: flex;
+    align-items: center;
+    column-gap: 20px;
+  }
+
+  &__nav-link {
+    text-transform: capitalize;
+    color: $primary-main;
   }
 
   & &__speed-dial {
     position: absolute;
-    bottom: -5px;
+    bottom: -25px;
     right: calc($container-padding--mobile - 5px);
     transform: scale(0.8);
     z-index: 0;
 
+    & > button {
+      background-color: $primary-main;
+    }
+
     @include on-tablet {
-      bottom: 20px;
+      bottom: -10px;
       transform: scale(1);
     }
   }
