@@ -1,7 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from dream.views import CommentListCreateView, DreamViewSet, LikeCommentView, LikeDreamView
+from dream.views import (
+    CommentListCreateView,
+    DreamViewSet,
+    LikeCommentView,
+    LikeDreamView,
+    FulfillDreamView
+)
 
 app_name = 'dream'
 
@@ -12,5 +18,6 @@ urlpatterns = [
     path('dreams/<int:dream_id>/comments/', CommentListCreateView.as_view(), name='comment'),
     path('comments/<int:comment_id>/like/', LikeCommentView.as_view(), name='like-comment'),
     path('dreams/<int:dream_id>/like/', LikeDreamView.as_view(), name='like-dream'),
+    path('dreams/<int:dream_id>/fulfill/', FulfillDreamView.as_view(), name='fulfill-dream'),
     path('', include(router.urls))
 ]
