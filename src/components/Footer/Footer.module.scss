@@ -1,5 +1,5 @@
-@use '../../assets/styles/utils/vars';
-@use '../../assets/styles/utils/mixins';
+@use '../../assets/styles/utils/vars' as *;
+@use '../../assets/styles/utils/mixins' as *;
 
 .footer {
   padding: 20px 0;

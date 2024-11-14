@@ -1,10 +1,10 @@
-@use './assets/styles/utils/nullstyle';
-@use './assets/styles/utils/fonts';
-@use './assets/styles/utils/vars';
-@use './assets/styles/utils/mixins';
-@use './assets/styles/page.module';
+@use './assets/styles/utils/nullstyle' as *;
+@use './assets/styles/utils/fonts' as *;
+@use './assets/styles/utils/vars' as *;
+@use './assets/styles/utils/mixins' as *;
+@use './assets/styles/page.module' as *;
 
-@use './components/SingUpInForm/SingUpInForm.module';
-@use './components/Header/Header.module';
-@use './components/NavMenu/NavMenu.module';
-@use './components/Footer/Footer.module';
+@use './components/SingUpInForm/SingUpInForm.module' as *;
+@use './components/Header/Header.module' as *;
+@use './components/NavMenu/NavMenu.module' as *;
+@use './components/Footer/Footer.module' as *;
