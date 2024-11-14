@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from dream.models import Comment, Dream
+from dream.models import Comment, Dream, Contribution
 from dream.serializers import (
     CommentSerializer,
     DreamSerializer,
@@ -57,3 +59,41 @@ class LikeDreamView(APIView):
             return Response({'likes': dream.likes}, status=status.HTTP_200_OK)
         except Dream.DoesNotExist:
             return Response({'error': 'Dream not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class FulfillDreamView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, dream_id):
+        dream = get_object_or_404(Dream, id=dream_id)
+
+        if dream.category == Dream.Category.MONEY:
+            contribution_amount = request.data.get('contribution_amount', 0)
+            if contribution_amount <= 0:
+                return Response(
+                    {'error': 'Contribution must be a positive integer.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            dream.accumulated += contribution_amount
+            if dream.accumulated >= dream.cost:
+                dream.status = Dream.Status.COMPLETED
+            else:
+                dream.status = Dream.Status.PENDING
+
+        elif dream.category in {Dream.Category.SERVICES, Dream.Category.GIFTS}:
+            contribution_description = request.data.get('contribution_description', '')
+            if not contribution_description:
+                return Response(
+                    {'error': 'Description of contribution is required for this category.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            Contribution.objects.create(
+                dream=dream,
+                user=request.user,
+                description=contribution_description
+            )
+            dream.status = Dream.Status.COMPLETED
+
+        dream.save()
+        serializer = DreamReadSerializer(dream)
+        return Response(serializer.data, status=status.HTTP_200_OK)
