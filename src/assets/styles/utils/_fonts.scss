@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap');
-@import './vars';
+@use './vars';
 
 body {
   font-family: "Noto Sans Mono", monospace;
