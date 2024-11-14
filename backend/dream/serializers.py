@@ -17,6 +17,8 @@ class DreamSerializer(serializers.ModelSerializer):
 
 
 class DreamReadSerializer(DreamSerializer):
+    contributions = ContributionSerializer(many=True, read_only=True)
+
     class Meta:
         model = Dream
         fields = [
@@ -31,7 +33,8 @@ class DreamReadSerializer(DreamSerializer):
             'category',
             'date_added',
             'location',
-            'likes'
+            'likes',
+            'contributions',
         ]
 
 
