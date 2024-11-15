@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from dream.models import Comment, Dream, Contribution
@@ -13,6 +13,8 @@ from dream.serializers import (
 
 
 class CommentListCreateView(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
     def get(self, request, dream_id):
         comments = Comment.objects.filter(dream__id=dream_id)
         serializer = CommentReadSerializer(comments, many=True)
@@ -27,6 +29,8 @@ class CommentListCreateView(APIView):
 
 
 class LikeCommentView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, comment_id):
         try:
             comment = Comment.objects.get(id=comment_id)
@@ -40,6 +44,7 @@ class LikeCommentView(APIView):
 class DreamViewSet(viewsets.ModelViewSet):
     queryset = Dream.objects.all()
     serializer_class = DreamSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -51,6 +56,8 @@ class DreamViewSet(viewsets.ModelViewSet):
 
 
 class LikeDreamView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, dream_id):
         try:
             dream = Dream.objects.get(id=dream_id)
