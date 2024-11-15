@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
@@ -16,7 +18,7 @@ class CommentListCreateView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get(self, request, dream_id):
-        comments = Comment.objects.filter(dream__id=dream_id)
+        comments = Comment.objects.filter(dream__id=dream_id).select_related('dream')
         serializer = CommentReadSerializer(comments, many=True)
         return Response(serializer.data)
 
@@ -42,9 +44,15 @@ class LikeCommentView(APIView):
 
 
 class DreamViewSet(viewsets.ModelViewSet):
-    queryset = Dream.objects.all()
+    queryset = Dream.objects.all().select_related('user')
     serializer_class = DreamSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        category = self.request.query_params.get('category', None)
+        if category:
+            return self.queryset.filter(category=category)
+        return self.queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -53,6 +61,35 @@ class DreamViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             return DreamSerializer
         return DreamReadSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='category',
+                description='Filter by categories. Available '
+                            'values: Money donation, Volunteer services, Gifts.',
+                required=False,
+                type=OpenApiTypes.STR,
+                examples=[
+                    OpenApiExample(
+                        'Money donation',
+                        value='Money donation',
+                    ),
+                    OpenApiExample(
+                        'Volunteer services',
+                        value='Volunteer services',
+                    ),
+                    OpenApiExample(
+                        'Gifts',
+                        value='Gifts',
+                    )
+                ]
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """Get list of dreams"""
+        return super().list(request, *args, **kwargs)
 
 
 class LikeDreamView(APIView):
