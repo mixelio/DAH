@@ -37,6 +37,9 @@ class Dream(models.Model):
     location = models.CharField(max_length=200)
     likes = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        ordering = ['-date_added']
+
     def __str__(self) -> str:
         return self.name
 
@@ -48,6 +51,9 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self) -> str:
         return self.text
 
@@ -58,5 +64,8 @@ class Contribution(models.Model):
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self) -> str:
         return f"{self.user.email} - {self.dream.name}"
