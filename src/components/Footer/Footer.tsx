@@ -51,8 +51,9 @@ export const Footer = () => {
               <SpeedDialIcon icon={<GroupsIcon />} openIcon={<CloseIcon />} />
             }
           >
-            {actions.map((action) => (
+            {actions.map((action, index) => (
               <SpeedDialAction
+                key={action.id || index}
                 sx={{ zIndex: 2, color: `${colorsPrimary.light}` }}
                 icon={action.icon}
                 tooltipTitle={action.name}

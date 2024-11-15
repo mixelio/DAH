@@ -10,6 +10,9 @@ import sentRegistrateData from '../../utils/axiosClient';
 import {Link} from 'react-router-dom';
 import {DreamsContext} from '../../DreamsContext';
 import classNames from 'classnames';
+import { theme } from "../../utils/theme";
+const colorsPrimary = theme.palette.primary;
+const colorsSecondary = theme.palette.secondary;
 
 export const SingUpInForm = () => {
   const {mainFormActive, setMainFormActive} = useContext(DreamsContext);
@@ -77,6 +80,10 @@ export const SingUpInForm = () => {
     event.preventDefault();
   };
 
+  useEffect(() => {
+    setValue('1');
+  }, [])
+
   return (
     <>
       <div
@@ -91,8 +98,8 @@ export const SingUpInForm = () => {
       >
         <IconButton
           aria-label="close"
-          color="primary"
           className="sing-up-in-form__close"
+          sx={{ color: colorsPrimary.dark }}
           onClick={() => {
             setMainFormActive(false);
           }}
@@ -103,15 +110,37 @@ export const SingUpInForm = () => {
           <Box
             sx={{
               borderBottom: 1,
-              borderColor: "divider",
+              borderColor: colorsPrimary.light,
             }}
           >
             <TabList
               onChange={handleChangeTab}
-              aria-label="lab API tabs example"
+              indicatorColor="primary"
+              sx={{
+                "& .MuiTabs-indicator": {
+                  backgroundColor: colorsPrimary.light,
+                },
+                "& .Mui-selected": {
+                  color: colorsPrimary.light,
+                },
+              }}
             >
-              <Tab label="Sing_Up" value="1" />
-              <Tab label="Sing_In" value="2" />
+              <Tab
+                label="Sign_Up"
+                value="1"
+                sx={{
+                  color: colorsPrimary.dark,
+                  fontFamily: "inherit",
+                }}
+              />
+              <Tab
+                label="Sign_In"
+                value="2"
+                sx={{
+                  color: colorsPrimary.dark,
+                  fontFamily: "inherit",
+                }}
+              />
             </TabList>
           </Box>
           {/*  tabs */}
@@ -210,7 +239,16 @@ export const SingUpInForm = () => {
                     label="Password_repeat"
                   />
                 </FormControl>
-                <Button variant="contained" type="submit">
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{
+                    backgroundColor: colorsPrimary.main,
+                    "&:hover": {
+                      backgroundColor: colorsSecondary.main,
+                    },
+                  }}
+                >
                   Sing Up
                 </Button>
                 <p>{}</p>
@@ -276,10 +314,21 @@ export const SingUpInForm = () => {
                     label="Password"
                   />
                 </FormControl>
-                <Button variant="contained" type="submit">
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{
+                    backgroundColor: colorsPrimary.main,
+                    "&:hover": {
+                      backgroundColor: colorsSecondary.main,
+                    },
+                  }}
+                >
                   Sing In
                 </Button>
-                <Link to="/">forget password?</Link>
+                <Link to="/" className="sing-up-in-form__foget">
+                  forget password?
+                </Link>
               </Box>
             </TabPanel>
           </Box>
