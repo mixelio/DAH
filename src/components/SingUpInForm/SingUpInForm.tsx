@@ -1,5 +1,5 @@
 import {Visibility, VisibilityOff} from '@mui/icons-material'
-import {Box, Button, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
+import {Box, Button, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -10,18 +10,22 @@ import sentRegistrateData from '../../utils/axiosClient';
 import {Link} from 'react-router-dom';
 import {DreamsContext} from '../../DreamsContext';
 import classNames from 'classnames';
+import { v1 as uuidv1 } from "uuid";
 import { theme } from "../../utils/theme";
+import {User} from '../../types/User';
 const colorsPrimary = theme.palette.primary;
 const colorsSecondary = theme.palette.secondary;
 
+enum Errors {
+  Empty = "All fields must be filling",
+}
+
 export const SingUpInForm = () => {
-  const {mainFormActive, setMainFormActive} = useContext(DreamsContext);
+  const {mainFormActive, setMainFormActive, users, setCurrentUser} = useContext(DreamsContext);
   const [showPassword, setShowPassword] = useState(false);
-  const [hasError, setHasError] = useState({
-    emailError: false,
-    passwordError: false,
-  })
+  const [errorMessege, setErrorMessage] = useState('');
   const [registerData, setRegisterData] = useState({
+    name: '',
     email: '',
     password: '',
   });
@@ -29,6 +33,8 @@ export const SingUpInForm = () => {
   const [value, setValue] = useState('1');
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  console.log(users)
 
   useEffect(() => {
     if (contentRef.current) {
@@ -42,11 +48,9 @@ export const SingUpInForm = () => {
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage('')
     const {name, value} = event.target;
-    setHasError({
-      emailError: false,
-      passwordError: false,
-    })
+
     setRegisterData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -56,29 +60,30 @@ export const SingUpInForm = () => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!registerData.email.trim()) {
-      setHasError({
-        emailError: true,
-        passwordError: false,
-      })
+    if (!registerData.email.trim() || !registerData.password.trim()) {
+      setErrorMessage(Errors.Empty);
     } else {
-      setHasError({
-        emailError: false,
-        passwordError: false,
-      })
+      const newUser: User = {
+        id: +uuidv1(),
+        name: registerData.name,
+        email: registerData.email,
+        password: registerData.password,
+        is_staff: false,
+      };
+      setCurrentUser(newUser);
       sentRegistrateData(registerData);
     }
   }
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  // const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  // };
 
-  const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  // const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  // };
 
   useEffect(() => {
     setValue('1');
@@ -87,18 +92,18 @@ export const SingUpInForm = () => {
   return (
     <>
       <div
-        className={classNames("sing-up-in-form__background", {
+        className={classNames("sign-up-in-form__background", {
           active: mainFormActive,
         })}
       ></div>
       <div
-        className={classNames("sing-up-in-form", {
+        className={classNames("sign-up-in-form", {
           active: mainFormActive,
         })}
       >
         <IconButton
           aria-label="close"
-          className="sing-up-in-form__close"
+          className="sign-up-in-form__close"
           sx={{ color: colorsPrimary.dark }}
           onClick={() => {
             setMainFormActive(false);
@@ -120,7 +125,7 @@ export const SingUpInForm = () => {
                 "& .MuiTabs-indicator": {
                   backgroundColor: colorsPrimary.light,
                 },
-                "& .Mui-selected": {
+                "& button.Mui-selected": {
                   color: colorsPrimary.light,
                 },
               }}
@@ -151,94 +156,97 @@ export const SingUpInForm = () => {
                 sx={{ "& > :not(style)": { m: 1 } }}
                 noValidate
                 autoComplete="off"
-                className="sing-up-in-form__sing-up"
+                className="sign-up-in-form__sign-up"
                 onSubmit={handleSubmit}
               >
-                <TextField
-                  error={hasError.emailError}
-                  name="email"
-                  id="outlined-basic"
-                  label="E-mail"
-                  variant="outlined"
-                  sx={{ margin: "0 auto" }}
-                  className="sing-up-in-form__login"
-                  onChange={handleChange}
-                  onBlur={() => {
-                    if (!registerData.email.trim()) {
-                      setHasError((prevState) => ({
-                        ...prevState,
-                        emailError: true,
-                      }));
-                    }
-                  }}
-                />
-                <FormControl
-                  sx={{ m: 1 }}
-                  variant="outlined"
-                  className="sing-up-in-form__password"
-                >
-                  <InputLabel htmlFor="outlined-adornment-password">
-                    Password
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
+                <div className="sign-up-in-form__fields-container">
+                  <TextField
+                    error={errorMessege.length > 0}
+                    name="name"
+                    id="outlined-basic"
+                    label="Name"
+                    variant="outlined"
+                    sx={{ margin: "0 auto" }}
+                    className="sign-up-in-form__login"
                     onChange={handleChange}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
                   />
-                </FormControl>
+                  <TextField
+                    error={errorMessege.length > 0}
+                    name="email"
+                    // id="outlined-basic"
+                    label="E-mail"
+                    variant="outlined"
+                    sx={{ margin: "0 auto" }}
+                    className="sign-up-in-form__login"
+                    onChange={handleChange}
+                  />
+                </div>
+                <Divider />
+                <div className="sign-up-in-form__fields-container">
+                  <FormControl
+                    sx={{ m: 1 }}
+                    variant="outlined"
+                    className="sign-up-in-form__password"
+                  >
+                    <InputLabel htmlFor="outlined-adornment-password">
+                      Password
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      onChange={handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showPassword
+                                ? "hide the password"
+                                : "display the password"
+                            }
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
 
-                <FormControl
-                  sx={{ m: 1 }}
-                  variant="outlined"
-                  className="sing-up-in-form__password"
-                >
-                  <InputLabel htmlFor="outlined-adornment-password">
-                    Password repeat
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-password"
-                    name="password_repeat"
-                    type={showPassword ? "text" : "password"}
-                    onChange={handleChange}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password_repeat"
-                  />
-                </FormControl>
+                  <FormControl
+                    sx={{ m: 1 }}
+                    variant="outlined"
+                    className="sign-up-in-form__password"
+                  >
+                    <InputLabel htmlFor="outlined-adornment-password-repeat">
+                      Password repeat
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password-repeat"
+                      name="password_repeat"
+                      type={showPassword ? "text" : "password"}
+                      onChange={handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showPassword
+                                ? "hide the password"
+                                : "display the password"
+                            }
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password_repeat"
+                    />
+                  </FormControl>
+                </div>
                 <Button
                   variant="contained"
                   type="submit"
@@ -251,7 +259,6 @@ export const SingUpInForm = () => {
                 >
                   Sing Up
                 </Button>
-                <p>{}</p>
               </Box>
             </TabPanel>
             <TabPanel value="2">
@@ -260,60 +267,51 @@ export const SingUpInForm = () => {
                 sx={{ "& > :not(style)": { m: 1 } }}
                 noValidate
                 autoComplete="off"
-                className="sing-up-in-form__sing-in"
+                className="sign-up-in-form__sign-in"
                 onSubmit={handleSubmit}
               >
-                <TextField
-                  error={hasError.emailError}
-                  name="email"
-                  id="outlined-basic"
-                  label="E-mail"
-                  variant="outlined"
-                  sx={{ margin: "0 auto" }}
-                  className="sing-up-in-form__login"
-                  onChange={handleChange}
-                  onBlur={() => {
-                    if (!registerData.email.trim()) {
-                      setHasError((prevState) => ({
-                        ...prevState,
-                        emailError: true,
-                      }));
-                    }
-                  }}
-                />
-                <FormControl
-                  sx={{ m: 1 }}
-                  variant="outlined"
-                  className="sing-up-in-form__password"
-                >
-                  <InputLabel htmlFor="outlined-adornment-password">
-                    Password
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
+                
+                  <TextField
+                    error={errorMessege.length > 0}
+                    name="email"
+                    id="outlined-basic"
+                    label="E-mail"
+                    variant="outlined"
+                    sx={{ margin: "0 auto" }}
                     onChange={handleChange}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
                   />
-                </FormControl>
+                  {/* <Divider /> */}
+                  <FormControl
+                    sx={{ m: 1 }}
+                    variant="outlined"
+                  >
+                    <InputLabel htmlFor="outlined-adornment-password">
+                      Password
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      onChange={handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={
+                              showPassword
+                                ? "hide the password"
+                                : "display the password"
+                            }
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
+                
                 <Button
                   variant="contained"
                   type="submit"
@@ -326,11 +324,12 @@ export const SingUpInForm = () => {
                 >
                   Sing In
                 </Button>
-                <Link to="/" className="sing-up-in-form__foget">
+                <Link to="/" className="sign-up-in-form__foget">
                   forget password?
                 </Link>
               </Box>
             </TabPanel>
+            <p className="sign-up-in-form__error-message">{errorMessege}</p>
           </Box>
         </TabContext>
       </div>

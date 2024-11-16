@@ -1,6 +1,7 @@
 @use '../../assets/styles/utils/vars' as *;
+@use '../../assets/styles/utils/mixins' as *;
 
-.sing-up-in-form {
+.sign-up-in-form {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -10,13 +11,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: $main-background;
 
   border-radius: 10px;
-  background-color: azure;
   transition-duration: 300ms;
   z-index: 5;
 
   opacity: 0;
+
+  @include on-tablet {
+    width: auto;
+  }
 
   &.active {
     transform: translate(-50%, -50%);
@@ -25,15 +30,15 @@
 
   & &__close {
     position: absolute;
-    right: 0;
-    top: 0;
-    transform: translate(100%, -100%);
-    background-color: azure;
+    right: 10px;
+    top: 10px;
+    transform: translate(0, 0);
     border-radius: 50%;
     transition-duration: 300ms;
+    background-color: $main-background;
 
     &:hover {
-      background-color: azure;
+      background-color: $main-background;
       box-shadow: 1px 1px 8px #777;
     }
   }
@@ -58,14 +63,41 @@
     }
   }
 
-  &__login {
-    display: block;
-    width: 90%;
-    margin: 0 auto;
+  &__sign-up {
+    & .sign-up-in-form__login.MuiFormControl-root {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .MuiInputBase-root {
+      width: 100%;
+    }
+  }
+  
+  &__sign-in {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    .sign-up-in-form__login {
+      width: 100%;
+    }
   }
 
-  &__password {
-    width: 90%;
+  &__fields-container {
+    display: flex;
+    column-gap: 10px;
+    justify-content: center;
+    flex-direction: column;
+    row-gap: 16px;
+
+    @include on-tablet {
+      flex-direction: row;
+      width: 400px;
+    }
+  }
+
+  & &__password {
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -83,4 +115,19 @@
       color: $primary-light;
     }
   }
+
+  &__error-message {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    color: red;
+  }
 }
+
+// .css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root {
+//   display: block;
+//   box-sizing: border-box;
+// }
