@@ -24,10 +24,6 @@ export const NavMenu = () => {
 
   const loginedUser = currentUser ? getUser(currentUser, users) : null;
 
-  if(loginedUser) {
-    console.log('' + loginedUser.photo);
-  }
-
   const handleMenuClick = (index: number) => {
     setActiveIndex(index)
   }

@@ -1,8 +1,22 @@
+@use '../../assets/styles/utils/mixins' as *;
+
 .dreams-gallery {
 
   &__content {
     display: grid;
+    grid-template-columns: 1fr;
     gap: 16px 20px;
     
+    @include on-tablet {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include on-desktop {
+      grid-template-columns: repeat(3, minmax(100px, 1fr));
+    }
+  }
+
+  &__item {
+    aspect-ratio: 1 / 1;
   }
 }

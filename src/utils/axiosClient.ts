@@ -13,10 +13,11 @@ async function sentRegistrateData(data: {
         'Content-Type': 'application/json',
       }
     });
-    console.log('Response from server:', response.data);
+    
     return response.data
-  } catch (error) {
-    console.error('Error sending data:', error);
+  } 
+  catch (error) {
+    console.log(error)
   }
 }
 

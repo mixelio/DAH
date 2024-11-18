@@ -52,7 +52,7 @@ export const SingUpInForm = () => {
   }
 
   // #endregion
-  console.log(users);
+  
 
   // #region hooks
   useEffect(() => {
@@ -130,7 +130,6 @@ export const SingUpInForm = () => {
 
   const handleLogIn = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(emailValidator(loginData.login));
     
     if (!emailValidator(loginData.login)) {
       setErrorMessage(Errors.EmailNotValid);

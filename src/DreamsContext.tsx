@@ -55,9 +55,6 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     getDreams().then((res) => setDreams([...res]));
   }, [])
 
-  useEffect(() => {
-    console.log(currentUser);
-  }, [currentUser])
 
   const value = useMemo(() => ({
     loader,
