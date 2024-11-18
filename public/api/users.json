@@ -1,9 +1,32 @@
 [
   {
     "id": 1,
-    "name": "Mykhailo",
     "email": "mixelios@gmail.com",
-    "password": "12345",
-    "is_staff": true
+    "is_staff": false,
+    "first_name": "Mykhailo",
+    "last_name": "",
+    "photo": "",
+    "location": "Sloviansk, Ukraine",
+    "password": "12345"
+  },
+  {
+    "id": 2,
+    "email": "user1@gmail.com",
+    "is_staff": false,
+    "first_name": "Mosi",
+    "last_name": "",
+    "photo": "http://localhost:5173/DAH/media/uploads/users/irene-strong-v2aKnjMbP_k-unsplash.jpg",
+    "location": "New Yourk, USA",
+    "password": "12345"
+  },
+  {
+    "id": 3,
+    "email": "user2@gmail.com",
+    "is_staff": false,
+    "first_name": "Lisa",
+    "last_name": "Smit",
+    "photo": "http://localhost:5173/DAH/media/uploads/users/irene-strong-v2aKnjMbP_k-unsplash.jpg",
+    "location": "Arnstadt, German",
+    "password": "12345"
   }
 ]

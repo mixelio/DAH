@@ -1,11 +1,11 @@
 import {Avatar, Button, Divider, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
 import {useContext, useEffect, useRef, useState} from 'react';
 import {NavLink} from 'react-router-dom'
-import userAvatar from '../../assets/images/user/user-avatar.jpeg';
 import logo from "../../assets/images/main-logo.png";
 import classNames from 'classnames';
 import {DreamsContext} from '../../DreamsContext';
 import {theme} from '../../utils/theme';
+import {getUser} from '../../utils/getUser';
 
 const pages = [
   {id: 1, name: 'Home', path: '/'},
@@ -16,11 +16,17 @@ const colorsPrimary = theme.palette.primary;
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { currentUser, setMainFormActive, activeIndex, setActiveIndex } =
+  const { currentUser, setMainFormActive, activeIndex, setActiveIndex, users, setCurrentUser } =
     useContext(DreamsContext);
   const open = Boolean(anchorEl);
   const underLineRef = useRef<HTMLDivElement>(null);
   const currentMenuItemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  const loginedUser = currentUser ? getUser(currentUser, users) : null;
+
+  if(loginedUser) {
+    console.log('' + loginedUser.photo);
+  }
 
   const handleMenuClick = (index: number) => {
     setActiveIndex(index)
@@ -89,7 +95,7 @@ export const NavMenu = () => {
           </NavLink>
         ))}
       </div>
-      {currentUser ? (
+      {loginedUser ? (
         <div className="navigation__user-arera">
           <Tooltip title="">
             <IconButton
@@ -102,9 +108,11 @@ export const NavMenu = () => {
             >
               <Avatar
                 alt="Remy Sharp"
-                src={userAvatar}
+                src={loginedUser.photo}
                 sx={{ width: 32, height: 32 }}
-              />
+              >
+                {!loginedUser.photo && loginedUser.first_name.charAt(0).toUpperCase()}
+              </Avatar>
             </IconButton>
           </Tooltip>
           <Menu
@@ -146,11 +154,14 @@ export const NavMenu = () => {
           >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={() => setCurrentUser(null)}>Logout</MenuItem>
           </Menu>
         </div>
       ) : (
-        <Button onClick={handleSingInOpen} sx={{fontFamily: "inherit", color: `${colorsPrimary.main}`}}>
+        <Button
+          onClick={handleSingInOpen}
+          sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
+        >
           Sing In
         </Button>
       )}

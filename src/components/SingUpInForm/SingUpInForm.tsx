@@ -10,7 +10,6 @@ import sentRegistrateData from '../../utils/axiosClient';
 import {Link} from 'react-router-dom';
 import {DreamsContext} from '../../DreamsContext';
 import classNames from 'classnames';
-import { v1 as uuidv1 } from "uuid";
 import { theme } from "../../utils/theme";
 import {User} from '../../types/User';
 const colorsPrimary = theme.palette.primary;
@@ -18,36 +17,68 @@ const colorsSecondary = theme.palette.secondary;
 
 enum Errors {
   Empty = "All fields must be filling",
+  EmailNotValid = "Use valid email",
+  PasswordIncorrect = "Invalid password. Please try again.",
+  NoRegistration = "Email not registered. Please sign up.",
 }
 
 export const SingUpInForm = () => {
-  const {mainFormActive, setMainFormActive, users, setCurrentUser} = useContext(DreamsContext);
+  // #region variables
+  const {mainFormActive, setMainFormActive, users, setCurrentUser, currentUser} = useContext(DreamsContext);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessege, setErrorMessage] = useState('');
   const [registerData, setRegisterData] = useState({
-    name: '',
+    first_name: '',
     email: '',
     password: '',
   });
 
+  const [loginData, setLoginData] = useState({
+    login: '',
+    password: ''
+  })
+
   const [value, setValue] = useState('1');
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  // #endregion
 
-  console.log(users)
+  // #region Validation
 
+  const emailValidator = (email: string) => {
+    const emailRegrex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/i;
+
+    return emailRegrex.test(email)
+  }
+
+  // #endregion
+  console.log(users);
+
+  // #region hooks
   useEffect(() => {
     if (contentRef.current) {
       setContentHeight(contentRef.current.clientHeight);
     }
   }, [contentHeight, value]);
 
+  useEffect(() => {
+    setValue("2");
+    setLoginData({
+      login: "",
+      password: "",
+    });
+  }, [currentUser]);
+  // #endregion
+
+  // #region hendlers
+
   const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
     event.preventDefault();
+    setErrorMessage('');
     setValue(newValue);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeReg = (event: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMessage('')
     const {name, value} = event.target;
 
@@ -63,55 +94,112 @@ export const SingUpInForm = () => {
     if (!registerData.email.trim() || !registerData.password.trim()) {
       setErrorMessage(Errors.Empty);
     } else {
-      const newUser: User = {
-        id: +uuidv1(),
-        name: registerData.name,
+      const newUser: Pick<User,"first_name" | "email" | "password"> | null = {
+        first_name: registerData.first_name,
         email: registerData.email,
         password: registerData.password,
-        is_staff: false,
       };
       setCurrentUser(newUser);
       sentRegistrateData(registerData);
     }
   }
 
+  const handleChangeLogIn = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setErrorMessage("");
+    const { name, value } = event.target;
+
+    setLoginData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleAutoComplete = (
+    event: React.FocusEvent<HTMLInputElement>
+  ) => {
+        setErrorMessage("");
+        const { name, value } = event.target;
+
+        setLoginData((prevState) => ({
+          ...prevState,
+          [name]: value,
+        }));
+  };
+
+  const handleLogIn = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log(emailValidator(loginData.login));
+    
+    if (!emailValidator(loginData.login)) {
+      setErrorMessage(Errors.EmailNotValid);
+      return;
+    } else if (!loginData.password.trim()) {
+      setErrorMessage(Errors.Empty);
+      return;
+    }
+
+    const checkUser =
+      users.find((user) => user.email === loginData.login) === undefined
+        ? false
+        : users.find((user) => user.email === loginData.login);
+    if(!checkUser) {
+      setErrorMessage(Errors.NoRegistration);
+      return;
+    }
+
+    if(checkUser.password === loginData.password) {
+      setCurrentUser(checkUser);
+      setLoginData({
+        login: '',
+        password: '',
+      })
+      setMainFormActive(false);
+    } else {
+      setCurrentUser(null);
+      setErrorMessage(Errors.PasswordIncorrect)
+    }
+    setLoginData({
+      login: "",
+      password: "",
+    });
+  };
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  // const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   event.preventDefault();
-  // };
-
-  // const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   event.preventDefault();
-  // };
-
-  useEffect(() => {
-    setValue('1');
-  }, [])
+  // #endregion
 
   return (
     <>
+      {/* fullscreen dark background for the form*/}
       <div
         className={classNames("sign-up-in-form__background", {
           active: mainFormActive,
         })}
       ></div>
+
+      {/* form container */}
       <div
         className={classNames("sign-up-in-form", {
           active: mainFormActive,
         })}
       >
+        {/* close button */}
         <IconButton
           aria-label="close"
           className="sign-up-in-form__close"
           sx={{ color: colorsPrimary.dark }}
           onClick={() => {
+            setErrorMessage("");
             setMainFormActive(false);
           }}
         >
           <CloseIcon />
         </IconButton>
+
         <TabContext value={value}>
+          {/* tabs */}
           <Box
             sx={{
               borderBottom: 1,
@@ -148,8 +236,10 @@ export const SingUpInForm = () => {
               />
             </TabList>
           </Box>
-          {/*  tabs */}
+
+          {/*  tabs bodies */}
           <Box ref={contentRef}>
+            {/* form for registration */}
             <TabPanel value="1">
               <Box
                 component="form"
@@ -168,7 +258,7 @@ export const SingUpInForm = () => {
                     variant="outlined"
                     sx={{ margin: "0 auto" }}
                     className="sign-up-in-form__login"
-                    onChange={handleChange}
+                    onChange={handleChangeReg}
                   />
                   <TextField
                     error={errorMessege.length > 0}
@@ -178,7 +268,7 @@ export const SingUpInForm = () => {
                     variant="outlined"
                     sx={{ margin: "0 auto" }}
                     className="sign-up-in-form__login"
-                    onChange={handleChange}
+                    onChange={handleChangeReg}
                   />
                 </div>
                 <Divider />
@@ -195,7 +285,7 @@ export const SingUpInForm = () => {
                       id="outlined-adornment-password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      onChange={handleChange}
+                      onChange={handleChangeReg}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -227,7 +317,7 @@ export const SingUpInForm = () => {
                       id="outlined-adornment-password-repeat"
                       name="password_repeat"
                       type={showPassword ? "text" : "password"}
-                      onChange={handleChange}
+                      onChange={handleChangeReg}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -261,6 +351,8 @@ export const SingUpInForm = () => {
                 </Button>
               </Box>
             </TabPanel>
+
+            {/* form for login */}
             <TabPanel value="2">
               <Box
                 component="form"
@@ -268,50 +360,50 @@ export const SingUpInForm = () => {
                 noValidate
                 autoComplete="off"
                 className="sign-up-in-form__sign-in"
-                onSubmit={handleSubmit}
+                onSubmit={handleLogIn}
               >
-                
-                  <TextField
+                <TextField
+                  error={errorMessege.length > 0}
+                  name="login"
+                  id="outlined-basic"
+                  label="E-mail"
+                  value={loginData.login}
+                  variant="outlined"
+                  sx={{ margin: "0 auto" }}
+                  onChange={handleChangeLogIn}
+                  onFocus={handleAutoComplete}
+                />
+                {/* <Divider /> */}
+                <FormControl sx={{ m: 1 }} variant="outlined">
+                  <InputLabel htmlFor="outlined-adornment-password">
+                    Password
+                  </InputLabel>
+                  <OutlinedInput
                     error={errorMessege.length > 0}
-                    name="email"
-                    id="outlined-basic"
-                    label="E-mail"
-                    variant="outlined"
-                    sx={{ margin: "0 auto" }}
-                    onChange={handleChange}
+                    id="outlined-adornment-password"
+                    name="password"
+                    value={loginData.password}
+                    type={showPassword ? "text" : "password"}
+                    onChange={handleChangeLogIn}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label={
+                            showPassword
+                              ? "hide the password"
+                              : "display the password"
+                          }
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Password"
                   />
-                  {/* <Divider /> */}
-                  <FormControl
-                    sx={{ m: 1 }}
-                    variant="outlined"
-                  >
-                    <InputLabel htmlFor="outlined-adornment-password">
-                      Password
-                    </InputLabel>
-                    <OutlinedInput
-                      id="outlined-adornment-password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      onChange={handleChange}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label={
-                              showPassword
-                                ? "hide the password"
-                                : "display the password"
-                            }
-                            onClick={handleClickShowPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      label="Password"
-                    />
-                  </FormControl>
-                
+                </FormControl>
+
                 <Button
                   variant="contained"
                   type="submit"
@@ -329,7 +421,11 @@ export const SingUpInForm = () => {
                 </Link>
               </Box>
             </TabPanel>
-            <p className="sign-up-in-form__error-message">{errorMessege}</p>
+
+            {/* errors message */}
+            {errorMessege && (
+              <p className="sign-up-in-form__error-message">{errorMessege}</p>
+            )}
           </Box>
         </TabContext>
       </div>
