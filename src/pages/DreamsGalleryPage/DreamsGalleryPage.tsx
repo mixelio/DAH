@@ -7,7 +7,6 @@ export const DreamsGalleryPage = () => {
   return (
     <section className="dreams-gallery">
       <div className="container">
-        <h2>Dreams</h2>
         <div className="dreams-gallery__content">
           {dreams &&
             dreams.map((dream) => (

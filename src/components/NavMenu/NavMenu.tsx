@@ -1,5 +1,5 @@
 import {Avatar, Button, Divider, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
-import {useContext, useEffect, useRef, useState} from 'react';
+import {useContext, useState} from 'react';
 import {NavLink} from 'react-router-dom'
 import logo from "../../assets/images/main-logo.png";
 import classNames from 'classnames';
@@ -16,11 +16,9 @@ const colorsPrimary = theme.palette.primary;
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { currentUser, setMainFormActive, activeIndex, setActiveIndex, users, setCurrentUser } =
+  const { currentUser, setMainFormActive, setActiveIndex, users, setCurrentUser } =
     useContext(DreamsContext);
   const open = Boolean(anchorEl);
-  const underLineRef = useRef<HTMLDivElement>(null);
-  const currentMenuItemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   const loginedUser = currentUser ? getUser(currentUser, users) : null;
 
@@ -47,31 +45,12 @@ export const NavMenu = () => {
     classNames('navigation__link', additionalClasses, {
       'is-active': isActive,
     });
-
-  useEffect(() => {
-    const activeItem = currentMenuItemRefs.current[activeIndex];
-    if (activeItem && underLineRef.current) {
-      const {offsetLeft, offsetWidth} = activeItem;
-      underLineRef.current.style.left = `${offsetLeft}px`;
-      underLineRef.current.style.width = `${offsetWidth}px`
-
-    }
-  }, [activeIndex])
   
   return (
     <nav className="navigation">
       <div
-        className="navigation__active-marker"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          height: "2px",
-          background: `${colorsPrimary.main}`,
-          transition: "left 0.3s ease, width 0.3s ease",
-        }}
-        ref={underLineRef}
-      ></div>
-      <div className="navigation__links">
+        className="navigation__links"
+      >
         <NavLink
           to="/"
           className="navigation__logo"
@@ -84,7 +63,6 @@ export const NavMenu = () => {
             style={{ color: `${colorsPrimary.main}` }}
             to={page.path}
             className={getLinkClass}
-            ref={(el) => (currentMenuItemRefs.current[index] = el)}
             onClick={() => handleMenuClick(index)}
           >
             {page.name}
@@ -107,7 +85,8 @@ export const NavMenu = () => {
                 src={loginedUser.photo}
                 sx={{ width: 32, height: 32 }}
               >
-                {!loginedUser.photo && loginedUser.first_name.charAt(0).toUpperCase()}
+                {!loginedUser.photo &&
+                  loginedUser.first_name.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
