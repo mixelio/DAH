@@ -16,6 +16,8 @@ type ContextType = {
   setCurrentUser: (
     value: Pick<User, "first_name" | "email" | "password"> | null
   ) => void;
+  currentDream: Dream | null;
+  setCurrentDream: (value: Dream | null) => void;
   mainFormActive: boolean;
   setMainFormActive: (value: boolean) => void;
   activeIndex: number;
@@ -32,6 +34,8 @@ export const DreamsContext = React.createContext<ContextType>({
   setLoader: () => {},
   currentUser: null,
   setCurrentUser: () => {},
+  currentDream: null,
+  setCurrentDream: () => {},
   mainFormActive: false,
   setMainFormActive: () => {},
   activeIndex: 0,
@@ -47,6 +51,7 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
   const [users, setUsers] = useState<User[]>([]);
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [currentUser, setCurrentUser] = useState<Pick<User, "first_name" | "email" | "password"> | null>(null);
+  const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [mainFormActive, setMainFormActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
@@ -70,6 +75,8 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     setLoader,
     currentUser,
     setCurrentUser,
+    currentDream,
+    setCurrentDream,
     mainFormActive,
     setMainFormActive,
     activeIndex,
@@ -78,7 +85,7 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     setUsers,
     dreams,
     setDreams,
-  }), [loader, currentUser, mainFormActive, activeIndex, users, dreams]);
+  }), [loader, currentUser, mainFormActive, activeIndex, users, dreams, currentDream]);
   
   return (
     <DreamsContext.Provider value={value}>{children}</DreamsContext.Provider>
