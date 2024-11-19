@@ -1,6 +1,10 @@
 import os
 import uuid
+from io import BytesIO
 
+from PIL import Image
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import models
 from django.utils.text import slugify
 
@@ -42,6 +46,23 @@ class Dream(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_dream = Dream.objects.filter(pk=self.pk).first()
+            if old_dream and old_dream.image != self.image:
+                if default_storage.exists(old_dream.image.path):
+                    default_storage.delete(old_dream.image.path)
+
+        if self.image:
+            img = Image.open(self.image)
+            if img.format != 'WEBP':
+                img_io = BytesIO()
+                img = img.convert('RGB')
+                img.save(img_io, format='WEBP', quality=85)
+                img_content = ContentFile(img_io.getvalue(), name=f"{os.path.splitext(self.image.name)[0]}.webp")
+                self.image = img_content
+        super().save(*args, **kwargs)
 
 
 class Comment(models.Model):
