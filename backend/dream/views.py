@@ -12,7 +12,7 @@ from dream.serializers import (
     DreamReadSerializer,
     CommentReadSerializer
 )
-from user.permissions import IsOwnerOrReadOnly
+from user.permissions import IsOwnerAdminOrReadOnly
 
 
 class CommentListCreateView(APIView):
@@ -52,7 +52,7 @@ class LikeCommentView(APIView):
 class DreamViewSet(viewsets.ModelViewSet):
     queryset = Dream.objects.all().select_related('user')
     serializer_class = DreamSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self):
         if self.request.user.is_authenticated:
