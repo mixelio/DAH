@@ -17,6 +17,11 @@ from dream.serializers import (
 class CommentListCreateView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CommentSerializer
+        return CommentReadSerializer
+
     def get(self, request, dream_id):
         comments = Comment.objects.filter(dream__id=dream_id).select_related('dream')
         serializer = CommentReadSerializer(comments, many=True)
