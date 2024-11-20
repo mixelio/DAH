@@ -46,6 +46,7 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     photo = models.ImageField(upload_to=user_image_file_path, null=True, blank=True)
     location = models.CharField(max_length=150, blank=True)
+    num_of_dreams = models.PositiveSmallIntegerField(default=0)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()

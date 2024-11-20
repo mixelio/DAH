@@ -5,7 +5,9 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 from dream.models import Comment, Dream, Contribution
+
 from dream.serializers import (
     CommentSerializer,
     DreamSerializer,
@@ -55,8 +57,6 @@ class DreamViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self):
-        if self.request.user.is_authenticated:
-            dreams = Dream.objects.filter(user=self.request.user).select_related('user')
         category = self.request.query_params.get('category', None)
         if category:
             return self.queryset.filter(category=category)
