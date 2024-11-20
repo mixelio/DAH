@@ -100,19 +100,6 @@ class DreamViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class LikeDreamView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request, dream_id):
-        try:
-            dream = Dream.objects.get(id=dream_id)
-            dream.likes += 1
-            dream.save()
-            return Response({'likes': dream.likes}, status=status.HTTP_200_OK)
-        except Dream.DoesNotExist:
-            return Response({'error': 'Dream not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
 class FulfillDreamView(APIView):
     permission_classes = [IsAuthenticated]
 
