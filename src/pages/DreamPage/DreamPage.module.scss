@@ -1,0 +1,85 @@
+@use '../../assets/styles/utils/vars' as *;
+@use '../../assets/styles/utils/mixins' as *;
+
+$sub-info-width: 20px;
+
+.dream {
+  &__author-info {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+
+    margin-bottom: 22px;
+  }
+  &__category {
+    color: $secondary-main;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  &__title {
+    margin-bottom: 12px;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  // &__dream-info {
+    
+  // }
+
+  &__author-name {
+    margin-bottom: 5px;
+  }
+
+  &__author-location {
+    font-size: 10px;
+    color: $secondary-light;
+  }
+
+  &__main-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    object-position: center;
+    margin-bottom: 20px;
+
+
+    @include on-tablet {
+      height: 250px;
+      margin-bottom: 30px;
+    }
+
+    @include on-desktop {
+      height: 350px;
+      margin-bottom: 40px;
+    }
+  }
+
+  &__sub-info {
+    position: absolute;
+    height: 10px;
+    width: $sub-info-width;
+    background-color: $primary-light;
+    bottom: -5px;
+
+    @for $i from 1 through 3 {
+      &--#{$i} {
+        left: 10px + ($i - 1) * $sub-info-width;
+      }
+    }
+  }
+
+  &__description {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    
+    
+      @include on-tablet {
+        margin-bottom: 30px;
+      }
+    
+      @include on-desktop {
+        margin-bottom: 40px;
+      }
+  }
+}

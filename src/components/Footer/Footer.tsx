@@ -7,7 +7,7 @@ import FacebookIcon from '@mui/icons-material/FacebookTwoTone';
 // import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import {theme} from '../../utils/theme';
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import {DreamsContext} from "../../DreamsContext";
 const colorsPrimary = theme.palette.primary;
 
@@ -17,7 +17,24 @@ const actions = [
 ]
 
 export const Footer = () => {
-  const {setActiveIndex} = useContext(DreamsContext)
+  const {setActiveIndex} = useContext(DreamsContext);
+  const [open, setOpen] = useState(false);
+
+  // #region Function
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  // #endregion
+
+  useEffect(() => {
+    if (open) {
+      window.addEventListener('scroll', handleClose)
+    } else {
+      window.removeEventListener('scroll', handleClose)
+    }
+  }, [open])
+
   return (
     <footer className="footer">
       <div className="container">
@@ -50,6 +67,10 @@ export const Footer = () => {
             icon={
               <SpeedDialIcon icon={<GroupsIcon />} openIcon={<CloseIcon />} />
             }
+            open={open}
+            onTouchStart={() => setOpen(!open)}
+            onMouseEnter={handleOpen}
+            onMouseLeave={handleClose}
           >
             {actions.map((action, index) => (
               <SpeedDialAction
