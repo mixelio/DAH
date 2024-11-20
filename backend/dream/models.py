@@ -39,7 +39,7 @@ class Dream(models.Model):
     category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateTimeField(auto_now_add=True)
     location = models.CharField(max_length=200)
-    likes = models.PositiveIntegerField(default=0)
+    views = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['-date_added']

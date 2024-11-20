@@ -33,7 +33,7 @@ class DreamReadSerializer(DreamSerializer):
             'category',
             'date_added',
             'location',
-            'likes',
+            'views',
             'contributions',
         ]
 
