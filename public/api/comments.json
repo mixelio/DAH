@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "dreamId": 1,
+    "userId": 2,
+    "commentBody": "Really big dream"
+  },
+  {
+    "id": 2,
+    "dreamId": 1,
+    "userId": 3,
+    "commentBody": "It is crazy"
+  },
+  {
+    "id": 3,
+    "dreamId": 5,
+    "userId": 1,
+    "commentBody": "I don't know what can I write here"
+  }
+]

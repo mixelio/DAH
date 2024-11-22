@@ -9,24 +9,28 @@ import {DreamsGalleryPage} from './pages/DreamsGalleryPage/DreamsGalleryPage.tsx
 import {AboutUsPage} from './pages/AboutUsPage/AboutUsPage.tsx'
 import {NotFoundPage} from './pages/NotFoundPage/NotFoundPage.tsx'
 import {DreamPage} from './pages/DreamPage/DreamPage.tsx'
+import {ThemeProvider} from '@mui/material'
+import {theme} from './utils/theme.ts'
 
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <DreamsProvider>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<App />}>
-            <Route index element={<HomePage />} />
-            <Route path="dreams">
-              <Route index element={<DreamsGalleryPage />} />
-              <Route path=":id?" element={<DreamPage />} />
+      <ThemeProvider theme={theme}>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route index element={<HomePage />} />
+              <Route path="dreams">
+                <Route index element={<DreamsGalleryPage />} />
+                <Route path=":id?" element={<DreamPage />} />
+              </Route>
+              <Route path="aboutus" element={<AboutUsPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
-            <Route path="aboutus" element={<AboutUsPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </HashRouter>
+          </Routes>
+        </HashRouter>
+      </ThemeProvider>
     </DreamsProvider>
   </StrictMode>
 );

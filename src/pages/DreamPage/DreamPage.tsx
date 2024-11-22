@@ -1,13 +1,21 @@
 import {useContext, useEffect, useState} from "react"
 import {DreamsContext} from "../../DreamsContext"
 import {Link, useParams} from "react-router-dom";
-import {Avatar, Divider} from "@mui/material";
+import {Avatar, Button, CircularProgress, Divider, IconButton, TextField} from "@mui/material";
 import {User} from "../../types/User";
 import {getAuthor} from "../../utils/getAuthor";
+import FaceIcon from "@mui/icons-material/Face";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import LinearProgress from "@mui/material/LinearProgress";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import SendIcon from "@mui/icons-material/Send";
+import {Comment} from "../../components/Comment/Comment";
+import { CommentType } from "../../types/Comment";
 
 export const DreamPage = () => {
-  const { currentDream, dreams, setCurrentDream, users } = useContext(DreamsContext);
+  const { currentDream, dreams, setCurrentDream, users, currentUser, loader, setLoader, comments } = useContext(DreamsContext);
   const [author, setAuthor] = useState<User | null>(null);
+  const [postComments, setPostComments] = useState<CommentType[] | null>(null)
   const { id } = useParams();
 
   useEffect(() => {
@@ -15,9 +23,15 @@ export const DreamPage = () => {
     if (currentDream && users) {
       setAuthor(getAuthor(currentDream.userId, users) || null)
     }
-    
   }, [id, dreams, users, currentDream, setCurrentDream])
-  
+
+  useEffect(() => {
+    if(comments && currentDream) {
+      setPostComments(comments.filter(item => item.dreamId === currentDream.id))
+      setLoader(false);
+    }
+    
+  }, [comments, currentDream, setLoader])
 
   return (
     <section className="dream">
@@ -48,12 +62,90 @@ export const DreamPage = () => {
                   src={currentDream.image}
                   alt=""
                 />
-                <div className="dream__sub-info dream__sub-info--1"></div>
-                <div className="dream__sub-info dream__sub-info--2"></div>
-                <div className="dream__sub-info dream__sub-info--3"></div>
               </div>
+              <div className="dream__sub-info-box">
+                <div className="dream__sub-info dream__sub-info--1">
+                  <FaceIcon />
+                  <span>24</span>
+                </div>
+                <div className="dream__sub-info dream__sub-info--2">
+                  <ChatBubbleOutlineIcon />
+                  <span>10</span>
+                </div>
+                <div className="dream__sub-info dream__sub-info--3 dream__progress">
+                  {currentDream.category === "money" ? (
+                    <LinearProgress
+                      variant="determinate"
+                      value={25}
+                      sx={{ width: "100%" }}
+                    />
+                  ) : (
+                    <>
+                      <HourglassEmptyIcon />
+                      <span>waiting...</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <Divider sx={{ mb: 2 }} />
               <p className="dream__description">{currentDream.description}</p>
               <Divider sx={{ mb: 2 }} />
+              <div className="dream__after-info">
+                {currentDream.category === "money" ? (
+                  <Button
+                    variant="contained"
+                    className="dream__donation-btn button"
+                    size="large"
+                  >
+                    Donate
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    className="dream__help-btn button"
+                  >
+                    I am with you
+                  </Button>
+                )}
+                <div className="dream__date">{currentDream.created}</div>
+              </div>
+            </div>
+            <div className="dream__comments-box">
+              {!currentUser ? (
+                <p className="dream__comments-info-message">
+                  Only authorized users can comment
+                </p>
+              ) : (
+                <form method="POST" action="/" className="dream__comment-form">
+                  <TextField
+                    id="outlined-multiline-static"
+                    className="dream__comment-input"
+                    label="Write yor comment..."
+                    multiline
+                    minRows={2}
+                  />
+                  <IconButton aria-label="sent" className="dream__comment-send">
+                    <SendIcon />
+                  </IconButton>
+                </form>
+              )}
+              {loader ? (
+                <CircularProgress />
+              ) : (
+                <div className="dream__comments">
+                  <Divider textAlign="center" sx={{ mb: 2, mt: 2}}>
+                    Comments
+                  </Divider>
+
+                  {postComments && postComments.length > 0 ? (
+                    postComments.map((item, index) => (
+                      <Comment key={item.id || index} comment={item} />
+                    ))
+                  ) : (
+                    <p className="dream__comments-info-message">no comments</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}

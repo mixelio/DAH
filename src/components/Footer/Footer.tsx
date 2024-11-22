@@ -51,7 +51,7 @@ export const Footer = () => {
               className="footer__nav-link"
               onClick={() => setActiveIndex(0)}
             >
-              About_Us
+              About Us
             </NavLink>
             <NavLink
               to="/contacts"

@@ -7,4 +7,5 @@ export type Dream = {
   cost: number;
   category: string;
   location: string;
+  created: string;
 }

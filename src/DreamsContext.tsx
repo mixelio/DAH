@@ -4,6 +4,8 @@ import {getUsers} from './services/users';
 import {Dream} from './types/Dream';
 import {getDreams} from './services/dreams';
 import {preloadImages} from './utils/preloadImages';
+import {getComments} from './services/comments';
+import {CommentType} from './types/Comment';
 
 type Props = {
   children: React.ReactNode;
@@ -26,6 +28,8 @@ type ContextType = {
   setUsers: (value: User[]) => void;
   dreams: Dream[];
   setDreams: (value: Dream[]) => void;
+  comments: CommentType[];
+  setComments: (value: CommentType[]) => void;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -43,13 +47,16 @@ export const DreamsContext = React.createContext<ContextType>({
   users: [],
   setUsers: () => {},
   dreams: [],
-  setDreams: () => {}
+  setDreams: () => {},
+  comments: [],
+  setComments: () => {},
 });
 
 export const DreamsProvider: React.FC<Props> = ({children}) => {
   const [loader, setLoader] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [dreams, setDreams] = useState<Dream[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [currentUser, setCurrentUser] = useState<Pick<User, "first_name" | "email" | "password"> | null>(null);
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [mainFormActive, setMainFormActive] = useState(false);
@@ -57,9 +64,12 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
 
   useEffect(() => {
     setLoader(true);
-    getUsers().then((res) => setUsers([...res]));
+    getUsers()
+    .then((res) => setUsers([...res]));
     getDreams()
     .then((res) => setDreams([...res]));
+    getComments()
+      .then((res) => setComments([...res]));
   }, [])
 
   useEffect(() => {
@@ -85,7 +95,9 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     setUsers,
     dreams,
     setDreams,
-  }), [loader, currentUser, mainFormActive, activeIndex, users, dreams, currentDream]);
+    comments,
+    setComments,
+  }), [loader, currentUser, mainFormActive, activeIndex, users, dreams, currentDream, comments]);
   
   return (
     <DreamsContext.Provider value={value}>{children}</DreamsContext.Provider>
