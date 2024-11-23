@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'dream',
-    'user'
+    'user',
+    'payment',
 ]
 
 MIDDLEWARE = [
