@@ -1,3 +1,6 @@
+from abc import ABC, abstractmethod
+
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -100,39 +103,68 @@ class DreamViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+class DreamHandler(ABC):
+    @abstractmethod
+    def handle(self, dream, user, data):
+        raise NotImplementedError("This method should be implemented by subclasses.")
+
+
+class MoneyDreamHandler(DreamHandler):
+    def handle(self, dream, user, data):
+        contribution_amount = data.get('contribution_amount', 0)
+        if contribution_amount <= 0:
+            raise ValueError("Contribution must be a positive integer.")
+        dream.accumulated += contribution_amount
+        if dream.accumulated >= dream.cost:
+            dream.status = Dream.Status.COMPLETED
+        else:
+            dream.status = Dream.Status.PENDING
+
+
+class NonMoneyDreamHandler(DreamHandler):
+    def handle(self, dream, user, data):
+        contribution_description = data.get('contribution_description', '')
+        if not contribution_description:
+            raise ValueError("Description of contribution is required for this category.")
+        Contribution.objects.create(dream=dream, user=user, description=contribution_description)
+        dream.status = Dream.Status.COMPLETED
+
+
 class FulfillDreamView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, dream_id):
         dream = get_object_or_404(Dream, id=dream_id)
+        user = request.user
 
-        if dream.category == Dream.Category.MONEY:
-            contribution_amount = request.data.get('contribution_amount', 0)
-            if contribution_amount <= 0:
-                return Response(
-                    {'error': 'Contribution must be a positive integer.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            dream.accumulated += contribution_amount
-            if dream.accumulated >= dream.cost:
-                dream.status = Dream.Status.COMPLETED
-            else:
-                dream.status = Dream.Status.PENDING
-
-        elif dream.category in {Dream.Category.SERVICES, Dream.Category.GIFTS}:
-            contribution_description = request.data.get('contribution_description', '')
-            if not contribution_description:
-                return Response(
-                    {'error': 'Description of contribution is required for this category.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            Contribution.objects.create(
-                dream=dream,
-                user=request.user,
-                description=contribution_description
+        if dream.status == Dream.Status.COMPLETED:
+            return Response(
+                {'error': 'This dream has already been fulfilled.'},
+                status=status.HTTP_400_BAD_REQUEST
             )
-            dream.status = Dream.Status.COMPLETED
+
+        handlers = {
+            Dream.Category.MONEY: MoneyDreamHandler(),
+            Dream.Category.SERVICES: NonMoneyDreamHandler(),
+            Dream.Category.GIFTS: NonMoneyDreamHandler(),
+        }
+
+        handler = handlers.get(dream.category)
+        if not handler:
+            return Response(
+                {'error': 'Unsupported dream category.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            handler.handle(dream, user, request.data)
+        except ValueError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         dream.save()
+        user.num_of_dreams = F('num_of_dreams') + 1
+        user.save()
+        user.refresh_from_db()
+
         serializer = DreamReadSerializer(dream)
         return Response(serializer.data, status=status.HTTP_200_OK)
