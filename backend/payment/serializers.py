@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from payments.models import Payment
+from payment.models import Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -8,8 +8,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "type",
-            "borrowing_id",
+            "dream_id",
             "session_url",
             "session_id",
             "money_to_pay",
