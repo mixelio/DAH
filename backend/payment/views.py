@@ -29,13 +29,13 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class PaymentSuccessTempView(APIView):
     def get(self, request):
-        session_id = request.GET.get("session_id")
+        session_id = request.GET.get('session_id')
         if session_id:
             return redirect(
-                reverse("payments:payments-success", kwargs={"session_id": session_id})
+                reverse('payments:payments-success', kwargs={'session_id': session_id})
             )
         return Response(
-            {"error": "Session ID not found."}, status=status.HTTP_400_BAD_REQUEST
+            {'error': 'Session ID not found.'}, status=status.HTTP_400_BAD_REQUEST
         )
 
 
@@ -46,21 +46,21 @@ class PaymentSuccessView(APIView):
         try:
             session = stripe.checkout.Session.retrieve(session_id)
 
-            if session.payment_status == "paid":
+            if session.payment_status == 'paid':
                 try:
                     payment = Payment.objects.get(session_id=session_id)
                     payment.status = Payment.StatusChoices.PAID
                     payment.save()
-                    return Response({"message": "Payment successful."})
+                    return Response({'message': 'Payment successful.'})
                 except Payment.DoesNotExist:
-                    return Response({"error": "Payment not found."}, status=404)
+                    return Response({'error': 'Payment not found.'}, status=404)
             else:
-                return Response({"message": "Payment not completed."}, status=400)
+                return Response({'message': 'Payment not completed.'}, status=400)
 
         except stripe.error.StripeError as e:
-            return Response({"stripe_error": str(e)}, status=500)
+            return Response({'stripe_error': str(e)}, status=500)
         except Exception as e:
-            return Response({"other_error": str(e)}, status=500)
+            return Response({'other_error': str(e)}, status=500)
 
 
 class PaymentCancelView(APIView):
@@ -68,5 +68,5 @@ class PaymentCancelView(APIView):
 
     def get(self, request):
         return Response(
-            {"message": "Payment was cancelled. You can pay again within 24 hours."}
+            {'message': 'Payment was cancelled. You can pay again within 24 hours.'}
         )

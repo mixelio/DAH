@@ -9,17 +9,17 @@ from payment.views import (
 )
 
 router = DefaultRouter()
-router.register("payment", PaymentViewSet, basename="payment")
+router.register('payment', PaymentViewSet, basename='payment')
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path('', include(router.urls)),
     path(
-        "payments/success/<str:session_id>/",
+        'payments/success/<str:session_id>/',
         PaymentSuccessView.as_view(),
-        name="payment-success",
+        name='payment-success',
     ),
-    path("payments/cancel/", PaymentCancelView.as_view(), name="payment-cancel"),
-    path("checkout/", PaymentSuccessTempView.as_view(), name="checkout-success"),
+    path('payments/cancel/', PaymentCancelView.as_view(), name='payment-cancel'),
+    path('checkout/', PaymentSuccessTempView.as_view(), name='checkout-success'),
 ]
 
-app_name = "payment"
+app_name = 'payment'
