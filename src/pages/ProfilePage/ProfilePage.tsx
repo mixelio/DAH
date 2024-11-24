@@ -1,6 +1,7 @@
-import {useContext, useRef} from "react"
+import {useContext} from "react"
 import {DreamsContext} from "../../DreamsContext"
 import {Avatar, Divider, IconButton} from "@mui/material";
+import { useMediaQuery } from "react-responsive";
 import {getUser} from "../../utils/getUser";
 import {useParams} from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,24 +14,51 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 export const ProfilePage = () => {
   const { users, dreams } = useContext(DreamsContext)
 
-  const prevRef = useRef<HTMLButtonElement | null>(null);
-  const nextRef = useRef<HTMLButtonElement | null>(null);
+  // const prevRef = useRef<HTMLButtonElement | null>(null);
+  // const nextRef = useRef<HTMLButtonElement | null>(null);
+
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
   const {id} = useParams();
   const currentProfile = id !== undefined ? getUser(+id, users) : null;
   const dreamsOfUser = dreams.filter(dream => dream.userId === currentProfile?.id);
 
+  // useEffect(() => {
+  //   const newPrevElement = document.querySelector(
+  //     `profile-prev-btn-${currentProfile?.id}`
+  //   );
+  //   const newNextElement = document.querySelector(
+  //     `profile-next-btn-${currentProfile?.id}`
+  //   );
+
+  //   prevRef.current = newPrevElement as HTMLButtonElement | null;
+  //   nextRef.current = newNextElement as HTMLButtonElement | null;
+  // }, [currentProfile])
+
+    const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
+    const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });
+
+    const slidesPerView = () => {
+      if (isDesctop) {
+        return 3;
+      }
+
+      if (isTablet) {
+        return 2;
+      }
+
+      return 1;
+    };
+
   return (
     <section className="profile">
-      {ownerProfile?.id === currentProfile?.id && (
-        <IconButton className="profile__edit-btn">
-          <ManageAccountsIcon sx={{ width: "28px", height: "28px" }} />
-        </IconButton>
-      )}
-
       <div className="container">
         <div className="profile__main-info">
+          {ownerProfile?.id === currentProfile?.id && (
+            <IconButton className="profile__edit-btn">
+              <ManageAccountsIcon sx={{ width: "28px", height: "28px" }} />
+            </IconButton>
+          )}
           <div className="profile__image-box">
             <Avatar
               alt={currentProfile?.first_name}
@@ -49,11 +77,11 @@ export const ProfilePage = () => {
           className="profile__slider"
           modules={[Navigation]}
           navigation={{
-            prevEl: prevRef.current,
-            nextEl: nextRef.current,
+            prevEl: `#profile-prev-btn-${currentProfile?.id}`,
+            nextEl: `#profile-next-btn-${currentProfile?.id}`,
           }}
           spaceBetween={30}
-          slidesPerView={1}
+          slidesPerView={slidesPerView()}
         >
           {dreamsOfUser &&
             dreamsOfUser.map((dream, index) => (
@@ -62,7 +90,7 @@ export const ProfilePage = () => {
               </SwiperSlide>
             ))}
           <IconButton
-            ref={prevRef}
+            id={`profile-prev-btn-${currentProfile?.id}`}
             style={{
               position: "absolute",
               background: "#fff",
@@ -75,7 +103,7 @@ export const ProfilePage = () => {
             <ArrowBackIosNewIcon />
           </IconButton>
           <IconButton
-            ref={nextRef}
+            id={`profile-next-btn-${currentProfile?.id}`}
             style={{
               position: "absolute",
               background: "#fff",

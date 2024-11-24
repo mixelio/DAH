@@ -1,16 +1,17 @@
 @use '../../assets/styles/utils/vars' as *;
+@use '../../assets/styles/utils/mixins' as *;
 
 .profile {
-  position: relative;
 
   & &__edit-btn {
     position: absolute;
     top: 0;
-    right: $container-padding--mobile;
+    right: 0;
     transform: translateY(-100%);
   }
 
   &__main-info {
+    position: relative;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -25,6 +26,12 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
+    max-width: 740px;
+    margin: 0 auto;
+
+    @include on-tablet {
+
+    }
   }
 
   &__name {
