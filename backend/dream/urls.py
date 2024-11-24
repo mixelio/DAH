@@ -11,11 +11,11 @@ from dream.views import (
 app_name = 'dream'
 
 router = DefaultRouter()
-router.register(r'dreams', DreamViewSet)
+router.register(r'dream', DreamViewSet)
 
 urlpatterns = [
-    path('dreams/<int:dream_id>/comments/', CommentListCreateView.as_view(), name='comment'),
-    path('comments/<int:comment_id>/like/', LikeCommentView.as_view(), name='like-comment'),
-    path('dreams/<int:dream_id>/fulfill/', FulfillDreamView.as_view(), name='fulfill-dream'),
+    path('dream/<int:dream_id>/comments/', CommentListCreateView.as_view(), name='comment'),
+    path('comment/<int:comment_id>/like/', LikeCommentView.as_view(), name='like-comment'),
+    path('dream/<int:dream_id>/fulfill/', FulfillDreamView.as_view(), name='fulfill-dream'),
     path('', include(router.urls))
 ]

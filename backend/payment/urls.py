@@ -14,11 +14,11 @@ router.register('payment', PaymentViewSet, basename='payment')
 urlpatterns = [
     path('', include(router.urls)),
     path(
-        'payments/success/<str:session_id>/',
+        'payment/success/<str:session_id>/',
         PaymentSuccessView.as_view(),
         name='payment-success',
     ),
-    path('payments/cancel/', PaymentCancelView.as_view(), name='payment-cancel'),
+    path('payment/cancel/', PaymentCancelView.as_view(), name='payment-cancel'),
     path('checkout/', PaymentSuccessTempView.as_view(), name='checkout-success'),
 ]
 
