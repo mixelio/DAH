@@ -1,6 +1,6 @@
 import {Avatar, Button, Divider, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
 import {useContext, useState} from 'react';
-import {NavLink} from 'react-router-dom'
+import {NavLink, useNavigate} from 'react-router-dom'
 import logo from "../../assets/images/main-logo.png";
 import classNames from 'classnames';
 import {DreamsContext} from '../../DreamsContext';
@@ -16,11 +16,19 @@ const colorsPrimary = theme.palette.primary;
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { currentUser, setMainFormActive, setActiveIndex, users, setCurrentUser } =
-    useContext(DreamsContext);
+  const {
+    setMainFormActive, 
+    setActiveIndex, 
+    users } = useContext(DreamsContext);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const userFromLocaleStorage = localStorage.getItem("currentUser");
 
-  const loginedUser = currentUser ? getUser(currentUser, users) : null;
+
+
+  const loginedUser = userFromLocaleStorage
+    ? getUser(+userFromLocaleStorage, users)
+    : null;
 
   const handleMenuClick = (index: number) => {
     setActiveIndex(index)
@@ -127,9 +135,9 @@ export const NavMenu = () => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={() => navigate(`profile/${loginedUser.id}`)}>Profile</MenuItem>
             <Divider />
-            <MenuItem onClick={() => setCurrentUser(null)}>Logout</MenuItem>
+            <MenuItem onClick={() => localStorage.setItem('currentUser', '')}>Logout</MenuItem>
           </Menu>
         </div>
       ) : (

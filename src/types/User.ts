@@ -6,5 +6,6 @@ export type User = {
   last_name: string,
   photo: string,
   location: string,
+  about_me: string,
   password: string,
 }

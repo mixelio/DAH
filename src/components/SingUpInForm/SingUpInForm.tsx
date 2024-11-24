@@ -149,7 +149,9 @@ export const SingUpInForm = () => {
     }
 
     if(checkUser.password === loginData.password) {
+      const currUser = checkUser.id.toString();
       setCurrentUser(checkUser);
+      localStorage.setItem("currentUser", currUser);
       setLoginData({
         login: '',
         password: '',
@@ -168,7 +170,7 @@ export const SingUpInForm = () => {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   // #endregion
-
+  
   return (
     <>
       {/* fullscreen dark background for the form*/}

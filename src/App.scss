@@ -1,8 +1,10 @@
+
 @use './assets/styles/utils/nullstyle' as *;
 @use './assets/styles/utils/fonts' as *;
 @use './assets/styles/utils/vars' as *;
 @use './assets/styles/utils/mixins' as *;
 @use './assets/styles/page.module' as *;
+
 
 @use './components/SingUpInForm/SingUpInForm.module' as *;
 @use './components/Header/Header.module' as *;
@@ -12,3 +14,6 @@
 @use './pages/DreamsGalleryPage/DreamsGalleryPage.module' as *;
 @use './pages/DreamPage/DreamPage.module' as *;
 @use './components/Comment/Comment.module' as *;
+@use './pages/ProfilePage/ProfilePage.module' as *;
+@import 'swiper/css';
+@import 'swiper/css/navigation';

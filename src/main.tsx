@@ -11,6 +11,8 @@ import {NotFoundPage} from './pages/NotFoundPage/NotFoundPage.tsx'
 import {DreamPage} from './pages/DreamPage/DreamPage.tsx'
 import {ThemeProvider} from '@mui/material'
 import {theme} from './utils/theme.ts'
+import {ContactsPage} from './pages/ContactsPage/ContactsPage.tsx'
+import {ProfilePage} from './pages/ProfilePage/ProfilePage.tsx'
 
 
 createRoot(document.getElementById("root")!).render(
@@ -26,6 +28,8 @@ createRoot(document.getElementById("root")!).render(
                 <Route path=":id?" element={<DreamPage />} />
               </Route>
               <Route path="aboutus" element={<AboutUsPage />} />
+              <Route path="contacts" element={<ContactsPage />} />
+              <Route path="profile/:id?" element={<ProfilePage />}/>
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>

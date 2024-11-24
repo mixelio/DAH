@@ -11,27 +11,45 @@ import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import SendIcon from "@mui/icons-material/Send";
 import {Comment} from "../../components/Comment/Comment";
 import { CommentType } from "../../types/Comment";
+import {getUser} from "../../utils/getUser";
 
 export const DreamPage = () => {
-  const { currentDream, dreams, setCurrentDream, users, currentUser, loader, setLoader, comments } = useContext(DreamsContext);
+  const {
+    currentDream,
+    dreams,
+    setCurrentDream,
+    users,
+    // currentUser,
+    loader,
+    setLoader,
+    comments,
+  } = useContext(DreamsContext);
   const [author, setAuthor] = useState<User | null>(null);
-  const [postComments, setPostComments] = useState<CommentType[] | null>(null)
+  const [postComments, setPostComments] = useState<CommentType[] | null>(null);
   const { id } = useParams();
+  const userFromLocaleStorage = localStorage.getItem("currentUser");
+  const [loginedUser, setLoginedUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const tempUser = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) ?? null : null;
+      setLoginedUser(tempUser);
+  }, [userFromLocaleStorage, users])
 
   useEffect(() => {
     setCurrentDream(dreams.find((dream) => String(dream.id) === id) || null);
     if (currentDream && users) {
-      setAuthor(getAuthor(currentDream.userId, users) || null)
+      setAuthor(getAuthor(currentDream.userId, users) || null);
     }
-  }, [id, dreams, users, currentDream, setCurrentDream])
+  }, [id, dreams, users, currentDream, setCurrentDream]);
 
   useEffect(() => {
-    if(comments && currentDream) {
-      setPostComments(comments.filter(item => item.dreamId === currentDream.id))
+    if (comments && currentDream) {
+      setPostComments(
+        comments.filter((item) => item.dreamId === currentDream.id)
+      );
       setLoader(false);
     }
-    
-  }, [comments, currentDream, setLoader])
+  }, [comments, currentDream, setLoader]);
 
   return (
     <section className="dream">
@@ -40,7 +58,7 @@ export const DreamPage = () => {
           <div className="dream__content">
             <p className="dream__category">{currentDream.category}</p>
             <h2 className="dream__title">{currentDream.name}</h2>
-            <Link to={`/${author.id}`} className="dream__author-info">
+            <Link to={`/profile/${author.id}`} className="dream__author-info">
               <Avatar
                 className="dream-cart__author-avatar"
                 alt="Remy Sharp"
@@ -111,7 +129,7 @@ export const DreamPage = () => {
               </div>
             </div>
             <div className="dream__comments-box">
-              {!currentUser ? (
+              {!loginedUser ? (
                 <p className="dream__comments-info-message">
                   Only authorized users can comment
                 </p>
@@ -133,7 +151,7 @@ export const DreamPage = () => {
                 <CircularProgress />
               ) : (
                 <div className="dream__comments">
-                  <Divider textAlign="center" sx={{ mb: 2, mt: 2}}>
+                  <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
                     Comments
                   </Divider>
 

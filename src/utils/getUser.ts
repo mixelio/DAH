@@ -1,8 +1,8 @@
 import {User} from "../types/User";
 
 export const getUser = (
-  user: Pick<User, "first_name" | "email" | "password">,
+  userId: number,
   users: User[],
 ) => {
-  return users.find(item => item.email === user.email);
+  return users.find(item => item.id === userId);
 };

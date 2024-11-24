@@ -15,7 +15,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
 
   return (
     <Link
-      to={String(dream.id)}
+      to={`/dreams/${dream.id}`}
       className="dream-cart"
     >
       <img
