@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from decimal import Decimal
 
 from django.db.models import F
 from django.shortcuts import get_object_or_404
@@ -10,6 +11,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from dream.models import Comment, Dream, Contribution
+from payment.serializers import PaymentSerializer
+
+from utils.stripe_helpers import create_stripe_session
 
 from dream.serializers import (
     CommentSerializer,
@@ -105,27 +109,37 @@ class DreamViewSet(viewsets.ModelViewSet):
 
 class DreamHandler(ABC):
     @abstractmethod
-    def handle(self, dream, user, data):
-        raise NotImplementedError("This method should be implemented by subclasses.")
+    def handle(self, dream, user, data, request=None):
+        raise NotImplementedError('This method should be implemented by subclasses.')
 
 
 class MoneyDreamHandler(DreamHandler):
-    def handle(self, dream, user, data):
+    def handle(self, dream, user, data, request=None):
+        if not request:
+            raise ValueError("Request object is required for this operation.")
+
         contribution_amount = data.get('contribution_amount', 0)
         if contribution_amount <= 0:
-            raise ValueError("Contribution must be a positive integer.")
+            raise ValueError('Contribution must be a positive integer.')
+
+        remaining_balance = dream.cost - (dream.accumulated or 0)
+
+        if contribution_amount > remaining_balance:
+            raise ValueError(f'Contribution exceeds the remaining balance: {remaining_balance}.')
+        try:
+            payment = create_stripe_session(dream.id, Decimal(contribution_amount), request)
+        except Exception as e:
+            print(f'stripe_exception: {e}')
         dream.accumulated += contribution_amount
-        if dream.accumulated >= dream.cost:
-            dream.status = Dream.Status.COMPLETED
-        else:
-            dream.status = Dream.Status.PENDING
+
+        return payment
 
 
 class NonMoneyDreamHandler(DreamHandler):
     def handle(self, dream, user, data):
         contribution_description = data.get('contribution_description', '')
         if not contribution_description:
-            raise ValueError("Description of contribution is required for this category.")
+            raise ValueError('Description of contribution is required for this category.')
         Contribution.objects.create(dream=dream, user=user, description=contribution_description)
         dream.status = Dream.Status.COMPLETED
 
@@ -157,7 +171,7 @@ class FulfillDreamView(APIView):
             )
 
         try:
-            handler.handle(dream, user, request.data)
+            response = handler.handle(dream, user, request.data, request)
         except ValueError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -165,6 +179,8 @@ class FulfillDreamView(APIView):
         user.num_of_dreams = F('num_of_dreams') + 1
         user.save()
         user.refresh_from_db()
-
+        if response:
+            serializer = PaymentSerializer(response)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = DreamReadSerializer(dream)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
