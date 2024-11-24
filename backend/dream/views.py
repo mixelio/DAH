@@ -19,7 +19,7 @@ from dream.serializers import (
     CommentSerializer,
     DreamSerializer,
     DreamReadSerializer,
-    CommentReadSerializer
+    CommentReadSerializer, ContributionSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
 
@@ -141,8 +141,9 @@ class NonMoneyDreamHandler(DreamHandler):
         contribution_description = data.get('contribution_description', '')
         if not contribution_description:
             raise ValueError('Description of contribution is required for this category.')
-        Contribution.objects.create(dream=dream, user=user, description=contribution_description)
+        contribution = Contribution.objects.create(dream=dream, user=user, description=contribution_description)
         dream.status = Dream.Status.COMPLETED
+        return contribution
 
 
 class FulfillDreamView(APIView):
@@ -183,5 +184,5 @@ class FulfillDreamView(APIView):
         if response:
             serializer = PaymentSerializer(response)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = DreamReadSerializer(dream)
+        serializer = ContributionSerializer(response)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
