@@ -13,6 +13,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -163,8 +167,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-STRIPE_PUBLISHABLE_KEY = "pk_test_51Q2wgyGRVZqdEvS6t3QA0h8jEt4pYncOCvcjESl1UzVCie3MSlJkmm8oCI2JBMR8HcppxsLxF43hiskcHvZyhxG200U74C7ePe"
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Q2wgyGRVZqdEvS6t3QA0h8jEt4pYncOCvcjESl1UzVCie3MSlJkmm8oCI2JBMR8HcppxsLxF43hiskcHvZyhxG200U74C7ePe'
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
