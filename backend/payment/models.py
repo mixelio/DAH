@@ -5,7 +5,7 @@ class Payment(models.Model):
     class StatusChoices(models.TextChoices):
         PENDING = 'PENDING'
         PAID = 'PAID'
-
+    user_id = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=10, choices=StatusChoices.choices)
     dream_id = models.PositiveIntegerField()
     session_url = models.URLField(max_length=500)

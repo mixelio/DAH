@@ -21,7 +21,7 @@ class PaymentViewSet(ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet
         if user.is_staff:
             return Payment.objects.all()
         if user.is_authenticated:
-            return Payment.objects.filter(user=user)
+            return Payment.objects.filter(user_id=user.id)
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -32,7 +32,7 @@ class PaymentSuccessTempView(APIView):
         session_id = request.GET.get('session_id')
         if session_id:
             return redirect(
-                reverse('payments:payments-success', kwargs={'session_id': session_id})
+                reverse('payment:payment-success', kwargs={'session_id': session_id})
             )
         return Response(
             {'error': 'Session ID not found.'}, status=status.HTTP_400_BAD_REQUEST
