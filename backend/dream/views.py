@@ -116,7 +116,7 @@ class DreamHandler(ABC):
 class MoneyDreamHandler(DreamHandler):
     def handle(self, dream, user, data, request=None):
         if not request:
-            raise ValueError("Request object is required for this operation.")
+            raise ValueError('Request object is required for this operation.')
 
         contribution_amount = data.get('contribution_amount', 0)
         if contribution_amount <= 0:
@@ -131,6 +131,7 @@ class MoneyDreamHandler(DreamHandler):
         except Exception as e:
             print(f'stripe_exception: {e}')
         dream.accumulated += contribution_amount
+        dream.save(update_fields=['accumulated'])
 
         return payment
 
