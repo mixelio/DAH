@@ -16,7 +16,7 @@
     "is_staff": false,
     "first_name": "Mosi",
     "last_name": "",
-    "photo": "https://mixelio.github.io/DAH/media/uploads/users/irene-strong-v2aKnjMbP_k-unsplash.jpg",
+    "photo": "media/uploads/users/irene-strong-v2aKnjMbP_k-unsplash.jpg",
     "location": "New Yourk, USA",
     "about_me": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, similique quo quas est tempore modi numquam mollitia. Sunt omnis quod suscipit minus voluptatem esse debitis laborum, maiores cumque, recusandae ipsum! Dolores in nostrum perferendis quas dignissimos exercitationem.",
     "password": "12345"
@@ -27,7 +27,7 @@
     "is_staff": false,
     "first_name": "Lisa",
     "last_name": "Smit",
-    "photo": "https://mixelio.github.io/DAH/media/uploads/users/fleur-kaan-w4Dj3MshHQ0-unsplash.jpg",
+    "photo": "media/uploads/users/fleur-kaan-w4Dj3MshHQ0-unsplash.jpg",
     "location": "Arnstadt, German",
     "about_me": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium, similique quo quas est tempore modi numquam mollitia. Sunt omnis quod suscipit minus voluptatem esse debitis laborum, maiores cumque, recusandae ipsum! Dolores in nostrum perferendis quas dignissimos exercitationem.",
     "password": "12345"

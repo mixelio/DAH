@@ -1,5 +1,7 @@
 export const getDreams = () => {
-  return fetch("https://mixelio.github.io/DAH/api/dreams.json").then((response) => {
+  const baseURL = import.meta.env.BASE_URL;
+
+  return fetch(`${baseURL}api/dreams.json`).then((response) => {
     if (!response.ok) {
       console.log("not ok");
     }

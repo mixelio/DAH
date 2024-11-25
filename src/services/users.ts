@@ -1,10 +1,12 @@
-export const getUsers = () => {
-  return fetch("https://mixelio.github.io/DAH/api/users.json")
-    .then((response) => {
-      if (!response.ok) {
-        console.log('not ok');
-      }
 
-      return response.json();
-    })
+export const getUsers = () => {
+  const baseURL = import.meta.env.BASE_URL;
+
+  return fetch(`${baseURL}api/users.json`).then((response) => {
+    if (!response.ok) {
+      console.log("not ok");
+    }
+
+    return response.json();
+  });
 }
