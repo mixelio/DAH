@@ -1,4 +1,5 @@
 @use '../../assets/styles/utils/vars' as *;
+@use '../../assets/styles/utils/mixins' as *;
 
 $underline-width: attr(data-width);
 
@@ -7,27 +8,65 @@ $underline-width: attr(data-width);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  column-gap: 16px;
+  
+    @include on-tablet {
+      column-gap: 20px;
+    }
+  
+    @include on-desktop {
+      column-gap: 24px;
+    }
+
+  & &__in-btn {
+    font-size: 16px;
+    text-transform: uppercase;
+    transition-duration: 300ms;
+    color: $main-background;
+  }
 
   &__links {
+    flex: 1;
     display: flex;
+    justify-content: space-between;
     align-items: center;
+  }
+
+  &__pages {
+    display: flex;
     column-gap: 16px;
+
+    @include on-tablet {
+      column-gap: 20px;
+    }
+
+    @include on-desktop {
+      column-gap: 24px;
+    }
   }
 
   &__link {
     position: relative;
     display: block;
     font-size: 16px;
+    font-weight: 600;
     text-transform: uppercase;
     transition-duration: 300ms;
     color: $primary-main;
     z-index: 2;
-    // overflow: hidden;
+
+    @include on-tablet {
+      font-size: 20px;
+    }
+
+    @include on-desktop {
+      font-size: 24px;
+    }
 
     &::after {
       content: '';
       position: absolute;
-      bottom: -30px;
+      bottom: -10px;
       left: 0;
       height: 2px;
       width: 100%;
@@ -48,18 +87,42 @@ $underline-width: attr(data-width);
     &:hover {
       color: #476671e0;
     }
-
-    
   }
 
   &__logo {
     margin-right: 10px;
-    display: block;
-    width: 32px;
-    height: 32px;
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $primary-main;
 
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+    @include on-tablet {
+      column-gap: 20px;
+      font-size: 22px;
+    }
+
+    @include on-desktop {
+      column-gap: 24px;
+      font-size: 26px;
+    }
+
+    &-img {
+      width: 32px;
+      height: 32px;
+
+      @include on-tablet {
+        width: 36px;
+        height: 36px;
+      }
+    
+      @include on-desktop {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+
   }
 }

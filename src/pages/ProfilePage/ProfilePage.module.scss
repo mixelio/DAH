@@ -59,4 +59,9 @@
   & .swiper-button-disabled {
     opacity: 0.5;
   }
+
+  &__add-rdeam-btn {
+    display: flex;
+    align-items: center;
+  }
 }

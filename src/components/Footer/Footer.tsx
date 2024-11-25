@@ -1,7 +1,6 @@
 import {SpeedDial, SpeedDialAction, SpeedDialIcon} from "@mui/material"
 import CloseIcon from '@mui/icons-material/Close';
 import GroupsIcon from '@mui/icons-material/Groups';
-import logo from "../../assets/images/main-logo.png";
 import {NavLink} from "react-router-dom"
 import FacebookIcon from '@mui/icons-material/FacebookTwoTone';
 // import TwitterIcon from '@mui/icons-material/Twitter';
@@ -42,25 +41,10 @@ export const Footer = () => {
           <NavLink
             to="/"
             className="navigation__logo"
-            style={{ backgroundImage: `url(${logo})` }}
             onClick={() => setActiveIndex(0)}
-          />
-          <div className="footer__navigation">
-            <NavLink
-              to="/aboutus"
-              className="footer__nav-link"
-              onClick={() => setActiveIndex(0)}
-            >
-              About Us
-            </NavLink>
-            <NavLink
-              to="/contacts"
-              className="footer__nav-link"
-              onClick={() => setActiveIndex(0)}
-            >
-              Contacts
-            </NavLink>
-          </div>
+          >
+            Dreams are here...
+          </NavLink>
           <SpeedDial
             ariaLabel="SpeedDial openIcon example"
             className="footer__speed-dial"

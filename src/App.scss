@@ -15,5 +15,6 @@
 @use './pages/DreamPage/DreamPage.module' as *;
 @use './components/Comment/Comment.module' as *;
 @use './pages/ProfilePage/ProfilePage.module' as *;
-@import 'swiper/css';
-@import 'swiper/css/navigation';
+@use 'swiper/css' as *;
+@use 'swiper/css/navigation' as *;
+@use './pages/HomePage/HomePage.module';

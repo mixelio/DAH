@@ -9,7 +9,8 @@ import {getUser} from '../../utils/getUser';
 
 const pages = [
   {id: 1, name: 'Home', path: '/'},
-  {id: 2, name: 'Dreams', path: '/dreams'}
+  {id: 2, name: 'Dreams', path: '/dreams'},
+  {id: 3, name: 'About', path: '/aboutus'}
 ]
 
 const colorsPrimary = theme.palette.primary;
@@ -56,26 +57,28 @@ export const NavMenu = () => {
   
   return (
     <nav className="navigation">
-      <div
-        className="navigation__links"
-      >
+      <div className="navigation__links">
         <NavLink
           to="/"
           className="navigation__logo"
-          style={{ backgroundImage: `url(${logo})` }}
           onClick={() => handleMenuClick(0)}
-        />
-        {pages.map((page, index) => (
-          <NavLink
-            key={page.id}
-            style={{ color: `${colorsPrimary.main}` }}
-            to={page.path}
-            className={getLinkClass}
-            onClick={() => handleMenuClick(index)}
-          >
-            {page.name}
-          </NavLink>
-        ))}
+        >
+          <img className='navigation__logo-img' src={logo} alt="" />
+          Dreams are here...
+        </NavLink>
+        <div className="navigation__pages">
+          {pages.map((page, index) => (
+            <NavLink
+              key={page.id}
+              style={{ color: `${colorsPrimary.main}` }}
+              to={page.path}
+              className={getLinkClass}
+              onClick={() => handleMenuClick(index)}
+            >
+              {page.name}
+            </NavLink>
+          ))}
+        </div>
       </div>
       {loginedUser ? (
         <div className="navigation__user-arera">
@@ -135,13 +138,19 @@ export const NavMenu = () => {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <MenuItem onClick={() => navigate(`profile/${loginedUser.id}`)}>Profile</MenuItem>
+            <MenuItem onClick={() => navigate(`profile/${loginedUser.id}`)}>
+              Profile
+            </MenuItem>
             <Divider />
-            <MenuItem onClick={() => localStorage.setItem('currentUser', '')}>Logout</MenuItem>
+            <MenuItem onClick={() => localStorage.setItem("currentUser", "")}>
+              Logout
+            </MenuItem>
           </Menu>
         </div>
       ) : (
         <Button
+          className="navigation__in-btn"
+          variant='contained'
           onClick={handleSingInOpen}
           sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
         >

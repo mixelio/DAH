@@ -19,7 +19,6 @@ export const DreamPage = () => {
     dreams,
     setCurrentDream,
     users,
-    // currentUser,
     loader,
     setLoader,
     comments,

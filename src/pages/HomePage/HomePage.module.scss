@@ -1,0 +1,23 @@
+@use '../../assets/styles/utils/vars' as *;
+
+.first-screen {
+  background-image: url('assets/images/content/main-page/first-screen.webp');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 60vh;
+  position: relative;
+
+  &__main-title {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    font-size: 52px;
+    font-weight: 600;
+    color: $primary-light;
+    text-shadow: 1px 1px 3px #000;
+
+  }
+}

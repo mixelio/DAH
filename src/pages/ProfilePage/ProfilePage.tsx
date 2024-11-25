@@ -1,6 +1,6 @@
 import {useContext} from "react"
 import {DreamsContext} from "../../DreamsContext"
-import {Avatar, Divider, IconButton} from "@mui/material";
+import {Avatar, Button, Divider, IconButton} from "@mui/material";
 import { useMediaQuery } from "react-responsive";
 import {getUser} from "../../utils/getUser";
 import {useParams} from "react-router-dom";
@@ -14,41 +14,26 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 export const ProfilePage = () => {
   const { users, dreams } = useContext(DreamsContext)
 
-  // const prevRef = useRef<HTMLButtonElement | null>(null);
-  // const nextRef = useRef<HTMLButtonElement | null>(null);
-
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
   const {id} = useParams();
   const currentProfile = id !== undefined ? getUser(+id, users) : null;
   const dreamsOfUser = dreams.filter(dream => dream.userId === currentProfile?.id);
 
-  // useEffect(() => {
-  //   const newPrevElement = document.querySelector(
-  //     `profile-prev-btn-${currentProfile?.id}`
-  //   );
-  //   const newNextElement = document.querySelector(
-  //     `profile-next-btn-${currentProfile?.id}`
-  //   );
+  const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
+  const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });
 
-  //   prevRef.current = newPrevElement as HTMLButtonElement | null;
-  //   nextRef.current = newNextElement as HTMLButtonElement | null;
-  // }, [currentProfile])
+  const slidesPerView = () => {
+    if (isDesctop) {
+      return 3;
+    }
 
-    const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
-    const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });
+    if (isTablet) {
+      return 2;
+    }
 
-    const slidesPerView = () => {
-      if (isDesctop) {
-        return 3;
-      }
-
-      if (isTablet) {
-        return 2;
-      }
-
-      return 1;
-    };
+    return 1;
+  };
 
   return (
     <section className="profile">
@@ -72,7 +57,9 @@ export const ProfilePage = () => {
             <p className="profile__description">{currentProfile?.about_me}</p>
           </div>
         </div>
-        <Divider sx={{ mb: 3, mt: 3 }} />
+        <Divider textAlign="center" sx={{ mb: 3, mt: 3 }}>
+          Dreams {dreamsOfUser.length}
+        </Divider>
         <Swiper
           className="profile__slider"
           modules={[Navigation]}
@@ -116,6 +103,14 @@ export const ProfilePage = () => {
             <ArrowForwardIosIcon />
           </IconButton>
         </Swiper>
+        {ownerProfile?.id === currentProfile?.id && (
+          <Button
+            variant="contained"
+            className="profile__add-dream-btn"
+          >
+            Add a Dream
+          </Button>
+        )}
       </div>
     </section>
   );
