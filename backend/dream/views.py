@@ -109,16 +109,16 @@ class DreamViewSet(viewsets.ModelViewSet):
 
 class DreamHandler(ABC):
     @abstractmethod
-    def handle(self, dream, user, data, request=None):
+    def handle(self, dream, user, request):
         raise NotImplementedError('This method should be implemented by subclasses.')
 
 
 class MoneyDreamHandler(DreamHandler):
-    def handle(self, dream, user, data, request=None):
+    def handle(self, dream, user, request):
         if not request:
             raise ValueError('Request object is required for this operation.')
 
-        contribution_amount = data.get('contribution_amount', 0)
+        contribution_amount = request.data.get('contribution_amount', 0)
         if contribution_amount <= 0:
             raise ValueError('Contribution must be a positive integer.')
 
@@ -137,8 +137,8 @@ class MoneyDreamHandler(DreamHandler):
 
 
 class NonMoneyDreamHandler(DreamHandler):
-    def handle(self, dream, user, data):
-        contribution_description = data.get('contribution_description', '')
+    def handle(self, dream, user, request):
+        contribution_description = request.data.get('contribution_description', '')
         if not contribution_description:
             raise ValueError('Description of contribution is required for this category.')
         contribution = Contribution.objects.create(dream=dream, user=user, description=contribution_description)
@@ -173,7 +173,7 @@ class FulfillDreamView(APIView):
             )
 
         try:
-            response = handler.handle(dream, user, request.data, request)
+            response = handler.handle(dream, user, request)
         except ValueError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
