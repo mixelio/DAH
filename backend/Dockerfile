@@ -4,6 +4,11 @@ LABEL maintainer="pzkpw31@gmail.com"
 
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=backend.settings.prod
+ENV PGDATABASE=railway
+ENV PGHOST=postgres.railway.internal
+ENV PGPASSWORD=PIMqEDIkaehgCTKSkufXxkifBXgEryop
+ENV PGPORT=5432
+ENV PGUSER=postgres
 
 WORKDIR /app/
 
