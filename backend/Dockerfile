@@ -2,7 +2,6 @@ FROM python:3.12-alpine3.19
 
 LABEL maintainer="pzkpw31@gmail.com"
 
-
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=backend.settings.prod
 ENV PGDATABASE=railway
