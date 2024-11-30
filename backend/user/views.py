@@ -24,8 +24,11 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-class RetrieveUserView(generics.RetrieveAPIView):
+class ListUserView(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+
+
+class RetrieveDetailUserView(generics.RetrieveAPIView, ListUserView):
     lookup_field = 'id'
 
