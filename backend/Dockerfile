@@ -3,7 +3,7 @@ FROM python:3.13-alpine
 LABEL maintainer="pzkpw31@gmail.com"
 
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=backend.settings.dev
+ENV DJANGO_SETTINGS_MODULE=backend.settings.prod
 ENV PGDATABASE=railway
 ENV PGHOST=autorack.proxy.rlwy.net
 ENV PGPASSWORD=PIMqEDIkaehgCTKSkufXxkifBXgEryop
