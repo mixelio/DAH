@@ -1,21 +1,12 @@
 import os
-import uuid
 from io import BytesIO
 
 from PIL import Image
+from cloudinary.models import CloudinaryField
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db import models
-from django.utils.text import slugify
 
 from user.models import User
-
-
-def dream_image_file_path(instance, filename) -> str:
-    _, extension = os.path.splitext(filename)
-    filename = f'{slugify(instance.name)}-{uuid.uuid4()}{extension}'
-
-    return os.path.join('dreams/', filename)
 
 
 class Dream(models.Model):
@@ -31,7 +22,7 @@ class Dream(models.Model):
 
     name = models.CharField(max_length=200)
     description = models.TextField()
-    image = models.ImageField(upload_to=dream_image_file_path, null=True, blank=True)
+    image = CloudinaryField('image', blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
     accumulated = models.PositiveIntegerField(null=True, blank=True, default=0)
@@ -48,20 +39,18 @@ class Dream(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            old_dream = Dream.objects.filter(pk=self.pk).first()
-            if old_dream and old_dream.image != self.image:
-                if default_storage.exists(old_dream.image.path):
-                    default_storage.delete(old_dream.image.path)
-
-        if self.image:
-            img = Image.open(self.image)
+        if self.image and hasattr(self.image, 'file'):
+            # Обробка локального зображення перед завантаженням у Cloudinary
+            img = Image.open(self.image.file)
             if img.format != 'WEBP':
                 img_io = BytesIO()
                 img = img.convert('RGB')
                 img.save(img_io, format='WEBP', quality=85)
+
+                # Оновлення зображення перед збереженням
                 img_content = ContentFile(img_io.getvalue(), name=f"{os.path.splitext(self.image.name)[0]}.webp")
                 self.image = img_content
+
         super().save(*args, **kwargs)
 
 
@@ -89,4 +78,4 @@ class Contribution(models.Model):
         ordering = ['-date']
 
     def __str__(self) -> str:
-        return f"{self.user.email} - {self.dream.name}"
+        return f'{self.user.email} - {self.dream.name}'

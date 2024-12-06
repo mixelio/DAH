@@ -1,17 +1,7 @@
-import os
-import uuid
-
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
 from django.db import models
-from django.utils.text import slugify
 from django.utils.translation import gettext as _
-
-
-def user_image_file_path(instance, filename) -> str:
-    _, extension = os.path.splitext(filename)
-    filename = f'{slugify(instance.email)}-{uuid.uuid4()}{extension}'
-
-    return os.path.join('users/', filename)
 
 
 class UserManager(DjangoUserManager):
@@ -44,7 +34,7 @@ class UserManager(DjangoUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
-    photo = models.ImageField(upload_to=user_image_file_path, null=True, blank=True)
+    photo = CloudinaryField('image', blank=True, null=True)
     location = models.CharField(max_length=150, blank=True)
     num_of_dreams = models.PositiveSmallIntegerField(default=0)
     about_me = models.TextField(blank=True)

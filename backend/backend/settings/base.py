@@ -13,6 +13,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -114,8 +117,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = 'staticfiles/'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = "https://res.cloudinary.com/{}/".format(os.getenv('CLOUDINARY_CLOUD_NAME'))
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -158,3 +162,9 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+)
