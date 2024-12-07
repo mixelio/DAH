@@ -24,8 +24,8 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
     def get_photo_url(self, obj):
-        if obj.image:
-            return obj.image.url
+        if obj.photo:
+            return obj.photo.url
         return None
 
     def create(self, validated_data):
