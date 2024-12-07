@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from dream.models import Comment, Dream, Contribution
+from payment.models import Payment
 from payment.serializers import PaymentSerializer
 
 from utils.stripe_helpers import create_stripe_session
@@ -128,12 +129,11 @@ class MoneyDreamHandler(DreamHandler):
             raise ValueError(f'Contribution exceeds the remaining balance: {remaining_balance}.')
         try:
             payment = create_stripe_session(dream.id, Decimal(contribution_amount), request)
+            return payment
         except Exception as e:
             print(f'stripe_exception: {e}')
         dream.accumulated += contribution_amount
         dream.save(update_fields=['accumulated'])
-
-        return payment
 
 
 class NonMoneyDreamHandler(DreamHandler):
@@ -181,8 +181,14 @@ class FulfillDreamView(APIView):
         user.num_of_dreams = F('num_of_dreams') + 1
         user.save()
         user.refresh_from_db()
-        if response:
+        if isinstance(response, Payment):
             serializer = PaymentSerializer(response)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = ContributionSerializer(response)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif isinstance(response, Contribution):
+            serializer = ContributionSerializer(response)
+        else:
+            return Response(
+                {'error': 'Unexpected response type from handler.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
