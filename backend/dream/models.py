@@ -1,9 +1,4 @@
-import os
-from io import BytesIO
-
-from PIL import Image
 from cloudinary.models import CloudinaryField
-from django.core.files.base import ContentFile
 from django.db import models
 
 from user.models import User
@@ -37,21 +32,6 @@ class Dream(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    def save(self, *args, **kwargs):
-        if self.image and hasattr(self.image, 'file'):
-            # Обробка локального зображення перед завантаженням у Cloudinary
-            img = Image.open(self.image.file)
-            if img.format != 'WEBP':
-                img_io = BytesIO()
-                img = img.convert('RGB')
-                img.save(img_io, format='WEBP', quality=85)
-
-                # Оновлення зображення перед збереженням
-                img_content = ContentFile(img_io.getvalue(), name=f"{os.path.splitext(self.image.name)[0]}.webp")
-                self.image = img_content
-
-        super().save(*args, **kwargs)
 
 
 class Comment(models.Model):
