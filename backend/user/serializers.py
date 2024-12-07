@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'photo',
-            'photo_url'
+            'photo_url',
             'location',
             'num_of_dreams',
             'about_me'
