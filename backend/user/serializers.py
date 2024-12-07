@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 
 
 class UserSerializer(serializers.ModelSerializer):
+    photo_url = serializers.SerializerMethodField()
     class Meta:
         model = get_user_model()
         fields = (
@@ -14,12 +15,18 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'photo',
+            'photo_url'
             'location',
             'num_of_dreams',
             'about_me'
         )
         read_only_fields = ("is_staff",)
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+
+    def get_photo_url(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
     def create(self, validated_data):
         """Create a new users with encrypted password and return it"""
