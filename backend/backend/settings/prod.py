@@ -19,3 +19,7 @@ DATABASES = {
         'PORT': int(os.environ['PGPORT']),
     }
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://dah-production-f4c2.up.railway.app',
+]
