@@ -161,6 +161,7 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'https://dah-production-f4c2.up.railway.app'
 ]
 
 cloudinary.config(
