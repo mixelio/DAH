@@ -18,6 +18,7 @@ class DreamSerializer(serializers.ModelSerializer):
 
 class DreamReadSerializer(DreamSerializer):
     contributions = ContributionSerializer(many=True, read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Dream
@@ -26,6 +27,7 @@ class DreamReadSerializer(DreamSerializer):
             'name',
             'description',
             'image',
+            'image_url',
             'user',
             'cost',
             'accumulated',
@@ -36,6 +38,11 @@ class DreamReadSerializer(DreamSerializer):
             'views',
             'contributions',
         ]
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
 
 
 class CommentSerializer(serializers.ModelSerializer):
