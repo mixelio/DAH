@@ -41,7 +41,6 @@ class RetrieveDetailUserView(generics.RetrieveAPIView, ListUserView):
     lookup_field = 'id'
 
 
-
 class PasswordResetRequestView(APIView):
     """
     View to handle password reset email requests.
