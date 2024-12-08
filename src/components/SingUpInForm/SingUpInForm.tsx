@@ -1,46 +1,65 @@
-import {Visibility, VisibilityOff} from '@mui/icons-material'
-import {Box, Button, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
+import { Visibility, VisibilityOff} from '@mui/icons-material'
+import {Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import {FormEvent, useContext, useEffect, useRef, useState} from 'react'
-import sentRegistrateData from '../../utils/axiosClient';
 import {Link} from 'react-router-dom';
 import {DreamsContext} from '../../DreamsContext';
 import classNames from 'classnames';
 import { theme } from "../../utils/theme";
 import {User} from '../../types/User';
+import {useAppDispatch, useAppSelector} from '../../app/hooks';
+import {usersInit} from '../../features/users';
+import {createUser, loginUser, verifyUser} from '../../api/users';
+import LoadingButton from "@mui/lab/LoadingButton";
+import { SnackbarProvider, useSnackbar } from "notistack";
 const colorsPrimary = theme.palette.primary;
 const colorsSecondary = theme.palette.secondary;
 
 enum Errors {
   Empty = "All fields must be filling",
   EmailNotValid = "Use valid email",
-  PasswordIncorrect = "Invalid password. Please try again.",
+  PasswordIncorrect = "Invalid password or email. Please try again.",
   NoRegistration = "Email not registered. Please sign up.",
+  NoServerAnswer = "No server answer. Try again latter",
+  AlreadyRegistrated = "User with this email already registrated",
+  EqualCheck = "Passwords must be equial",
 }
 
 export const SingUpInForm = () => {
   // #region variables
-  const {mainFormActive, setMainFormActive, users, setCurrentUser, currentUser} = useContext(DreamsContext);
+  const {mainFormActive, setMainFormActive, setCurrentUser, currentUser} = useContext(DreamsContext);
+  const {users} = useAppSelector(store => store.users);
+  const dispatch = useAppDispatch();
+  const [loginWaiting, setLoginWaiting] = useState<boolean>(false)
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
   const [errorMessege, setErrorMessage] = useState('');
   const [registerData, setRegisterData] = useState({
     first_name: '',
+    last_name: '',
     email: '',
     password: '',
   });
 
   const [loginData, setLoginData] = useState({
-    login: '',
+    email: '',
     password: ''
-  })
+  });
+
+  const [repeatedPassword, setRepeatedPassword] = useState<string>('');
+  const [open, setOpen] = useState(false);
 
   const [value, setValue] = useState('1');
   const [contentHeight, setContentHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { enqueueSnackbar } = useSnackbar();
+  
+  
   // #endregion
 
   // #region Validation
@@ -51,9 +70,41 @@ export const SingUpInForm = () => {
     return emailRegrex.test(email)
   }
 
+  const passwordValidator = (password: string) => {
+    const errors = [];
+
+    if(password.localeCompare(repeatedPassword)) {
+      errors.push("Passwords must be equial");
+    }
+
+    if(password.length < 6) {
+      errors.push("Password must be at least 6 characters long.");
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Password must include at least one uppercase letter (A-Z).");
+    }
+
+    if (!/[a-z]/.test(password)) {
+      errors.push("Password must include at least one lowercase letter (a-z).");
+    }
+
+    if (!/[0-9]/.test(password)) {
+      errors.push("Password must include at least one number (0-9).");
+    }
+
+    if (/[^A-Za-z0-9]/.test(password)) {
+      errors.push(
+        "Password must only include letters and numbers (no special characters)."
+      );
+    }
+
+
+    return errors
+  }
+
   // #endregion
   
-
   // #region hooks
   useEffect(() => {
     if (contentRef.current) {
@@ -64,7 +115,7 @@ export const SingUpInForm = () => {
   useEffect(() => {
     setValue("2");
     setLoginData({
-      login: "",
+      email: "",
       password: "",
     });
   }, [currentUser]);
@@ -88,19 +139,60 @@ export const SingUpInForm = () => {
       }))
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!registerData.email.trim() || !registerData.password.trim()) {
       setErrorMessage(Errors.Empty);
     } else {
-      const newUser: Pick<User,"first_name" | "email" | "password"> | null = {
+      if(registerData.first_name.trim().includes(" ")) {
+        const firstName = registerData.first_name.split(" ")[0]; // get first name
+        const lastName = registerData.first_name.split(" ")[1]; // get last name if it exists
+
+        setRegisterData((prevState) => ({ // set first and last name
+          ...prevState,
+          first_name: firstName,
+          last_name: lastName,
+        }))
+      };
+
+      const newUser: Pick<User,"first_name" | "last_name" | "email" | "password"> | null = {
         first_name: registerData.first_name,
-        email: registerData.email,
+        last_name: registerData.last_name,
+        email: registerData.email.toLowerCase(),
         password: registerData.password,
       };
-      setCurrentUser(newUser);
-      sentRegistrateData(registerData);
+
+      if(users.find(user => user.email === newUser.email) !== undefined) {
+        setErrorMessage(Errors.AlreadyRegistrated);
+        return
+      }
+      if (passwordValidator(newUser.password).length === 0) {
+        
+        setLoginWaiting(true);
+        try {
+          const response = await createUser(newUser);
+          if (response) {
+            setOpen(true);
+            enqueueSnackbar("Registration success", { variant: "success" });
+            console.log(open, "user created");
+          }
+        } catch (error) {
+          console.log(error, "user not created");
+        } finally {
+          setRegisterData({
+            first_name: '',
+            last_name: '',
+            email: '',
+            password: '',
+          });
+          setLoginWaiting(false);
+          
+        }
+        
+        // dispatch(userRegister({ ...newUser }))
+      
+      }
     }
   }
 
@@ -128,10 +220,11 @@ export const SingUpInForm = () => {
         }));
   };
 
-  const handleLogIn = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     
-    if (!emailValidator(loginData.login)) {
+
+    if (!emailValidator(loginData.email)) {
       setErrorMessage(Errors.EmailNotValid);
       return;
     } else if (!loginData.password.trim()) {
@@ -140,39 +233,70 @@ export const SingUpInForm = () => {
     }
 
     const checkUser =
-      users.find((user) => user.email === loginData.login) === undefined
+      users.find((user) => user.email === loginData.email) === undefined
         ? false
-        : users.find((user) => user.email === loginData.login);
-    if(!checkUser) {
+        : users.find((user) => user.email === loginData.email);
+    if (!checkUser) {
       setErrorMessage(Errors.NoRegistration);
       return;
     }
 
-    if(checkUser.password === loginData.password) {
-      const currUser = checkUser.id.toString();
-      setCurrentUser(checkUser);
-      localStorage.setItem("currentUser", currUser);
-      setLoginData({
-        login: '',
-        password: '',
-      })
-      setMainFormActive(false);
-    } else {
-      setCurrentUser(null);
-      setErrorMessage(Errors.PasswordIncorrect)
+    setLoginWaiting(true);
+
+    try {
+      const response = await loginUser(loginData);
+
+      if (response.access && response.refresh) {
+        localStorage.setItem('access', response.access);
+        localStorage.setItem('refresh', response.refresh);
+
+        const accessToken = localStorage.getItem("access");
+        if(accessToken) {
+          const verifyResponse = await verifyUser(accessToken);
+          if (verifyResponse) {
+            setCurrentUser(checkUser)
+            const currUser = checkUser.id.toString();
+            localStorage.setItem("currentUser", currUser);
+            setLoginData({
+              email: "",
+              password: "",
+            });
+            setMainFormActive(false);
+            setLoginWaiting(false);
+            return
+          }
+        } else {
+          setCurrentUser(null);
+          setErrorMessage(Errors.PasswordIncorrect);
+        }
+        
+      } else {
+        setErrorMessage(Errors.PasswordIncorrect)
+      }
+
+      setLoginWaiting(false);
+    } catch (error) {
+      console.log(error)
+      setErrorMessage(Errors.NoServerAnswer)
+      setLoginWaiting(false);
     }
-    setLoginData({
-      login: "",
-      password: "",
-    });
+
+
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPasswordRepeat = () => setShowPasswordRepeat((show) => !show);
 
   // #endregion
+
+  useEffect(() => {
+    dispatch(usersInit());
+    enqueueSnackbar("Registration success", { variant: "success" });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   
   return (
-    <>
+    <SnackbarProvider>
       {/* fullscreen dark background for the form*/}
       <div
         className={classNames("sign-up-in-form__background", {
@@ -253,7 +377,7 @@ export const SingUpInForm = () => {
                 <div className="sign-up-in-form__fields-container">
                   <TextField
                     error={errorMessege.length > 0}
-                    name="name"
+                    name="first_name"
                     id="outlined-basic"
                     label="Name"
                     variant="outlined"
@@ -272,7 +396,7 @@ export const SingUpInForm = () => {
                     onChange={handleChangeReg}
                   />
                 </div>
-                <Divider />
+                <Divider style={{opacity: "0"}}/>
                 <div className="sign-up-in-form__fields-container">
                   <FormControl
                     sx={{ m: 1 }}
@@ -317,20 +441,29 @@ export const SingUpInForm = () => {
                     <OutlinedInput
                       id="outlined-adornment-password-repeat"
                       name="password_repeat"
-                      type={showPassword ? "text" : "password"}
-                      onChange={handleChangeReg}
+                      type={showPasswordRepeat ? "text" : "password"}
+                      onChange={(event) => {
+                        setTimeout(
+                          () => setRepeatedPassword(event.target.value),
+                          3000
+                        );
+                      }}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
                             aria-label={
-                              showPassword
+                              showPasswordRepeat
                                 ? "hide the password"
                                 : "display the password"
                             }
-                            onClick={handleClickShowPassword}
+                            onClick={handleClickShowPasswordRepeat}
                             edge="end"
                           >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                            {showPasswordRepeat ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       }
@@ -343,12 +476,25 @@ export const SingUpInForm = () => {
                   type="submit"
                   sx={{
                     backgroundColor: colorsPrimary.main,
+                    position: "relative",
+                    width: "auto",
+                    transitionDuration: "0.3s",
                     "&:hover": {
                       backgroundColor: colorsSecondary.main,
                     },
                   }}
                 >
-                  Sing Up
+                  {loginWaiting ? (
+                    <CircularProgress
+                      size={18}
+                      sx={{
+                        color: colorsSecondary.light,
+                        height: "100%",
+                      }}
+                    />
+                  ) : (
+                    "Sing Up"
+                  )}
                 </Button>
               </Box>
             </TabPanel>
@@ -365,10 +511,10 @@ export const SingUpInForm = () => {
               >
                 <TextField
                   error={errorMessege.length > 0}
-                  name="login"
+                  name="email"
                   id="outlined-basic"
                   label="E-mail"
-                  value={loginData.login}
+                  value={loginData.email}
                   variant="outlined"
                   sx={{ margin: "0 auto" }}
                   onChange={handleChangeLogIn}
@@ -404,19 +550,25 @@ export const SingUpInForm = () => {
                     label="Password"
                   />
                 </FormControl>
+                {!loginWaiting ? (
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                      backgroundColor: colorsPrimary.main,
+                      "&:hover": {
+                        backgroundColor: colorsSecondary.main,
+                      },
+                    }}
+                  >
+                    Sing In
+                  </Button>
+                ) : (
+                  <LoadingButton loading variant="outlined">
+                    Submit
+                  </LoadingButton>
+                )}
 
-                <Button
-                  variant="contained"
-                  type="submit"
-                  sx={{
-                    backgroundColor: colorsPrimary.main,
-                    "&:hover": {
-                      backgroundColor: colorsSecondary.main,
-                    },
-                  }}
-                >
-                  Sing In
-                </Button>
                 <Link to="/" className="sign-up-in-form__foget">
                   forget password?
                 </Link>
@@ -424,12 +576,25 @@ export const SingUpInForm = () => {
             </TabPanel>
 
             {/* errors message */}
+
             {errorMessege && (
               <p className="sign-up-in-form__error-message">{errorMessege}</p>
             )}
+            {registerData.password &&
+              passwordValidator(registerData.password).length > 0 && (
+                <p className="sign-up-in-form__error-message">
+                  {passwordValidator(registerData.password)[0]}
+                </p>
+              )}
           </Box>
         </TabContext>
+        {/* <Snackbar
+          open={open}
+          autoHideDuration={5000}
+          onClose={() => setOpen(false)}
+          message="Registration success"
+        /> */}
       </div>
-    </>
+    </SnackbarProvider>
   );
 }

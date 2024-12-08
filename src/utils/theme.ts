@@ -19,7 +19,7 @@ export const theme = createTheme({
           borderRadius: 4, // Заокруглення країв
         },
         bar: {
-          backgroundColor: "#33838f", // Кольорова смужка прогресу
+          backgroundColor: "#87D068", // Кольорова смужка прогресу
         },
         dashed: {
           background: "none", // Приклад кастомізації dashed ліній
@@ -29,7 +29,7 @@ export const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#016573",
+      main: "#87D068",
       // light
       // dark
       // contrastText

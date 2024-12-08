@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "proxy": "https://dah-production-f4c2.up.railway.app",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -23,6 +24,7 @@
     "lazysizes": "^5.3.2",
     "lozad": "^1.16.0",
     "motion": "^11.11.17",
+    "notistack": "^3.0.1",
     "react": "^17.0.0 || ^18.0.0",
     "react-dom": "^17.0.0 || ^18.0.0",
     "react-lazy-load-image-component": "^1.6.2",
@@ -31,6 +33,7 @@
     "react-redux": "^9.1.2",
     "react-responsive": "^10.0.0",
     "react-router-dom": "^6.28.0",
+    "react-share": "^5.1.1",
     "swiper": "^11.1.15",
     "uuid": "^11.0.3"
   },

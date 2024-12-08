@@ -28,13 +28,23 @@ $underline-width: attr(data-width);
   &__links {
     flex: 1;
     display: flex;
-    justify-content: space-between;
+    column-gap: 20px;
     align-items: center;
+
+    @include on-tablet {
+      column-gap: 30px;
+    }
+
+    @include on-desktop {
+      column-gap: 40px;
+    }
   }
 
   &__pages {
     display: flex;
     column-gap: 16px;
+    align-items: center;
+    height: 100%;
 
     @include on-tablet {
       column-gap: 20px;
@@ -48,44 +58,33 @@ $underline-width: attr(data-width);
   &__link {
     position: relative;
     display: block;
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: uppercase;
+    padding: 10px 0;
+    height: 100%;
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: capitalize;
     transition-duration: 300ms;
-    color: $primary-main;
+    color: $text-color-dark;
     z-index: 2;
 
     @include on-tablet {
-      font-size: 20px;
+      font-size: 16px;
     }
 
     @include on-desktop {
-      font-size: 24px;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 0;
-      height: 2px;
-      width: 100%;
-      opacity: 0;
-      background-color: $primary-light;
-      transition-duration: 300ms;
-      transform: translateX(-100%);
+      font-size: 20px;
     }
 
     &.is-active {
-      &::after {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      
-    }
+      font-size: 18px;
 
-    &:hover {
-      color: #476671e0;
+      @include on-tablet {
+        font-size: 24px;
+      }
+
+      @include on-desktop {
+        font-size: 30px;
+      }
     }
   }
 
@@ -109,17 +108,17 @@ $underline-width: attr(data-width);
     }
 
     &-img {
-      width: 32px;
-      height: 32px;
+      width: 90px;
+      height: 40px;
 
       @include on-tablet {
-        width: 36px;
-        height: 36px;
+        width: 110px;
+        height: 61px;
       }
     
       @include on-desktop {
-        width: 40px;
-        height: 40px;
+        width: 145px;
+        height: 96px;
       }
     }
 

@@ -1,8 +1,9 @@
-import React, {useContext} from "react";
+import React /* {useContext} */ from "react";
 import {Link} from "react-router-dom";
 import {Dream} from "../../types/Dream";
-import {DreamsContext} from "../../DreamsContext";
+// import {DreamsContext} from "../../DreamsContext";
 import {Avatar} from "@mui/material";
+import {useAppSelector} from "../../app/hooks";
 
 
 type Props = {
@@ -10,8 +11,9 @@ type Props = {
 }
 
 export const DreamCart: React.FC<Props> = ({ dream }) => {
-  const { users } = useContext(DreamsContext);
-  const author = users.find(user => user.id === dream.userId)
+  const { users } = useAppSelector((state) => state.users);
+  // const { users } = useContext(DreamsContext);
+  const author = users.find(user => user.id === dream.userId);
 
   return (
     <Link

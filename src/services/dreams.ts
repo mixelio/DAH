@@ -3,7 +3,7 @@ export const getDreams = () => {
 
   return fetch(`${baseURL}api/dreams.json`).then((response) => {
     if (!response.ok) {
-      console.log("not ok");
+      console.log();
     }
 
     return response.json();

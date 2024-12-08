@@ -10,6 +10,7 @@ export const HomePage = () => {
       }, 1000);
       return () => clearTimeout(timer);
     }, []);
+
   return (
     <motion.section
       className="first-screen"
@@ -26,6 +27,7 @@ export const HomePage = () => {
         >
           Dreams are here...
         </motion.h1>
+
       </div>
     </motion.section>
   );

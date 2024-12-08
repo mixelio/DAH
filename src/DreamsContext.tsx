@@ -30,6 +30,8 @@ type ContextType = {
   setDreams: (value: Dream[]) => void;
   comments: CommentType[];
   setComments: (value: CommentType[]) => void;
+  logginedUserId: string | null;
+  setLogginedUserId: (value: string | null) => void;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -50,6 +52,8 @@ export const DreamsContext = React.createContext<ContextType>({
   setDreams: () => {},
   comments: [],
   setComments: () => {},
+  logginedUserId: localStorage.getItem('currentUser'),
+  setLogginedUserId: () => {}
 });
 
 export const DreamsProvider: React.FC<Props> = ({children}) => {
@@ -61,6 +65,7 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [mainFormActive, setMainFormActive] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [logginedUserId, setLogginedUserId] = useState<string | null>(localStorage.getItem('currentUser'));
 
   useEffect(() => {
     setLoader(true);
@@ -75,10 +80,25 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
   useEffect(() => {
     if (dreams.length > 0) {
       preloadImages(dreams.map((dream) => dream.image)).then(() => {
-        console.log("All images loaded!");
+        console.log();
       });
     }
   }, [dreams])
+
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'currentUser') {
+        setLogginedUserId(e.newValue)
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+    
+  }, [])
 
   const value = useMemo(() => ({
     loader,
@@ -97,7 +117,9 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     setDreams,
     comments,
     setComments,
-  }), [loader, currentUser, mainFormActive, activeIndex, users, dreams, currentDream, comments]);
+    logginedUserId,
+    setLogginedUserId,
+  }), [loader, currentUser, currentDream, mainFormActive, activeIndex, users, dreams, comments, logginedUserId]);
   
   return (
     <DreamsContext.Provider value={value}>{children}</DreamsContext.Provider>

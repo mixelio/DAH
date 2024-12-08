@@ -1,24 +1,43 @@
-import {useContext} from "react"
+import {useContext, useEffect} from "react"
 import {DreamsContext} from "../../DreamsContext"
 import {Avatar, Button, Divider, IconButton} from "@mui/material";
 import { useMediaQuery } from "react-responsive";
 import {getUser} from "../../utils/getUser";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import {DreamCart} from "../../components/DreamCart/DreamCart";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {currentUserInit, usersInit} from "../../features/users";
 
 export const ProfilePage = () => {
-  const { users, dreams } = useContext(DreamsContext)
+  const { dreams } = useContext(DreamsContext);
 
-  const userFromLocaleStorage = localStorage.getItem("currentUser");
-  const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
+  // #region get logined user info
+
+  const { users, loginedUser} = useAppSelector(store => store.users);
+  const dispatch = useAppDispatch();
+
+  const chekTocken = localStorage.getItem("access") ?? '';
+
+  useEffect(() => {
+    dispatch(usersInit());
+    dispatch(currentUserInit(chekTocken));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // #endregion
+
+  // const userFromLocaleStorage = localStorage.getItem("currentUser");
+  // const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
   const {id} = useParams();
   const currentProfile = id !== undefined ? getUser(+id, users) : null;
   const dreamsOfUser = dreams.filter(dream => dream.userId === currentProfile?.id);
+
+  const navigate = useNavigate();
 
   const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
   const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });
@@ -39,8 +58,10 @@ export const ProfilePage = () => {
     <section className="profile">
       <div className="container">
         <div className="profile__main-info">
-          {ownerProfile?.id === currentProfile?.id && (
-            <IconButton className="profile__edit-btn">
+          {loginedUser?.id === currentProfile?.id && (
+            <IconButton className="profile__edit-btn" onClick={() => {
+              navigate('edit');
+            }}>
               <ManageAccountsIcon sx={{ width: "28px", height: "28px" }} />
             </IconButton>
           )}
@@ -103,7 +124,7 @@ export const ProfilePage = () => {
             <ArrowForwardIosIcon />
           </IconButton>
         </Swiper>
-        {ownerProfile?.id === currentProfile?.id && (
+        {loginedUser?.id === currentProfile?.id && (
           <Button
             variant="contained"
             className="profile__add-dream-btn"

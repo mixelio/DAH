@@ -1,5 +1,16 @@
+@use '../../assets/styles/utils/mixins' as *;
+
 .header {
+  margin-bottom: 30px;
   padding: 16px 0;
   position: relative;
   transition: all 300ms;
+
+  @include on-tablet {
+    margin-bottom: 46px;
+  }
+
+  @include on-desktop {
+    margin-bottom: 60px;
+  }
 }

@@ -1,0 +1,178 @@
+@use '../../assets/styles/utils/mixins' as *;
+@use '../../assets/styles/utils/vars' as *;
+
+.profile-edit {
+  &__image-block {
+    max-width: 400px;
+    margin: 0 auto 60px;
+
+    @include on-tablet {
+      margin: 0 auto 75px;
+    }
+
+    @include on-tablet {
+      margin: 0 auto 90px;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 172px;
+    height: 172px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+
+    border: 1px solid #eee;
+  }
+
+  &__load-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 20px;
+  }
+
+  &__text-fields-block {
+    margin-bottom: 40px;
+
+    @include on-tablet {
+      margin-bottom: 50px;
+    }
+
+    @include on-desktop {
+      margin-bottom: 60px;
+    }
+  }
+
+  &__sub-block {
+    margin-bottom: 16px;
+    @include on-tablet {
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      column-gap: 36px;
+    }
+
+    @include on-desktop {
+      margin-bottom: 46px;
+    }
+  }
+
+  &__input-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    &:not(:last-child) {
+      margin-bottom: 16px;
+
+      @include on-tablet {
+        margin-bottom: 0;
+      }
+    }
+
+    @include on-tablet {
+      row-gap: 18px;
+      font-size: 20px;
+    }
+
+    @include on-desktop {
+      row-gap: 22px;
+      font-size: 25px;
+    }
+
+    &--password {
+      position: relative;
+
+      input {
+        &:disabled {
+          color: #bbb;
+        }
+      }
+    }
+  }
+
+  &__input-text {
+    background-color: #F4F4F4;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 300;
+    text-transform: capitalize;
+
+    &--email {
+      text-transform: lowercase;
+    }
+
+    @include on-tablet {
+      font-size: 18px;
+    }
+
+    @include on-desktop {
+      font-size: 20px;
+    }
+  }
+
+  &__textarea {
+    resize: none;
+    min-height: 180px;
+    text-transform: none;
+
+    @include on-tablet {
+      min-height: 200px;
+    }
+
+    @include on-desktop {
+      min-height: 220px;
+    }
+  }
+
+  &__password-label {
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin-bottom: 16px;
+
+    @include on-tablet {
+      margin-bottom: 18px;
+      font-size: 20px;
+    }
+
+    @include on-desktop {
+      margin-bottom: 22px;
+      font-size: 25px;
+    }
+  }
+
+
+
+  .show-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &__change-pass-btn {
+    background: none;
+    padding: 10px 12px;
+    width: fit-content;
+  }
+
+  &__submit-btn {
+    padding: 14px 24px;
+    background-color: $text-color-dark;
+    color: #F4F4F4;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    width: 200px;
+  }
+}

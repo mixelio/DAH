@@ -1,6 +1,6 @@
 import {useContext, useEffect, useState} from "react"
 import {DreamsContext} from "../../DreamsContext"
-import {Link, useParams} from "react-router-dom";
+import {Link, useLocation, useParams} from "react-router-dom";
 import {Avatar, Button, CircularProgress, Divider, IconButton, TextField} from "@mui/material";
 import {User} from "../../types/User";
 import {getAuthor} from "../../utils/getAuthor";
@@ -12,6 +12,7 @@ import SendIcon from "@mui/icons-material/Send";
 import {Comment} from "../../components/Comment/Comment";
 import { CommentType } from "../../types/Comment";
 import {getUser} from "../../utils/getUser";
+import {FacebookShareButton} from "react-share";
 
 export const DreamPage = () => {
   const {
@@ -28,6 +29,10 @@ export const DreamPage = () => {
   const { id } = useParams();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
+
+  const location = useLocation()
+  const currentUrl = `${window.location.origin}${location.pathname}`
+  
 
   useEffect(() => {
     const tempUser = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) ?? null : null;
@@ -71,6 +76,7 @@ export const DreamPage = () => {
                 <p className="dream__author-location">{author.location}</p>
               </div>
             </Link>
+
             <Divider sx={{ mb: 2 }} />
             <div className="dream__dream-info">
               <div className="dream__image-container">
@@ -164,6 +170,7 @@ export const DreamPage = () => {
                 </div>
               )}
             </div>
+            <FacebookShareButton children url={currentUrl} style={{width: "32px", height: "32px"}}/>
           </div>
         )}
       </div>

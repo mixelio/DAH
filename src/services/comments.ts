@@ -3,7 +3,7 @@ export const getComments = () => {
 
   return fetch(`${baseURL}api/comments.json`).then((response) => {
     if (!response.ok) {
-      console.log("not ok");
+      console.log();
     }
 
     return response.json();

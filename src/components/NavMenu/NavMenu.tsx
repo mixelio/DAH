@@ -1,4 +1,4 @@
-import {Avatar, Button, Divider, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
+import {Avatar, Button, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
 import {useContext, useState} from 'react';
 import {NavLink, useNavigate} from 'react-router-dom'
 import logo from "../../assets/images/main-logo.png";
@@ -6,12 +6,13 @@ import classNames from 'classnames';
 import {DreamsContext} from '../../DreamsContext';
 import {theme} from '../../utils/theme';
 import {getUser} from '../../utils/getUser';
+import {useAppSelector} from '../../app/hooks';
 
 const pages = [
   {id: 1, name: 'Home', path: '/'},
   {id: 2, name: 'Dreams', path: '/dreams'},
   {id: 3, name: 'About', path: '/aboutus'}
-]
+];
 
 const colorsPrimary = theme.palette.primary;
 
@@ -19,13 +20,11 @@ export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const {
     setMainFormActive, 
-    setActiveIndex, 
-    users } = useContext(DreamsContext);
+    setActiveIndex } = useContext(DreamsContext);
+  const {users} = useAppSelector(store => store.users)
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
-
-
 
   const loginedUser = userFromLocaleStorage
     ? getUser(+userFromLocaleStorage, users)
@@ -63,14 +62,13 @@ export const NavMenu = () => {
           className="navigation__logo"
           onClick={() => handleMenuClick(0)}
         >
-          <img className='navigation__logo-img' src={logo} alt="" />
-          Dreams are here...
+          <img className="navigation__logo-img" src={logo} alt="" />
+          
         </NavLink>
         <div className="navigation__pages">
           {pages.map((page, index) => (
             <NavLink
               key={page.id}
-              style={{ color: `${colorsPrimary.main}` }}
               to={page.path}
               className={getLinkClass}
               onClick={() => handleMenuClick(index)}
@@ -111,6 +109,7 @@ export const NavMenu = () => {
               paper: {
                 elevation: 0,
                 sx: {
+                  width: "150px",
                   overflow: "visible",
                   filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                   mt: 1.5,
@@ -139,10 +138,19 @@ export const NavMenu = () => {
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
             <MenuItem onClick={() => navigate(`profile/${loginedUser.id}`)}>
-              Profile
+              My Profile
             </MenuItem>
-            <Divider />
-            <MenuItem onClick={() => localStorage.setItem("currentUser", "")}>
+
+            <MenuItem>Favorite Dreams</MenuItem>
+
+            <MenuItem>Help&Support</MenuItem>
+
+            <MenuItem onClick={() => {
+              localStorage.setItem("currentUser", "");
+              localStorage.removeItem("access");
+              localStorage.removeItem("refresh");
+              navigate("/");
+            }}>
               Logout
             </MenuItem>
           </Menu>
@@ -150,7 +158,7 @@ export const NavMenu = () => {
       ) : (
         <Button
           className="navigation__in-btn"
-          variant='contained'
+          variant="contained"
           onClick={handleSingInOpen}
           sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
         >

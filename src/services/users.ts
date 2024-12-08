@@ -4,7 +4,7 @@ export const getUsers = () => {
 
   return fetch(`${baseURL}api/users.json`).then((response) => {
     if (!response.ok) {
-      console.log("not ok");
+      console.log();
     }
 
     return response.json();

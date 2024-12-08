@@ -13,28 +13,36 @@ import {ThemeProvider} from '@mui/material'
 import {theme} from './utils/theme.ts'
 import {ContactsPage} from './pages/ContactsPage/ContactsPage.tsx'
 import {ProfilePage} from './pages/ProfilePage/ProfilePage.tsx'
+import {Provider} from 'react-redux'
+import {store} from './app/store.ts'
+import {ProfileEdit} from './pages/ProfileEdit/ProfileEdit.tsx'
 
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <DreamsProvider>
-      <ThemeProvider theme={theme}>
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<App />}>
-              <Route index element={<HomePage />} />
-              <Route path="dreams">
-                <Route index element={<DreamsGalleryPage />} />
-                <Route path=":id?" element={<DreamPage />} />
+    <Provider store={store}>
+      <DreamsProvider>
+        <ThemeProvider theme={theme}>
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<App />}>
+                <Route index element={<HomePage />} />
+                <Route path="dreams">
+                  <Route index element={<DreamsGalleryPage />} />
+                  <Route path=":id?" element={<DreamPage />} />
+                </Route>
+                <Route path="aboutus" element={<AboutUsPage />} />
+                <Route path="contacts" element={<ContactsPage />} />
+                <Route path="profile/:id?">
+                  <Route index element={<ProfilePage />} />
+                  <Route path="edit" element={<ProfileEdit />} />
+                </Route>
+                <Route path="*" element={<NotFoundPage />} />
               </Route>
-              <Route path="aboutus" element={<AboutUsPage />} />
-              <Route path="contacts" element={<ContactsPage />} />
-              <Route path="profile/:id?" element={<ProfilePage />}/>
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-          </Routes>
-        </HashRouter>
-      </ThemeProvider>
-    </DreamsProvider>
+            </Routes>
+          </HashRouter>
+        </ThemeProvider>
+      </DreamsProvider>
+    </Provider>
   </StrictMode>
 );
