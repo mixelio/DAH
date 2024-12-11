@@ -160,7 +160,7 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'https://mixelio.github.io/DAH/'
+    'https://mixelio.github.io'
 ]
 
 CLOUDINARY = {
