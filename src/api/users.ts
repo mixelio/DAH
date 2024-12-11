@@ -19,7 +19,7 @@ export const getLoginedUser = (token: string) => {
   return response;
 }
 
-export const changeUser = (data: Omit<User, "id" | "is_staff" | "num_of_dreams">, token: string) => {
+export const changeUser = (data: Omit<User, "id" | "is_staff" | "num_of_dreams" | "password">, token: string) => {
   return client.patch<User>(`user/me/`, data, token)
 };
 

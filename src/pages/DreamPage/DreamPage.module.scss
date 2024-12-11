@@ -4,6 +4,7 @@
 $sub-info-width: 40px;
 
 .dream {
+  padding: 45px 0;
   margin-bottom: 20px;
 
   @include on-tablet {
@@ -18,8 +19,18 @@ $sub-info-width: 40px;
     display: flex;
     align-items: center;
     column-gap: 10px;
+    width: fit-content;
 
     margin-bottom: 22px;
+    font-size: 16px;
+
+    @include on-tablet {
+      font-size: 18px;
+    }
+
+    @include on-desktop {
+      font-size: 20px;
+    }
   }
 
   &__category {
@@ -31,6 +42,14 @@ $sub-info-width: 40px;
     margin-bottom: 20px;
     font-size: 32px;
     font-weight: 700;
+
+    @include on-tablet {
+      font-size: 40px;
+    }
+
+    @include on-desktop {
+      font-size: 48px;
+    }
   }
 
   &__dream-info {
@@ -38,27 +57,29 @@ $sub-info-width: 40px;
   }
 
   &__author-name {
-    margin-bottom: 8px;
+    text-transform: capitalize;
+    font-weight: 600;
   }
 
   &__author-location {
-    font-size: 10px;
-    color: $secondary-light;
+    color: $text-color-light;
+    font-weight: 400;
   }
 
   &__image-container {
     position: relative;
-    height: 150px;
+    height: 200px;
     margin-bottom: 20px;
-    
+    border-radius: 20px;
+    overflow: hidden;
     
       @include on-tablet {
-        height: 250px;
+        height: 350px;
         margin-bottom: 30px;
       }
     
       @include on-desktop {
-        height: 350px;
+        height: 450px;
         margin-bottom: 40px;
       }
   }
@@ -152,5 +173,9 @@ $sub-info-width: 40px;
       background: none;
       color: $secondary-main;
     }
+  }
+
+  &__waiting {
+    transform: translate(-50%, -50%);
   }
 }

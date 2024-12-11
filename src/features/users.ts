@@ -42,11 +42,11 @@ const usersSlice = createSlice({
     // geting logined user
     builder
       .addCase(currentUserInit.pending, (state) => {
-        console.log('loading...')
+        console.log()
         state.usersLoading = true;
       })
       .addCase(currentUserInit.fulfilled, (state, action) => {
-        console.log('loaded!');
+        console.log();
         state.loginedUser = action.payload;
         state.usersLoading = false;
       })
@@ -77,14 +77,14 @@ export const currentUserInit = createAsyncThunk("currUser/fetch", async (token: 
 })
 
 export const currentUserUpdate = createAsyncThunk("currentUser/patch", async ({ data, token }: { data: FormData, token: string }) => {
-  const userData: Omit<User, "id" | "is_staff" | "num_of_dreams"> = {
+  const userData: Omit<User, "id" | "is_staff" | "num_of_dreams" | "password"> = {
     email: data.get("email") as string,
     first_name: data.get("first_name") as string,
     last_name: data.get("last_name") as string,
-    photo: data.get("photo") as string,
-    password: data.get("password") as string,
+    photo: data.get("photo") instanceof File ? (data.get("photo") as File).name : "",
     location: data.get("location") as string,
     about_me: data.get("about_me") as string,
+    photo_url: data.get("photo_url") as string,
   };
 
   const response = await changeUser(userData, token);

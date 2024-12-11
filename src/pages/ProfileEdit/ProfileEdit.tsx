@@ -1,9 +1,9 @@
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {currentUserInit, currentUserUpdate, usersInit} from "../../features/users";
-import {Button, CircularProgress, IconButton} from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import {Button, CircularProgress} from "@mui/material";
+// import VisibilityIcon from "@mui/icons-material/Visibility";
+// import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {useNavigate} from "react-router-dom";
 // import {Email} from "@mui/icons-material";
 
@@ -22,10 +22,10 @@ export const ProfileEdit = () => {
 
   useEffect(() => {}, [loginedUser]);
 
-  const passInputRef = useRef<HTMLInputElement>(null);
+  // const passInputRef = useRef<HTMLInputElement>(null);
 
-  const [showPass, setShowPass] = useState(false);
-  const [passChange, setPassChange] = useState(true);
+  // const [showPass, setShowPass] = useState(false);
+  // const [passChange, setPassChange] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -57,21 +57,23 @@ export const ProfileEdit = () => {
       setSelectedFile(file);
 
       const reader = new FileReader();
+
       reader.onload = () => {
         setPreviewUrl(reader.result as string);
       };
+
       reader.readAsDataURL(file);
     }
   };
 
-  const handleChangeOpportunity = () => {
-    setPassChange((allow) => !allow);
-    setTimeout(() => {
-      if (passInputRef.current) {
-        passInputRef.current.focus();
-      }
-    }, 0);
-  };
+  // const handleChangeOpportunity = () => {
+  //   setPassChange((allow) => !allow);
+  //   setTimeout(() => {
+  //     if (passInputRef.current) {
+  //       passInputRef.current.focus();
+  //     }
+  //   }, 0);
+  // };
 
   const handleChangeProfileData = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDataForChange((prev) => (
@@ -132,7 +134,7 @@ export const ProfileEdit = () => {
         >
           <div className="profile-edit__image-block">
             <img
-              src={loginedUser?.photo ?? previewUrl ?? undefined}
+              src={previewUrl ?? loginedUser?.photo ?? ""}
               alt=""
               className="profile-edit__image"
             />
@@ -213,7 +215,7 @@ export const ProfileEdit = () => {
               ></textarea>
             </label>
           </div>
-          <div className="profile-edit__password-block">
+          {/* <div className="profile-edit__password-block">
             <p className="profile-edit__password-label">Password</p>
             <div className="profile-edit__sub-block">
               <label className="profile-edit__input-box profile-edit__input-box--password">
@@ -246,12 +248,10 @@ export const ProfileEdit = () => {
                 </button>
               </div>
             </div>
-          </div>
-            <button type="submit" className="profile-edit__submit-btn">
-              {loader ?
-            <CircularProgress size={16}/>
-            : "Save Changes "}
-            </button>
+          </div> */}
+          <button type="submit" className="profile-edit__submit-btn">
+            {loader ? <CircularProgress size={16} /> : "Save Changes "}
+          </button>
         </form>
       </div>
     </section>

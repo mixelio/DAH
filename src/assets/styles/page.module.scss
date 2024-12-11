@@ -1,7 +1,10 @@
+@use './utils/vars' as *;
+
 .page {
   &__body {
-    
+    background: url('../../assets/images/snow.svg');
     overflow-y: scroll;
+
     & .container {
       max-width: 1440px;
       padding: 0 16px;
@@ -28,6 +31,21 @@
 
     & .main {
       flex-grow: 1;
+    }
+
+    & .title {
+      text-align: center;
+      font-size: 38px;
+      font-weight: 700;
+      color: $primary-main;
+
+      @mixin on-tablet {
+        font-size: 48px;
+      }
+
+      @mixin on-desktop {
+        font-size: 58px;
+      }
     }
   }
 }

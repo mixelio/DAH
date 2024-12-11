@@ -5,9 +5,9 @@
 
   & &__edit-btn {
     position: absolute;
-    top: 0;
+    top: 50%;
     right: 0;
-    transform: translateY(-100%);
+    transform: translate(110%, -50%);
   }
 
   &__main-info {
@@ -27,7 +27,7 @@
     align-items: center;
     gap: 16px;
     max-width: 740px;
-    margin: 0 auto;
+    margin: 0 auto 24px;
 
     @include on-tablet {
 
@@ -35,6 +35,7 @@
   }
 
   &__name {
+    position: relative;
     font-size: 24px;
     font-weight: 600;
     color: $primary-main;
@@ -60,8 +61,13 @@
     opacity: 0.5;
   }
 
-  &__add-rdeam-btn {
-    display: flex;
-    align-items: center;
+  &__add-dream-btn.MuiButton-root {
+    background-color: $primary-main;
+    display: block;
+    margin: 0 auto;
+
+    &:hover {
+      background-color: $primary-light;
+    }
   }
 }

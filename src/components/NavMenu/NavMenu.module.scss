@@ -4,28 +4,34 @@
 $underline-width: attr(data-width);
 
 .navigation {
-  height: 45px;
+  height: 46px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   column-gap: 16px;
   
     @include on-tablet {
+      height: 50px;
       column-gap: 20px;
     }
   
     @include on-desktop {
+      height: 54px;
       column-gap: 24px;
     }
 
   & &__in-btn {
-    font-size: 16px;
-    text-transform: uppercase;
+    height: 100%;
+    padding: 14px 66px;
+    font-size: 20px;
+    text-transform: capitalize;
     transition-duration: 300ms;
     color: $main-background;
+    border-radius: 20px;
   }
 
   &__links {
+    height: 100%;
     flex: 1;
     display: flex;
     column-gap: 20px;
@@ -57,8 +63,8 @@ $underline-width: attr(data-width);
 
   &__link {
     position: relative;
-    display: block;
-    padding: 10px 0;
+    display: flex;
+    align-items: center;
     height: 100%;
     font-size: 14px;
     font-weight: 400;
@@ -89,6 +95,8 @@ $underline-width: attr(data-width);
   }
 
   &__logo {
+    height: 100%;
+    aspect-ratio: 3/2;
     margin-right: 10px;
     display: flex;
     align-items: center;
@@ -108,20 +116,18 @@ $underline-width: attr(data-width);
     }
 
     &-img {
-      width: 90px;
-      height: 40px;
-
-      @include on-tablet {
-        width: 110px;
-        height: 61px;
-      }
-    
-      @include on-desktop {
-        width: 145px;
-        height: 96px;
-      }
+      width: 100%;
+      height: 100%;
     }
 
+    &__user-arera {
+      height: 100%;
+
+      & > button {
+        margin: 0;
+        width: 100%;
+      }
+    }
 
   }
 }

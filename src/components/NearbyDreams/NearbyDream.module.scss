@@ -1,0 +1,53 @@
+@use '../../assets/styles/utils/mixins' as *;
+
+.nearby-dreams {
+  &__title-block {
+    margin-bottom: 18px;
+    
+    @include on-tablet {
+      margin-bottom: 24px;
+    }
+
+    @include on-desktop {
+      margin-bottom: 32px;
+    }
+  }
+
+  &__title {
+    margin-bottom: 16px;
+  }
+
+  &__location {
+    text-align: center;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+
+    @include on-tablet {
+      flex-direction: row;
+    }
+
+  }
+
+  &__item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dream-cart {
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+
+    @include on-tablet {
+      &:not(:last-child) {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

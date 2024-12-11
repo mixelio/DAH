@@ -4,22 +4,41 @@ import {Link, useLocation, useParams} from "react-router-dom";
 import {Avatar, Button, CircularProgress, Divider, IconButton, TextField} from "@mui/material";
 import {User} from "../../types/User";
 import {getAuthor} from "../../utils/getAuthor";
-import FaceIcon from "@mui/icons-material/Face";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import LinearProgress from "@mui/material/LinearProgress";
-import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
-import SendIcon from "@mui/icons-material/Send";
 import {Comment} from "../../components/Comment/Comment";
 import { CommentType } from "../../types/Comment";
 import {getUser} from "../../utils/getUser";
 import {FacebookShareButton} from "react-share";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {dreamsInit} from "../../features/dreamsFeature";
+import {usersInit} from "../../features/users";
+import {Dream, DreamCategory} from "../../types/Dream";
+import {isImageAvailable} from "../../utils/isImageAvailable";
+import { getDream } from "../../api/dreams";
+
+// import LinearProgress from "@mui/material/LinearProgress";
+// import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import SendIcon from "@mui/icons-material/Send";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+// import InsertCommentIcon from "@mui/icons-material/InsertComment";
+
 
 export const DreamPage = () => {
+  const {dreams} = useAppSelector(store => store.dreams);
+  const {users} = useAppSelector(store => store.users);
+
+  const [postImage, setPostImage] = useState<string>("");
+  const [currentDream, setCurrentDream] = useState<Dream | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+      dispatch(dreamsInit());
+      dispatch(usersInit());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const {
-    currentDream,
-    dreams,
-    setCurrentDream,
-    users,
     loader,
     setLoader,
     comments,
@@ -30,9 +49,32 @@ export const DreamPage = () => {
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
 
-  const location = useLocation()
-  const currentUrl = `${window.location.origin}${location.pathname}`
-  
+  const location = useLocation();
+  const currentUrl = `${window.location.origin}${location.pathname}`;
+
+  useEffect(() => {
+    console.log("check rerender", currentDream?.views);
+  }, [currentDream]);
+
+  useEffect(() => {
+    const fetchDream = async () => {
+      if (id) {
+        setLoading(true);
+        try {
+          const res = await getDream(+id);
+          setCurrentDream(res);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setCurrentDream(null);
+      }
+    }
+
+    fetchDream();
+  }, [id, setCurrentDream])
 
   useEffect(() => {
     const tempUser = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) ?? null : null;
@@ -40,11 +82,22 @@ export const DreamPage = () => {
   }, [userFromLocaleStorage, users])
 
   useEffect(() => {
-    setCurrentDream(dreams.find((dream) => String(dream.id) === id) || null);
-    if (currentDream && users) {
-      setAuthor(getAuthor(currentDream.userId, users) || null);
+    if (currentDream && users.length > 0) {
+      setAuthor(getAuthor(currentDream.user, users) || null);
     }
-  }, [id, dreams, users, currentDream, setCurrentDream]);
+    if (currentDream?.image) {
+      isImageAvailable(currentDream.image).then((res) => {
+        if (res) {
+          setPostImage(currentDream.image);
+        } else {
+          setPostImage("https://via.placeholder.com/150");
+        }
+      });
+    } else {
+      setPostImage("https://via.placeholder.com/150");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, dreams, users, setCurrentDream, postImage]);
 
   useEffect(() => {
     if (comments && currentDream) {
@@ -58,45 +111,54 @@ export const DreamPage = () => {
   return (
     <section className="dream">
       <div className="container">
-        {currentDream && author && (
+        {currentDream && author && !loading ? (
           <div className="dream__content">
-            <p className="dream__category">{currentDream.category}</p>
             <h2 className="dream__title">{currentDream.name}</h2>
             <Link to={`/profile/${author.id}`} className="dream__author-info">
               <Avatar
                 className="dream-cart__author-avatar"
-                alt="Remy Sharp"
+                alt=""
                 src={author && author.photo}
                 sx={{ width: 38, height: 38 }}
               ></Avatar>
               <div className="dream__author-text-info">
-                <p className="dream__author-name">
-                  {author.first_name + " " + author.last_name}
-                </p>
-                <p className="dream__author-location">{author.location}</p>
+                {author.first_name && (
+                  <p className="dream__author-name">
+                    {`${author.first_name}${
+                      author.last_name ? " " + author.last_name : ""
+                    }`}
+                    {author.location && (
+                      <>
+                        ,{" "}
+                        <span className="dream__author-location">
+                          {author.location}
+                        </span>
+                      </>
+                    )}
+                  </p>
+                )}
               </div>
             </Link>
 
-            <Divider sx={{ mb: 2 }} />
             <div className="dream__dream-info">
               <div className="dream__image-container">
                 <img
                   className="dream__main-image"
-                  src={currentDream.image}
+                  src={`https://picsum.photos/id/${id}/1200/600`}
                   alt=""
                 />
               </div>
               <div className="dream__sub-info-box">
                 <div className="dream__sub-info dream__sub-info--1">
-                  <FaceIcon />
-                  <span>24</span>
+                  <PeopleAltIcon />
+                  <span>{currentDream.views}</span>
                 </div>
-                <div className="dream__sub-info dream__sub-info--2">
-                  <ChatBubbleOutlineIcon />
-                  <span>10</span>
-                </div>
-                <div className="dream__sub-info dream__sub-info--3 dream__progress">
-                  {currentDream.category === "money" ? (
+                {/* <div className="dream__sub-info dream__sub-info--2">
+                  <InsertCommentIcon />
+                  <span></span>
+                </div> */}
+                {/* <div className="dream__sub-info dream__sub-info--3 dream__progress">
+                  {currentDream.category === DreamCategory.MoneyDonation ? (
                     <LinearProgress
                       variant="determinate"
                       value={25}
@@ -108,13 +170,13 @@ export const DreamPage = () => {
                       <span>waiting...</span>
                     </>
                   )}
-                </div>
+                </div> */}
               </div>
               <Divider sx={{ mb: 2 }} />
               <p className="dream__description">{currentDream.description}</p>
               <Divider sx={{ mb: 2 }} />
               <div className="dream__after-info">
-                {currentDream.category === "money" ? (
+                {currentDream.category === DreamCategory.MoneyDonation ? (
                   <Button
                     variant="contained"
                     className="dream__donation-btn button"
@@ -130,7 +192,7 @@ export const DreamPage = () => {
                     I am with you
                   </Button>
                 )}
-                <div className="dream__date">{currentDream.created}</div>
+                <div className="dream__date">{currentDream.date_added}</div>
               </div>
             </div>
             <div className="dream__comments-box">
@@ -170,8 +232,17 @@ export const DreamPage = () => {
                 </div>
               )}
             </div>
-            <FacebookShareButton children url={currentUrl} style={{width: "32px", height: "32px"}}/>
+            <FacebookShareButton
+              children
+              url={currentUrl}
+              style={{ width: "32px", height: "32px" }}
+            />
           </div>
+        ) : (
+          <CircularProgress
+            style={{ position: "absolute", top: "50%", left: "50%" }}
+            className="dream__waiting"
+          />
         )}
       </div>
     </section>

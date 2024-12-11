@@ -7,6 +7,7 @@ import {DreamsContext} from '../../DreamsContext';
 import {theme} from '../../utils/theme';
 import {getUser} from '../../utils/getUser';
 import {useAppSelector} from '../../app/hooks';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const pages = [
   {id: 1, name: 'Home', path: '/'},
@@ -63,7 +64,6 @@ export const NavMenu = () => {
           onClick={() => handleMenuClick(0)}
         >
           <img className="navigation__logo-img" src={logo} alt="" />
-          
         </NavLink>
         <div className="navigation__pages">
           {pages.map((page, index) => (
@@ -90,12 +90,11 @@ export const NavMenu = () => {
               aria-expanded={open ? "true" : undefined}
             >
               <Avatar
-                alt="Remy Sharp"
-                src={loginedUser.photo}
-                sx={{ width: 32, height: 32 }}
+                alt=""
+                src={loginedUser.photo_url}
               >
                 {!loginedUser.photo &&
-                  loginedUser.first_name.charAt(0).toUpperCase()}
+                  <AccountCircleIcon />}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -162,7 +161,7 @@ export const NavMenu = () => {
           onClick={handleSingInOpen}
           sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
         >
-          Sing In
+          Singin
         </Button>
       )}
     </nav>
