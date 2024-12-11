@@ -78,6 +78,17 @@ class DreamViewSet(viewsets.ModelViewSet):
             return DreamSerializer
         return DreamReadSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        """Retrieve a dream and increment its views count."""
+        instance = self.get_object()
+        # Increment views count
+        instance.views = (instance.views or 0) + 1
+        instance.save(update_fields=['views'])
+
+        # Serialize and return the response
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
