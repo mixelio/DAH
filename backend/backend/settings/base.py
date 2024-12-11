@@ -118,7 +118,6 @@ STATIC_URL = 'static/'
 STATIC_ROOT = 'staticfiles/'
 
 MEDIA_URL = "https://res.cloudinary.com/{}/".format(os.getenv('CLOUDINARY_CLOUD_NAME'))
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
@@ -161,6 +160,7 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'https://mixelio.github.io/DAH/'
 ]
 
 CLOUDINARY = {
