@@ -15,9 +15,9 @@ export const NearbyDream = () => {
 
   const [street, city, country] = adress;
 
-  console.log(street, city, country);
 
   useEffect(() => {
+    console.log("get adress", street)
     getAdress().then((data) => setAdress(data));
     // const tempDreams = dreams.filter(
     //   dream => dream.location.toLowerCase() === "kyiv"
@@ -30,6 +30,7 @@ export const NearbyDream = () => {
     if (dreams.length > 0) {
       setDreamsNearby(dreams.slice(0, 3));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dreams, city]);
 
   

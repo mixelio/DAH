@@ -3,7 +3,6 @@ import {DreamsContext} from "../../DreamsContext"
 import {Link, useLocation, useParams} from "react-router-dom";
 import {Avatar, Button, CircularProgress, Divider, IconButton, TextField} from "@mui/material";
 import {User} from "../../types/User";
-import {getAuthor} from "../../utils/getAuthor";
 import {Comment} from "../../components/Comment/Comment";
 import { CommentType } from "../../types/Comment";
 import {getUser} from "../../utils/getUser";
@@ -25,44 +24,55 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 export const DreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const {users} = useAppSelector(store => store.users);
-
+  const { id } = useParams();
+  const userFromLocaleStorage = localStorage.getItem("currentUser");
   const [postImage, setPostImage] = useState<string>("");
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-      dispatch(dreamsInit());
-      dispatch(usersInit());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const {
-    loader,
-    setLoader,
-    comments,
-  } = useContext(DreamsContext);
   const [author, setAuthor] = useState<User | null>(null);
-  const [postComments, setPostComments] = useState<CommentType[] | null>(null);
-  const { id } = useParams();
-  const userFromLocaleStorage = localStorage.getItem("currentUser");
+  const [postComments, setPostComments] = useState<CommentType[]>([]);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
 
   const location = useLocation();
   const currentUrl = `${window.location.origin}${location.pathname}`;
 
-  useEffect(() => {
-    console.log("check rerender", currentDream?.views);
-  }, [currentDream]);
+  const dispatch = useAppDispatch();
+
+  const { comments } = useContext(DreamsContext);
 
   useEffect(() => {
+    const initializate = async () => {
+      try {
+        await Promise.all([dispatch(dreamsInit()).unwrap(), dispatch(usersInit()).unwrap()]);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        console.log("initializate dreams page")
+      }
+    }
+
+    initializate();
+    console.log("first render of dream page")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    console.log("get dream");
     const fetchDream = async () => {
       if (id) {
         setLoading(true);
         try {
-          const res = await getDream(+id);
-          setCurrentDream(res);
+          const dream = await getDream(+id);
+
+          const tempUser: User | null = userFromLocaleStorage
+            ? getUser(+userFromLocaleStorage, users) || null
+            : null;
+
+          const tempAuthor: User = currentDream?.user !== undefined ? getUser(currentDream.user, users) || {} as User : {} as User;
+
+          setCurrentDream(dream);
+          setLoginedUser(tempUser);
+          setAuthor(tempAuthor);
         } catch (e) {
           console.error(e);
         } finally {
@@ -71,20 +81,13 @@ export const DreamPage = () => {
       } else {
         setCurrentDream(null);
       }
-    }
+    };
 
     fetchDream();
-  }, [id, setCurrentDream])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    const tempUser = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) ?? null : null;
-      setLoginedUser(tempUser);
-  }, [userFromLocaleStorage, users])
-
-  useEffect(() => {
-    if (currentDream && users.length > 0) {
-      setAuthor(getAuthor(currentDream.user, users) || null);
-    }
     if (currentDream?.image) {
       isImageAvailable(currentDream.image).then((res) => {
         if (res) {
@@ -96,7 +99,7 @@ export const DreamPage = () => {
     } else {
       setPostImage("https://via.placeholder.com/150");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, dreams, users, setCurrentDream, postImage]);
 
   useEffect(() => {
@@ -104,14 +107,14 @@ export const DreamPage = () => {
       setPostComments(
         comments.filter((item) => item.dreamId === currentDream.id)
       );
-      setLoader(false);
     }
-  }, [comments, currentDream, setLoader]);
+  }, [comments, currentDream]);
 
   return (
     <section className="dream">
       <div className="container">
-        {currentDream && author && !loading ? (
+        {currentDream && author && !loading ? 
+        (
           <div className="dream__content">
             <h2 className="dream__title">{currentDream.name}</h2>
             <Link to={`/profile/${author.id}`} className="dream__author-info">
@@ -214,9 +217,7 @@ export const DreamPage = () => {
                   </IconButton>
                 </form>
               )}
-              {loader ? (
-                <CircularProgress />
-              ) : (
+
                 <div className="dream__comments">
                   <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
                     Comments
@@ -230,7 +231,6 @@ export const DreamPage = () => {
                     <p className="dream__comments-info-message">no comments</p>
                   )}
                 </div>
-              )}
             </div>
             <FacebookShareButton
               children

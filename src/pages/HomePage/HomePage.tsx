@@ -6,12 +6,12 @@ import {NearbyDream} from "../../components/NearbyDreams/NearbyDream";
 export const HomePage = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [adress, setAdress] = useState<string[]>([]);
-    const [street, city, country] = adress;
-
-    console.log(street, city, country);
+    // const [street, city, country] = adress;
 
     useEffect(() => {
+      console.log("get adress", adress)
       getAdress().then((data) => setAdress(data));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 

@@ -1,5 +1,4 @@
-import {useContext, useEffect} from "react"
-import {DreamsContext} from "../../DreamsContext"
+import {useEffect, useState} from "react"
 import {Avatar, Button, Divider, IconButton} from "@mui/material";
 import { useMediaQuery } from "react-responsive";
 import {getUser} from "../../utils/getUser";
@@ -13,22 +12,47 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {currentUserInit, usersInit} from "../../features/users";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import {User} from "../../types/User";
 
 
 export const ProfilePage = () => {
-  const { dreams } = useContext(DreamsContext);
-
   // #region get logined user info
 
   const { users, loginedUser} = useAppSelector(store => store.users);
+  const { dreams } = useAppSelector(store => store.dreams);
   const dispatch = useAppDispatch();
 
   const chekTocken = localStorage.getItem("access") ?? '';
+  const { id } = useParams();
+  // const currentProfile = id !== undefined ? getUser(+id, users) : null;
+  const [currentProfile, setCurrentProfile] = useState<User | null>(null);
+
+  useEffect(() => {
+    console.log("get current profile");
+    const fetchCurrentProfile = async () => {
+      if (id) {
+        try {
+          const user = getUser(+id, users);
+          setCurrentProfile(user ?? null);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
+    fetchCurrentProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  const dreamsOfUser = dreams.filter(
+    (dream) => dream.user === currentProfile?.id
+  );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(usersInit());
     dispatch(currentUserInit(chekTocken));
-    console.log(currentProfile?.photo_url);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -36,12 +60,7 @@ export const ProfilePage = () => {
 
   // const userFromLocaleStorage = localStorage.getItem("currentUser");
   // const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
-  const {id} = useParams();
-  const currentProfile = id !== undefined ? getUser(+id, users) : null;
-  const dreamsOfUser = dreams.filter(dream => dream.user === currentProfile?.id);
-  console.log(!!currentProfile?.photo);
 
-  const navigate = useNavigate();
 
   const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
   const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });

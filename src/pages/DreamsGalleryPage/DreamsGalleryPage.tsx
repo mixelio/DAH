@@ -11,9 +11,10 @@ export const DreamsGalleryPage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    console.log("get dreams")
     dispatch(dreamsInit());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dreams])
+  }, [])
 
 
   return (
