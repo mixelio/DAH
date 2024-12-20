@@ -1,10 +1,15 @@
+from typing import Optional
+
 import stripe
 from django.conf import settings
+from django.db.models import QuerySet
+from django.http import HttpResponseRedirect, HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
 from rest_framework import viewsets, status
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -16,7 +21,8 @@ class PaymentViewSet(ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Payment]:
+        """Retrieve the appropriate queryset based on user permissions."""
         user = self.request.user
         if user.is_staff:
             return Payment.objects.all()
@@ -28,8 +34,9 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class PaymentSuccessTempView(APIView):
-    def get(self, request):
-        session_id = request.GET.get('session_id')
+    def get(self, request: HttpRequest) -> HttpResponseRedirect | Response:
+        """Handle redirection after temporary payment success."""
+        session_id: Optional[str] = request.GET.get('session_id')
         if session_id:
             return redirect(
                 reverse('payment:payment-success', kwargs={'session_id': session_id})
@@ -42,7 +49,8 @@ class PaymentSuccessTempView(APIView):
 class PaymentSuccessView(APIView):
     serializer_class = PaymentSerializer
 
-    def get(self, request, session_id):
+    def get(self, request: Request, session_id: str) -> Response:
+        """Handle payment success using Stripe session ID."""
         try:
             session = stripe.checkout.Session.retrieve(session_id)
 
@@ -66,7 +74,8 @@ class PaymentSuccessView(APIView):
 class PaymentCancelView(APIView):
     serializer_class = PaymentSerializer
 
-    def get(self, request):
+    def get(self, request) -> Response:
+        """Handle payment cancellation."""
         return Response(
             {'message': 'Payment was cancelled. You can pay again within 24 hours.'}
         )
