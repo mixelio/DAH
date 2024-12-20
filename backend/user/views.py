@@ -35,10 +35,12 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class ListUserView(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class RetrieveDetailUserView(generics.RetrieveAPIView, ListUserView):
     lookup_field = 'id'
+    permission_classes = (IsAuthenticated,)
 
 
 class PasswordResetRequestView(APIView):
