@@ -23,16 +23,17 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("is_staff",)
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
 
-    def get_photo_url(self, obj):
+    def get_photo_url(self, obj: get_user_model()) -> str | None:
+        """Create user photo url"""
         if obj.photo:
             return obj.photo.url
         return None
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> get_user_model():
         """Create a new users with encrypted password and return it"""
         return get_user_model().objects.create_user(**validated_data)
 
-    def update(self, instance, validated_data):
+    def update(self, instance: get_user_model(), validated_data: dict) -> get_user_model():
         """Update a users, set the password correctly and return it"""
         password = validated_data.pop('password', None)
         user = super().update(instance, validated_data)
