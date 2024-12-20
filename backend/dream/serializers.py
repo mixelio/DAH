@@ -39,7 +39,7 @@ class DreamReadSerializer(DreamSerializer):
             'contributions',
         ]
 
-    def get_image_url(self, obj):
+    def get_image_url(self, obj: Dream) -> str | None:
         if obj.image:
             return obj.image.url
         return None
