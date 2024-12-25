@@ -60,15 +60,15 @@ class LikeCommentView(APIView):
 
 
 class DreamViewSet(viewsets.ModelViewSet):
-    queryset = Dream.objects.all().select_related('user')
     serializer_class = DreamSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self):
+        queryset = Dream.objects.all().select_related('user')
         category = self.request.query_params.get('category', None)
         if category:
-            return self.queryset.filter(category=category)
-        return self.queryset
+            return queryset.filter(category=category)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
