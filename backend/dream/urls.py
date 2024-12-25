@@ -11,7 +11,7 @@ from dream.views import (
 app_name = 'dream'
 
 router = DefaultRouter()
-router.register(r'dream', DreamViewSet)
+router.register(r'dream', DreamViewSet, basename='dream')
 
 urlpatterns = [
     path('dream/<int:dream_id>/comments/', CommentListCreateView.as_view(), name='comment'),
