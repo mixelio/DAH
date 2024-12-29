@@ -6,7 +6,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -35,12 +35,12 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class ListUserView(generics.ListAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
 
 class RetrieveDetailUserView(generics.RetrieveAPIView, ListUserView):
     lookup_field = 'id'
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
 
 class PasswordResetRequestView(APIView):
