@@ -10,6 +10,7 @@ export type Dream = {
   name: string;
   description: string;
   image: string;
+  image_url: string;
   cost: number;
   accumulated: number;
   status: DreamCategory;

@@ -19,7 +19,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
       <div className="dream-cart__image-box">
         <img
           className="lozad dream-cart__image"
-          src={`https://picsum.photos/id/${dream.id}/1200/600`}
+          src={dream.image_url}
           alt="dream_image"
           loading="lazy"
         />

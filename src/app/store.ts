@@ -3,7 +3,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import usersReducer from '../features/users';
 import dreamsReducer from '../features/dreamsFeature';
 // import currentUserReducer from '../features/currentUser';
-// import currentPostReducer from '../features/currentPost';
+import currentDreamReducer from '../features/currentDreamFeature';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +11,7 @@ export const store = configureStore({
     users: usersReducer,
     dreams: dreamsReducer,
     // currentUser: currentUserReducer,
-    // currentPost: currentPostReducer,
+    currentDream: currentDreamReducer,
   },
 });
 

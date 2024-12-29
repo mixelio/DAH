@@ -2,6 +2,15 @@
 @use '../../assets/styles/utils/mixins' as *;
 
 .profile {
+  padding: 24px 0;
+
+  @include on-tablet {
+    padding: 32px 0;
+  }
+
+  @include on-desktop {
+    padding: 40px 0;
+  }
 
   & &__edit-btn {
     position: absolute;
@@ -18,7 +27,33 @@
   }
 
   &__image-box {
+    width: 142px;
+    height: 142px;
+    border-radius: 50%;
+    overflow: hidden;
     margin-bottom: 18px;
+
+    & input {
+      width: 100%;
+    }
+
+    @include on-tablet {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 24px;
+    }
+
+    @include on-desktop {
+      width: 240px;
+      height: 240px;
+      margin-bottom: 32px;
+    }
+  }
+
+  &__avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   &__sub-info {
@@ -36,8 +71,6 @@
 
   &__name {
     position: relative;
-    font-size: 24px;
-    font-weight: 600;
     color: $primary-main;
   }
 

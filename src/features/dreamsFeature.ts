@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {getDreams} from "../api/dreams";
+import {createDream, getDreams} from "../api/dreams";
 
 export type dreamsState = {
   dreams: Dream[],
@@ -29,15 +29,15 @@ const dreamsSlice = createSlice({
       .addCase(dreamsInit.fulfilled, (state, action) => {
         state.dreams = action.payload;
       });
-    // geting current dream
-    // builder
-    //   .addCase(currentDreamInit.pending, (state) => {
-    //     state.dreamsLoading = true;
-    //   })
-    //   .addCase(currentDreamInit.fulfilled, (state, action) => {
-    //     state.currentDream = action.payload;
-    //     state.dreamsLoading = false;
-    //   });
+
+    builder.
+      addCase(dreamCreateInit.pending, (state) => {
+        state.dreamsLoading = true;
+      })
+      .addCase(dreamCreateInit.fulfilled, (state, action) => {
+        state.dreamsLoading = false;
+        state.dreams = [...state.dreams, action.payload];
+      },);
   },
 });
 
@@ -46,5 +46,11 @@ export const { actions } = dreamsSlice;
 
 export const dreamsInit = createAsyncThunk("dreams/fetch", async () => {
   const response = await getDreams();
+  return response;
+});
+
+export const dreamCreateInit = createAsyncThunk("dreams/create", async (data: { dreamData: FormData, token: string }) => {
+  const { dreamData, token } = data;
+  const response = await createDream(dreamData, token);
   return response;
 });

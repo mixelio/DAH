@@ -167,6 +167,7 @@
   }
 
   &__submit-btn {
+    display: inline-block;
     padding: 14px 24px;
     background-color: $text-color-dark;
     color: #F4F4F4;
@@ -174,5 +175,9 @@
     font-size: 18px;
     font-weight: 700;
     width: 200px;
+
+    &:not(:last-child) {
+      margin-right: 20px;
+    }
   }
 }

@@ -1,21 +1,17 @@
 import {useEffect, useState} from "react"
-import {Avatar, Button, Divider, IconButton} from "@mui/material";
-import { useMediaQuery } from "react-responsive";
+import {Avatar, IconButton} from "@mui/material";
 import {getUser} from "../../utils/getUser";
-import {useNavigate, useParams} from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import {DreamCart} from "../../components/DreamCart/DreamCart";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {currentUserInit, usersInit} from "../../features/users";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {User} from "../../types/User";
+import {dreamsInit} from "../../features/dreamsFeature";
 
 
 export const ProfilePage = () => {
+  
   // #region get logined user info
 
   const { users, loginedUser} = useAppSelector(store => store.users);
@@ -24,15 +20,18 @@ export const ProfilePage = () => {
 
   const chekTocken = localStorage.getItem("access") ?? '';
   const { id } = useParams();
-  // const currentProfile = id !== undefined ? getUser(+id, users) : null;
   const [currentProfile, setCurrentProfile] = useState<User | null>(null);
 
   useEffect(() => {
-    console.log("get current profile");
+    dispatch(dreamsInit());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     const fetchCurrentProfile = async () => {
       if (id) {
         try {
-          const user = getUser(+id, users);
+          const user = await getUser(+id, users);
           setCurrentProfile(user ?? null);
         } catch (error) {
           console.error(error);
@@ -41,8 +40,8 @@ export const ProfilePage = () => {
     }
 
     fetchCurrentProfile();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+    
+  }, [id, users]);
 
   const dreamsOfUser = dreams.filter(
     (dream) => dream.user === currentProfile?.id
@@ -51,33 +50,19 @@ export const ProfilePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(usersInit());
-    dispatch(currentUserInit(chekTocken));
+    const initializate = async () => {
+      try {
+        await Promise.all([dispatch(usersInit()).unwrap(), dispatch(currentUserInit(chekTocken)).unwrap()]);
+      } catch (error) {
+        console.error(error);
+      }
+  }
+
+    initializate();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // #endregion
-
-  // const userFromLocaleStorage = localStorage.getItem("currentUser");
-  // const ownerProfile = userFromLocaleStorage ? getUser(+userFromLocaleStorage, users) : null;
-
-
-  const isTablet = useMediaQuery({ query: "(min-width: 640px)" });
-  const isDesctop = useMediaQuery({ query: "(min-width: 1200px)" });
-
-  
-
-  const slidesPerView = () => {
-    if (isDesctop) {
-      return 3;
-    }
-
-    if (isTablet) {
-      return 2;
-    }
-
-    return 1;
-  };
 
   return (
     <section className="profile">
@@ -86,13 +71,16 @@ export const ProfilePage = () => {
           {/* avatar and user info */}
 
           <div className="profile__image-box">
-            <Avatar
-              alt=""
-              src={currentProfile?.photo_url}
-              sx={{ width: 156, height: 156 }}
-            >
-              {!loginedUser?.photo && <AccountCircleIcon />}
-            </Avatar>
+            {currentProfile && (
+              <Avatar
+                alt=""
+                src={currentProfile.photo_url}
+                sx={{ width: "100%", height: "100%" }}
+                className="profile__avatar"
+              >
+                {!currentProfile.photo_url && <AccountCircleIcon />}
+              </Avatar>
+            )}
           </div>
 
           <div className="profile__sub-info">
@@ -113,60 +101,18 @@ export const ProfilePage = () => {
             <p className="profile__description">{currentProfile?.about_me}</p>
           </div>
         </div>
-        {loginedUser?.id === currentProfile?.id && (
-          <Button variant="contained" className="profile__add-dream-btn">
-            Add a Dream
-          </Button>
-        )}
-        {dreamsOfUser.length > 0 && (
-          <div className="profile__dreams-of-user">
-            <Divider textAlign="center" sx={{ mb: 3, mt: 3 }}>
-              Dreams {dreamsOfUser.length}
-            </Divider>
-            <Swiper
-              className="profile__slider"
-              modules={[Navigation]}
-              navigation={{
-                prevEl: `#profile-prev-btn-${currentProfile?.id}`,
-                nextEl: `#profile-next-btn-${currentProfile?.id}`,
-              }}
-              spaceBetween={30}
-              slidesPerView={slidesPerView()}
-            >
-              {dreamsOfUser &&
-                dreamsOfUser.map((dream, index) => (
-                  <SwiperSlide key={index} className="profile__slide">
-                    <DreamCart dream={dream} />
-                  </SwiperSlide>
-                ))}
-              <IconButton
-                id={`profile-prev-btn-${currentProfile?.id}`}
-                style={{
-                  position: "absolute",
-                  background: "#fff",
-                  top: "50%",
-                  left: "10px",
-                  zIndex: 10,
-                  transform: "translateY(-50%)",
-                }}
-              >
-                <ArrowBackIosNewIcon />
-              </IconButton>
-              <IconButton
-                id={`profile-next-btn-${currentProfile?.id}`}
-                style={{
-                  position: "absolute",
-                  background: "#fff",
-                  top: "50%",
-                  right: "10px",
-                  zIndex: 10,
-                  transform: "translateY(-50%)",
-                }}
-              >
-                <ArrowForwardIosIcon />
-              </IconButton>
-            </Swiper>
+        {dreamsOfUser.length > 0 && dreamsOfUser.map(dream => (
+          <div 
+            key={dream.id} 
+            className="profile__dream"
+          >
+            {dream.name}
           </div>
+        ))}
+        {loginedUser?.id === currentProfile?.id && (
+          <Link to="create" className="profile__add-dream-btn">
+            Add a new dream
+          </Link>
         )}
       </div>
     </section>

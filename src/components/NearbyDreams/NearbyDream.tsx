@@ -10,6 +10,7 @@ export const NearbyDream = () => {
   const dispatch = useAppDispatch();
 
   const [adress, setAdress] = useState<string[]>([]);
+  const [adressLoading, setAdressLoading] = useState<boolean>(false);
   const [onlyCity, setOnlyCity] = useState<string>("");
   const [dreamsNearby, setDreamsNearby] = useState<Dream[]>([]);
 
@@ -17,8 +18,19 @@ export const NearbyDream = () => {
 
 
   useEffect(() => {
-    console.log("get adress", street)
-    getAdress().then((data) => setAdress(data));
+    console.log("adress", street);
+    setAdressLoading(true);
+    const fetchAdress = async () => {
+      try {
+        const data = await getAdress();
+        setAdress(data);
+        setAdressLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchAdress();
     // const tempDreams = dreams.filter(
     //   dream => dream.location.toLowerCase() === "kyiv"
     // );
@@ -44,9 +56,15 @@ export const NearbyDream = () => {
       <div className="container">
         <div className="nearby-dreams__title-block">
           <h2 className="title nearby-dreams__title">Nearby Dreams</h2>
-          <p className="nearby-dreams__location">
-            Near <strong>{`${onlyCity}, ${country}`}</strong>
-          </p>
+          {adressLoading ? (
+            <p className="nearby-dreams__location">
+              loading...
+            </p>
+          ) : (
+            <p className="nearby-dreams__location">
+              Near <strong>{`${onlyCity}, ${country}`}</strong>
+            </p>
+          )}
         </div>
 
         <div className="nearby-dreams__content">

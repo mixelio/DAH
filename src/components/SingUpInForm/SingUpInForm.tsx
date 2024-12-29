@@ -13,7 +13,7 @@ import { theme } from "../../utils/theme";
 import {User} from '../../types/User';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import {usersInit} from '../../features/users';
-import {createUser, loginUser, verifyUser} from '../../api/users';
+import {createUser, getLoginedUser, loginUser, verifyUser} from '../../api/users';
 import LoadingButton from "@mui/lab/LoadingButton";
 import { SnackbarProvider, useSnackbar } from "notistack";
 const colorsPrimary = theme.palette.primary;
@@ -107,6 +107,14 @@ export const SingUpInForm = () => {
   
   // #region hooks
   useEffect(() => {
+    
+    const fetchUsers = async () => {
+      await dispatch(usersInit());
+    }
+    fetchUsers();
+  }, [dispatch, users]);
+
+  useEffect(() => {
     if (contentRef.current) {
       setContentHeight(contentRef.current.clientHeight);
     }
@@ -174,8 +182,8 @@ export const SingUpInForm = () => {
           const response = await createUser(newUser);
           if (response) {
             setOpen(true);
+            console.log(open)
             enqueueSnackbar("Registration success", { variant: "success" });
-            console.log(open, "user created");
           }
         } catch (error) {
           console.log(error, "user not created");
@@ -222,22 +230,12 @@ export const SingUpInForm = () => {
 
   const handleLogIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
 
     if (!emailValidator(loginData.email)) {
       setErrorMessage(Errors.EmailNotValid);
       return;
     } else if (!loginData.password.trim()) {
       setErrorMessage(Errors.Empty);
-      return;
-    }
-
-    const checkUser =
-      users.find((user) => user.email === loginData.email) === undefined
-        ? false
-        : users.find((user) => user.email === loginData.email);
-    if (!checkUser) {
-      setErrorMessage(Errors.NoRegistration);
       return;
     }
 
@@ -254,16 +252,15 @@ export const SingUpInForm = () => {
         if(accessToken) {
           const verifyResponse = await verifyUser(accessToken);
           if (verifyResponse) {
-            setCurrentUser(checkUser)
-            const currUser = checkUser.id.toString();
-            localStorage.setItem("currentUser", currUser);
+            const currUser = getLoginedUser(accessToken);
+            localStorage.setItem("currentUser", (await currUser).id.toString());
             setLoginData({
               email: "",
               password: "",
             });
             setMainFormActive(false);
             setLoginWaiting(false);
-            return
+            return;
           }
         } else {
           setCurrentUser(null);
@@ -271,9 +268,8 @@ export const SingUpInForm = () => {
         }
         
       } else {
-        setErrorMessage(Errors.PasswordIncorrect)
+        setErrorMessage(Errors.PasswordIncorrect);
       }
-
       setLoginWaiting(false);
     } catch (error) {
       console.log(error)
@@ -493,7 +489,7 @@ export const SingUpInForm = () => {
                       }}
                     />
                   ) : (
-                    "Sing Up"
+                    "Sign Up"
                   )}
                 </Button>
               </Box>
@@ -561,7 +557,7 @@ export const SingUpInForm = () => {
                       },
                     }}
                   >
-                    Sing In
+                    Sign In
                   </Button>
                 ) : (
                   <LoadingButton loading variant="outlined">

@@ -16,6 +16,7 @@ import {ProfilePage} from './pages/ProfilePage/ProfilePage.tsx'
 import {Provider} from 'react-redux'
 import {store} from './app/store.ts'
 import {ProfileEdit} from './pages/ProfileEdit/ProfileEdit.tsx'
+import {CreateDreamPage} from './pages/CreateDreamPage/CreateDreamPage.tsx'
 
 
 createRoot(document.getElementById("root")!).render(
@@ -36,6 +37,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="profile/:id?">
                   <Route index element={<ProfilePage />} />
                   <Route path="edit" element={<ProfileEdit />} />
+                  <Route path="create" element={<CreateDreamPage />} />
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
               </Route>

@@ -1,28 +1,22 @@
 import { motion } from "motion/react";
 import {useEffect, useState} from "react";
-import {getAdress} from "../../utils/getAdress";
 import {NearbyDream} from "../../components/NearbyDreams/NearbyDream";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {usersInit} from "../../features/users";
 
 export const HomePage = () => {
-    const [isVisible, setIsVisible] = useState(false);
-    const [adress, setAdress] = useState<string[]>([]);
-    // const [street, city, country] = adress;
+  const [isVisible, setIsVisible] = useState(false);
+  const {users} = useAppSelector(state => state.users);
+  const dispatch = useAppDispatch();
 
-    useEffect(() => {
-      console.log("get adress", adress)
-      getAdress().then((data) => setAdress(data));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-
-    
-
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    dispatch(usersInit());
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      console.log('check users', users);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [dispatch, users]);
 
   return (
     <>

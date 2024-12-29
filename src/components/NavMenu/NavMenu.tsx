@@ -1,5 +1,5 @@
 import {Avatar, Button, IconButton, Menu, MenuItem, Tooltip} from '@mui/material'
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {NavLink, useNavigate} from 'react-router-dom'
 import logo from "../../assets/images/main-logo.png";
 import classNames from 'classnames';
@@ -26,6 +26,10 @@ export const NavMenu = () => {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
+
+  useEffect(() => {
+    
+  }, [userFromLocaleStorage]);
 
   const loginedUser = userFromLocaleStorage
     ? getUser(+userFromLocaleStorage, users)

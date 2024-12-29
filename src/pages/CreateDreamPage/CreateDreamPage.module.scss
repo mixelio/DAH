@@ -1,0 +1,72 @@
+@use '../../assets/styles/utils/mixins' as *;
+
+.create-dream {
+
+  &__title {
+    margin-bottom: 24px;
+
+    @include on-tablet {
+      margin-bottom: 32px;
+    }
+
+    @include on-desktop {
+      margin-bottom: 40px;
+    }
+  }
+
+  &__image-block {
+    max-width: 600px;
+    margin: 0 auto;
+    
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 20px;
+  }
+
+  &__image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__load-area {
+    width: fit-content;
+    margin: 0 auto 24px;
+  }
+
+  &__info-block {
+    margin-bottom: 18px;
+
+    @include on-tablet {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+
+      margin-bottom:24px;
+    }
+  }
+
+  &__form-control {
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+
+    @include on-tablet {
+
+      &:not(:last-child) {
+        margin-bottom: 0;
+      }
+
+      &:last-child {
+        grid-column: span 2;
+      }
+    }
+
+  }
+}

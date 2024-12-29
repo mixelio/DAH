@@ -12,6 +12,7 @@ export const theme = createTheme({
     //     },
     //   },
     // },
+
     MuiLinearProgress: {
       styleOverrides: {
         root: {

@@ -94,18 +94,20 @@
     text-align: center;
   }
 
-  &__bookmark.css-aixiz9-MuiButtonBase-root-MuiIconButton-root {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 2;
-    background-color: #fff;
-    opacity: 0.9;
-    transition-duration: 300ms;
-
-    &:hover {
+  &__bookmark {
+    &.MuiIconButton-root {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
       background-color: #fff;
-      opacity: 1;
+      opacity: 0.9;
+      transition-duration: 300ms;
+    
+      &:hover {
+        background-color: #fff;
+        opacity: 1;
+      }
     }
   }
 }

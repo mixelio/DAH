@@ -10,9 +10,7 @@ function request<T>(
   token: string | null = null
 ): Promise<T> {
   const options: RequestInit = { method };
-  const headers: HeadersInit = {
-    "Content-Type": "application/json; charset=UTF-8",
-  };
+  const headers: HeadersInit = {};
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -21,8 +19,17 @@ function request<T>(
   options.headers = headers;
 
   if (data) {
-    // We add body and Content-Type only for the requests with data
-    options.body = JSON.stringify(data);
+      if (data instanceof FormData) {
+        // Якщо це FormData (тобто є файл), не потрібно серіалізувати та змінювати Content-Type
+        options.body = data;
+      } else {
+        // Для звичайних даних
+        options.body = JSON.stringify(data);
+        options.headers = {
+          ...options.headers,
+          "Content-Type": "application/json",
+        };
+      }
   }
 
   // Execute the fetch request immediately without delay

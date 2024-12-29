@@ -1,10 +1,9 @@
-import {useContext, useEffect, useState} from "react"
-import {DreamsContext} from "../../DreamsContext"
+import {useEffect, useState} from "react"
 import {Link, useLocation, useParams} from "react-router-dom";
 import {Avatar, Button, CircularProgress, Divider, IconButton, TextField} from "@mui/material";
 import {User} from "../../types/User";
-import {Comment} from "../../components/Comment/Comment";
-import { CommentType } from "../../types/Comment";
+// import {Comment} from "../../components/Comment/Comment";
+// import { CommentType } from "../../types/Comment";
 import {getUser} from "../../utils/getUser";
 import {FacebookShareButton} from "react-share";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
@@ -18,19 +17,20 @@ import { getDream } from "../../api/dreams";
 // import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import SendIcon from "@mui/icons-material/Send";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-// import InsertCommentIcon from "@mui/icons-material/InsertComment";
+import InsertCommentIcon from "@mui/icons-material/InsertComment";
+import {commentAdd, commentsInit} from "../../features/currentDreamFeature";
 
 
 export const DreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const {users} = useAppSelector(store => store.users);
+  const {comments} = useAppSelector(store => store.currentDream);
   const { id } = useParams();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const [postImage, setPostImage] = useState<string>("");
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [author, setAuthor] = useState<User | null>(null);
-  const [postComments, setPostComments] = useState<CommentType[]>([]);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
 
   const location = useLocation();
@@ -38,26 +38,53 @@ export const DreamPage = () => {
 
   const dispatch = useAppDispatch();
 
-  const { comments } = useContext(DreamsContext);
+  const handleCommentAdd = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const comment = formData.get("text") as string;
+      const accessToken = localStorage.getItem("access");
+
+      // console.log(id, comment);
+
+      if (id && comment && accessToken) {
+        await dispatch(
+          commentAdd({
+            dreamId: id,
+            comment: { text: comment },
+            token: accessToken,
+          })
+        ).unwrap();
+      }
+      
+
+    } catch (e) { console.error(e); } finally {
+      if (id) {
+        await dispatch(commentsInit(id)).unwrap();
+        // console.log("comment added");
+      }
+    }
+  };
 
   useEffect(() => {
     const initializate = async () => {
       try {
-        await Promise.all([dispatch(dreamsInit()).unwrap(), dispatch(usersInit()).unwrap()]);
+        if (id) {
+          await Promise.all([dispatch(dreamsInit()).unwrap(), dispatch(usersInit()).unwrap(), dispatch(commentsInit(id)).unwrap()]);
+        }
       } catch (e) {
         console.error(e);
       } finally {
-        console.log("initializate dreams page")
+        // console.log("initializate dreams page")
       }
     }
 
     initializate();
-    console.log("first render of dream page")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    console.log("get dream");
     const fetchDream = async () => {
       if (id) {
         setLoading(true);
@@ -102,26 +129,18 @@ export const DreamPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, dreams, users, setCurrentDream, postImage]);
 
-  useEffect(() => {
-    if (comments && currentDream) {
-      setPostComments(
-        comments.filter((item) => item.dreamId === currentDream.id)
-      );
-    }
-  }, [comments, currentDream]);
-
+  console.log(comments)
   return (
     <section className="dream">
       <div className="container">
-        {currentDream && author && !loading ? 
-        (
+        {currentDream && author && !loading ? (
           <div className="dream__content">
             <h2 className="dream__title">{currentDream.name}</h2>
             <Link to={`/profile/${author.id}`} className="dream__author-info">
               <Avatar
                 className="dream-cart__author-avatar"
                 alt=""
-                src={author && author.photo}
+                src={author && author.photo_url}
                 sx={{ width: 38, height: 38 }}
               ></Avatar>
               <div className="dream__author-text-info">
@@ -156,10 +175,10 @@ export const DreamPage = () => {
                   <PeopleAltIcon />
                   <span>{currentDream.views}</span>
                 </div>
-                {/* <div className="dream__sub-info dream__sub-info--2">
+                <div className="dream__sub-info dream__sub-info--2">
                   <InsertCommentIcon />
                   <span></span>
-                </div> */}
+                </div>
                 {/* <div className="dream__sub-info dream__sub-info--3 dream__progress">
                   {currentDream.category === DreamCategory.MoneyDonation ? (
                     <LinearProgress
@@ -204,33 +223,34 @@ export const DreamPage = () => {
                   Only authorized users can comment
                 </p>
               ) : (
-                <form method="POST" action="/" className="dream__comment-form">
+                <form method="POST" action="/" className="dream__comment-form" onSubmit={handleCommentAdd}>
                   <TextField
                     id="outlined-multiline-static"
                     className="dream__comment-input"
                     label="Write yor comment..."
+                    name="text"
                     multiline
                     minRows={2}
                   />
-                  <IconButton aria-label="sent" className="dream__comment-send">
+                  <IconButton aria-label="sent" className="dream__comment-send" type="submit">
                     <SendIcon />
                   </IconButton>
                 </form>
               )}
 
-                <div className="dream__comments">
-                  <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
-                    Comments
-                  </Divider>
+              <div className="dream__comments">
+                <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
+                  Comments
+                </Divider>
 
-                  {postComments && postComments.length > 0 ? (
-                    postComments.map((item, index) => (
-                      <Comment key={item.id || index} comment={item} />
-                    ))
-                  ) : (
-                    <p className="dream__comments-info-message">no comments</p>
-                  )}
-                </div>
+                {comments && comments.length > 0 ? (
+                  comments.map((comment, index) => (
+                    <p key={index}>{comment.toString()} {index}</p>
+                  ))
+                ) : (
+                  <p className="dream__comments-info-message">no comments</p>
+                )}
+              </div>
             </div>
             <FacebookShareButton
               children
