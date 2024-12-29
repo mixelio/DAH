@@ -48,10 +48,5 @@ class DreamReadSerializer(DreamSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['text']
-
-
-class CommentReadSerializer(CommentSerializer):
-    class Meta:
-        model = Comment
         fields = ['id', 'user', 'text', 'created_at', 'likes']
+        read_only_fields = ['id', 'dream', 'user', 'created_at', 'likes']

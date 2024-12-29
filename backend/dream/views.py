@@ -17,25 +17,21 @@ from payment.serializers import PaymentSerializer
 from utils.stripe_helpers import create_stripe_session
 
 from dream.serializers import (
-    CommentSerializer,
     DreamSerializer,
     DreamReadSerializer,
-    CommentReadSerializer, ContributionSerializer
+    CommentSerializer,
+    ContributionSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
 
 
 class CommentListCreateView(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CommentSerializer
-        return CommentReadSerializer
+    serializer_class = CommentSerializer
 
     def get(self, request, dream_id):
-        comments = Comment.objects.filter(dream__id=dream_id).select_related('dream')
-        serializer = CommentReadSerializer(comments, many=True)
+        comments = Comment.objects.filter(dream__id=dream_id).select_related('dream', 'user')
+        serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
     def post(self, request, dream_id):
