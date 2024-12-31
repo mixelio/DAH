@@ -11,7 +11,8 @@ class ContributionSerializer(serializers.ModelSerializer):
 class DreamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dream
-        fields = ['name', 'description', 'image', 'cost', 'category', 'location', 'views']
+        fields = ['id', 'name', 'description', 'image', 'cost', 'category', 'location', 'views']
+        read_only_fields = ['id']
 
     category = serializers.ChoiceField(choices=Dream.Category.choices)
 
