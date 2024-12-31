@@ -63,7 +63,7 @@ class DreamViewSet(viewsets.ModelViewSet):
         queryset = Dream.objects.all().select_related('user')
         category = self.request.query_params.get('category', None)
         if category:
-            return queryset.filter(category=category)
+            return queryset.filter(category__icontains=category)
         return queryset
 
     def perform_create(self, serializer):
