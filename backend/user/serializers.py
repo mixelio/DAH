@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 
 class UserSerializer(serializers.ModelSerializer):
     photo_url = serializers.SerializerMethodField()
+
     class Meta:
         model = get_user_model()
         fields = (

@@ -17,10 +17,10 @@ from payment.serializers import PaymentSerializer
 from utils.stripe_helpers import create_stripe_session
 
 from dream.serializers import (
-    DreamSerializer,
-    DreamReadSerializer,
+    DreamCreateSerializer,
+    DreamListSerializer,
     CommentSerializer,
-    ContributionSerializer
+    ContributionSerializer, DreamRetrieveSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
 
@@ -56,7 +56,7 @@ class LikeCommentView(APIView):
 
 
 class DreamViewSet(viewsets.ModelViewSet):
-    serializer_class = DreamSerializer
+    serializer_class = DreamCreateSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self):
@@ -70,9 +70,11 @@ class DreamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'create':
-            return DreamSerializer
-        return DreamReadSerializer
+        if self.action == 'list':
+            return DreamListSerializer
+        if self.action == 'retrieve':
+            return DreamRetrieveSerializer
+        return DreamCreateSerializer
 
     def retrieve(self, request, *args, **kwargs):
         """Retrieve a dream and increment its views count."""
