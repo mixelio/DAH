@@ -91,6 +91,8 @@ export const DreamPage = () => {
         try {
           const dream = await getDream(+id);
 
+          console.log(dream);
+          
           const tempUser: User | null = userFromLocaleStorage
             ? getUser(+userFromLocaleStorage, users) || null
             : null;
@@ -129,7 +131,8 @@ export const DreamPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, dreams, users, setCurrentDream, postImage]);
 
-  console.log(comments)
+
+  // console.log(author)
   return (
     <section className="dream">
       <div className="container">

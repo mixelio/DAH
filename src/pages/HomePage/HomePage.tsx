@@ -10,13 +10,21 @@ export const HomePage = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(usersInit());
+    const fetchUsers = async () => {
+      try {
+        dispatch(usersInit());
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchUsers();
     const timer = setTimeout(() => {
       setIsVisible(true);
       console.log('check users', users);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [dispatch, users]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

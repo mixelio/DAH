@@ -32,7 +32,7 @@ export const Comment: React.FC<Props> = ({ comment }) => {
         ) : null}
       </div>
       <Divider sx={{ mb: 1, mt: 1 }} />
-      <div className="comment-body">{comment.commentBody}</div>
+      <div className="comment-body">{comment.text}</div>
     </div>
   );
 }

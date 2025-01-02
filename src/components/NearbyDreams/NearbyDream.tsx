@@ -14,11 +14,10 @@ export const NearbyDream = () => {
   const [onlyCity, setOnlyCity] = useState<string>("");
   const [dreamsNearby, setDreamsNearby] = useState<Dream[]>([]);
 
-  const [street, city, country] = adress;
-
+  const city = adress[1]
+  const country = adress[2]
 
   useEffect(() => {
-    console.log("adress", street);
     setAdressLoading(true);
     const fetchAdress = async () => {
       try {
@@ -43,7 +42,7 @@ export const NearbyDream = () => {
       setDreamsNearby(dreams.slice(0, 3));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dreams, city]);
+  }, []);
 
   
 

@@ -107,12 +107,11 @@ export const SingUpInForm = () => {
   
   // #region hooks
   useEffect(() => {
-    
-    const fetchUsers = async () => {
-      await dispatch(usersInit());
-    }
-    fetchUsers();
-  }, [dispatch, users]);
+    // const fetchUsers = async () => {
+    //   await dispatch(usersInit());
+    // }
+    // fetchUsers();
+  }, [dispatch]);
 
   useEffect(() => {
     if (contentRef.current) {
