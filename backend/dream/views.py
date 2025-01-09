@@ -128,7 +128,7 @@ class MoneyDreamHandler(DreamHandler):
         if not request:
             raise ValueError('Request object is required for this operation.')
 
-        contribution_amount = request.data.get('contribution_amount', 0)
+        contribution_amount = int(request.data.get('contribution_amount', 0))
         if contribution_amount <= 0:
             raise ValueError('Contribution must be a positive integer.')
 
@@ -141,8 +141,6 @@ class MoneyDreamHandler(DreamHandler):
             return payment
         except Exception as e:
             print(f'stripe_exception: {e}')
-        dream.accumulated += contribution_amount
-        dream.save(update_fields=['accumulated'])
 
 
 class NonMoneyDreamHandler(DreamHandler):
@@ -152,6 +150,7 @@ class NonMoneyDreamHandler(DreamHandler):
             raise ValueError('Description of contribution is required for this category.')
         contribution = Contribution.objects.create(dream=dream, user=user, description=contribution_description)
         dream.status = Dream.Status.COMPLETED
+        dream.save(update_fields=['status'])
         return contribution
 
 
