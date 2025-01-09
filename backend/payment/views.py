@@ -2,6 +2,7 @@ from typing import Optional
 
 import stripe
 from django.conf import settings
+from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponseRedirect, HttpRequest
 from django.shortcuts import redirect
@@ -13,6 +14,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from dream.models import Dream
 from payment.models import Payment
 from payment.serializers import PaymentSerializer
 
@@ -54,16 +56,25 @@ class PaymentSuccessView(APIView):
         try:
             session = stripe.checkout.Session.retrieve(session_id)
 
-            if session.payment_status == 'paid':
-                try:
-                    payment = Payment.objects.get(session_id=session_id)
+            if session.payment_status != 'paid':
+                return Response({'message': 'Payment not completed.'}, status=400)
+
+            try:
+                with transaction.atomic():
+                    payment = Payment.objects.select_for_update().get(session_id=session_id)
+                    if payment.status == Payment.StatusChoices.PAID:
+                        return Response({'message': 'Payment already processed.'}, status=400)
+
                     payment.status = Payment.StatusChoices.PAID
                     payment.save()
-                    return Response({'message': 'Payment successful.'})
-                except Payment.DoesNotExist:
-                    return Response({'error': 'Payment not found.'}, status=404)
-            else:
-                return Response({'message': 'Payment not completed.'}, status=400)
+
+                    dream = Dream.objects.get(id=payment.dream_id)
+                    dream.update_accumulated(payment.money_to_pay)
+                    dream.save(update_fields=['accumulated'])
+
+                return Response({'message': 'Payment successful.'}, status=200)
+            except Payment.DoesNotExist:
+                return Response({'error': 'Payment not found.'}, status=404)
 
         except stripe.error.StripeError as e:
             return Response({'stripe_error': str(e)}, status=500)
