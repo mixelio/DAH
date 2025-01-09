@@ -33,6 +33,19 @@ class Dream(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def update_accumulated(self, amount: int) -> None:
+        """
+        Update the accumulated amount and adjust the status of the dream.
+        """
+        self.accumulated += amount
+
+        if self.accumulated >= self.cost:
+            self.status = self.Status.COMPLETED
+        elif self.accumulated > 0:
+            self.status = self.Status.PENDING
+
+        self.save(update_fields=['accumulated', 'status'])
+
 
 class Comment(models.Model):
     dream = models.ForeignKey(Dream, on_delete=models.CASCADE)
