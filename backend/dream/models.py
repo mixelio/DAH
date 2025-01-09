@@ -23,7 +23,7 @@ class Dream(models.Model):
     accumulated = models.PositiveIntegerField(null=True, blank=True, default=0)
     status = models.CharField(choices=Status.choices, default=Status.NEW, max_length=15)
     category = models.CharField(choices=Category.choices, max_length=50)
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_added = models.DateField(auto_now_add=True)
     location = models.CharField(max_length=200)
     views = models.PositiveIntegerField(default=0)
 
