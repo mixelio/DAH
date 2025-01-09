@@ -42,19 +42,6 @@ class CommentListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LikeCommentView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request, comment_id):
-        try:
-            comment = Comment.objects.get(id=comment_id)
-            comment.likes += 1
-            comment.save()
-            return Response({'likes': comment.likes}, status=status.HTTP_200_OK)
-        except Comment.DoesNotExist:
-            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
 class DreamViewSet(viewsets.ModelViewSet):
     serializer_class = DreamCreateSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
