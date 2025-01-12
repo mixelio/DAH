@@ -94,7 +94,9 @@ class DreamRetrieveSerializer(DreamListSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserDreamListSerializer(read_only=True)
+
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'text', 'created_at', 'likes']
-        read_only_fields = ['id', 'dream', 'user', 'created_at', 'likes']
+        fields = ['id', 'user', 'dream', 'text', 'created_at',]
+        read_only_fields = ['id', 'dream', 'user', 'created_at',]
