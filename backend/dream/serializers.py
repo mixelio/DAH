@@ -94,7 +94,7 @@ class DreamRetrieveSerializer(DreamListSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserDreamListSerializer(read_only=True)
+    user = UserDreamRetrieveSerializer(read_only=True)
 
     class Meta:
         model = Comment
