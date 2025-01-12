@@ -60,22 +60,24 @@
   }
 
   &__description {
+    position: relative;
     flex: 1 0 auto;
-    height: 50px;
+    height: 5em;
     overflow-y: hidden;
     text-overflow: ellipsis;
-    font-size: 14px;
+    font-size: 1em;
     font-weight: 400;
     color: $text-color-light;
     margin-bottom: 36px;
+  }
 
-    @include on-tablet {
-      height: 70px;
-    }
-
-    @include on-desktop {
-      height: 90px;
-    }
+  &__more {
+    padding-left: 16px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(270deg, rgba(255, 255, 255, 1) 85%, rgba(255, 255, 255, 0.4962359943977591) 100%);
   }
 
   &__author-name {

@@ -13,7 +13,7 @@ export const getUsers = async () => {
 };
 
 export const getUser = (id: number) => {
-  return client.get<User[]>(`user/${id}`)
+  return client.get<User>(`user/${id}`)
 };
 
 export const createUser = (data: Pick<User, "first_name" | "email" | "password">) => {

@@ -6,7 +6,7 @@ import {CommentType} from "../types/Comment";
 export type currentDreamState = {
   currentDream: Dream | null,
   currentDreamLoading: boolean,
-  comments: Comment[],
+  comments: CommentType[],
   commentsLoading: boolean,
   currentDreamError: string | null,
   commentsError: string | null,
@@ -25,9 +25,7 @@ export const currentDreamSlice = createSlice({
   name: "currentDream",
   initialState,
   reducers: {
-    addNewComment: (state, action) => {
-      state.comments = [...state.comments, action.payload];
-    }
+
   },
   extraReducers: (builder) => {
     builder.addCase(currentDreamInit.pending, (state) => {
@@ -41,6 +39,25 @@ export const currentDreamSlice = createSlice({
       state.currentDreamError = "Failed to load dream";
     });
 
+    builder.addCase(commentsInit.pending, (state) => {
+      state.commentsLoading = true;
+      state.commentsError = null;
+    }).addCase(commentsInit.fulfilled, (state, action) => {
+      state.comments = [...action.payload as CommentType[]];
+      state.commentsLoading = false;
+    }).addCase(commentsInit.rejected, (state) => {
+      state.commentsLoading = false;
+      state.commentsError = "Failed to load comments";
+    });
+
+    builder.addCase(commentAdd.pending, (state) => {
+      state.commentsLoading = true;
+      state.commentsError = null;
+    }).addCase(commentAdd.fulfilled, (state, action) => {
+      state.comments.push(action.payload as CommentType);
+      console.log(action.payload);
+      state.commentsLoading = false;
+    });
   }
 });
 
@@ -65,12 +82,10 @@ export const commentAdd = createAsyncThunk(
   "currentDream/commentAdd",
   async ({dreamId, comment, token}: {dreamId: string, comment: Pick<CommentType, "text">, token: string}) => {
     try{
-      const comments = await createDreamComment(+dreamId, comment, token);
-      return comments;
+      const newComment = await createDreamComment(+dreamId, comment, token);
+      return newComment;
     } catch (e) {
       return e;
     }
-    
-    
   }
 );

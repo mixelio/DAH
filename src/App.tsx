@@ -7,7 +7,7 @@ import {useRefresh} from './app/hooks';
 
 
 function App() {
-  useRefresh(1000 * 60 * 1);
+  useRefresh(1000 * 60 * 30);
   
   return (
     <div className='wrapper'>

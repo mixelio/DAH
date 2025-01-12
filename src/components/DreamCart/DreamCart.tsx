@@ -1,7 +1,6 @@
-import React /* {useContext} */ from "react";
+import React  from "react";
 import {Link} from "react-router-dom";
 import {Dream} from "../../types/Dream";
-import {useAppSelector} from "../../app/hooks";
 import { IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 
@@ -11,8 +10,6 @@ type Props = {
 }
 
 export const DreamCart: React.FC<Props> = ({ dream }) => {
-  const { users } = useAppSelector((state) => state.users);
-  const author = users.find(user => user.id === dream.user);
 
   return (
     <div className="dream-cart">
@@ -32,12 +29,12 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
 
         <p className="dream-cart__description">
           {dream.description}
-          <Link to={`/dreams/${dream.id}`}>
+          <Link to={`/dreams/${dream.id}`} className="dream-cart__more">
             {" "}
             <strong>more</strong>
           </Link>
         </p>
-        <p className="dream-cart__author-name">{author?.first_name}</p>
+        <p className="dream-cart__author-name">{dream.user.first_name}</p>
         <LinearProgress
           className="dream-cart__progress"
           variant="determinate"

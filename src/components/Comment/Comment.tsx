@@ -1,8 +1,6 @@
 import {Divider, IconButton} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import {useContext} from "react";
-import {DreamsContext} from "../../DreamsContext";
 import {CommentType} from "../../types/Comment";
 
 type Props = {
@@ -10,17 +8,13 @@ type Props = {
 }
 
 export const Comment: React.FC<Props> = ({ comment }) => {
-  const { users, currentUser } = useContext(DreamsContext)
-
-    const getUser = (userId: number) => {
-      return users.find((user) => user.id === userId);
-    }; 
+  const currentUser = localStorage.getItem('currentUser') || "";
 
   return (
     <div className="comment">
       <div className="comment-author">
-        {getUser(comment.userId)?.first_name}
-        {getUser(comment.userId)?.email === currentUser?.email ? (
+        {comment.user?.first_name}
+        {currentUser && comment.user?.id === +currentUser ? (
           <div className="comment-tools">
             <IconButton aria-label="edit" sx={{ padding: 0.5 }}>
               <EditIcon />

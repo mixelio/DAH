@@ -1,12 +1,11 @@
 import { motion } from "motion/react";
 import {useEffect, useState} from "react";
 import {NearbyDream} from "../../components/NearbyDreams/NearbyDream";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {useAppDispatch} from "../../app/hooks";
 import {usersInit} from "../../features/users";
 
 export const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const {users} = useAppSelector(state => state.users);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -20,7 +19,6 @@ export const HomePage = () => {
     fetchUsers();
     const timer = setTimeout(() => {
       setIsVisible(true);
-      console.log('check users', users);
     }, 1000);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps

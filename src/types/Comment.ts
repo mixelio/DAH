@@ -1,6 +1,11 @@
 export type CommentType = {
   id: number;
-  userId: number;
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
+  dream: number;
   text: string;
   created_at: string;
 };

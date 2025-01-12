@@ -19,6 +19,7 @@ import {DreamCategory} from "../../types/Dream";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {useAppDispatch} from "../../app/hooks";
 import {dreamCreateInit} from "../../features/dreamsFeature";
+import {useNavigate} from "react-router-dom";
 
 export const CreateDreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,6 +33,8 @@ export const CreateDreamPage = () => {
   const [options, setOptions] = useState<OptionType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const [dataForCreate, setDataForCreate] = useState<DataForCreate>({
     image: null,
@@ -132,6 +135,7 @@ export const CreateDreamPage = () => {
       console.error(e);
     } finally {
       setLoading(false);
+      navigate("/");
     }
   };
 
