@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework import status, viewsets
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,21 +27,34 @@ from dream.serializers import (
 from user.permissions import IsOwnerAdminOrReadOnly
 
 
-class CommentListCreateView(APIView):
+class CommentListCreateView(ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = CommentSerializer
 
-    def get(self, request, dream_id):
-        comments = Comment.objects.filter(dream__id=dream_id).select_related('dream', 'user')
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return Comment.objects.filter(dream_id=self.kwargs['dream_id']).select_related('dream', 'user')
 
-    def post(self, request, dream_id):
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(dream_id=dream_id, user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(dream_id=self.kwargs['dream_id'], user=self.request.user)
+
+
+class CommentDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.filter(dream_id=self.kwargs['dream_id'])
+
+    def perform_update(self, serializer):
+        comment = self.get_object()
+        if comment.user != self.request.user:
+            raise PermissionDenied('You do not have permission to edit this comment.')
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.user != self.request.user:
+            raise PermissionDenied('You do not have permission to delete this comment.')
+        instance.delete()
 
 
 class DreamViewSet(viewsets.ModelViewSet):
