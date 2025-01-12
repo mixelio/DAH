@@ -32,7 +32,9 @@ class CommentListCreateView(ListCreateAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return Comment.objects.filter(dream_id=self.kwargs['dream_id']).select_related('dream', 'user')
+        return Comment.objects.filter(
+            dream_id=self.kwargs['dream_id']
+        ).select_related('dream', 'user')
 
     def perform_create(self, serializer):
         serializer.save(dream_id=self.kwargs['dream_id'], user=self.request.user)
@@ -43,7 +45,9 @@ class CommentDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return Comment.objects.filter(dream_id=self.kwargs['dream_id'])
+        return Comment.objects.filter(
+            dream_id=self.kwargs['dream_id']
+        ).select_related('dream', 'user')
 
     def perform_update(self, serializer):
         comment = self.get_object()
