@@ -46,5 +46,5 @@ export const client = {
   post: <T>(url: string, data: unknown, token?: string) => request<T>(url, "POST", data, token),
   patch: <T>(url: string, data: unknown, token?: string) => request<T>(url, "PATCH", data, token),
   put: <T>(url: string, data: unknown, token?: string) => request<T>(url, "PUT", data, token),
-  delete: (url: string) => request(url, "DELETE"),
+  delete: (url: string, token: string) => request(url, "DELETE", null, token),
 };

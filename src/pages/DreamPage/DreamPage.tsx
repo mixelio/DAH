@@ -88,7 +88,7 @@ export const DreamPage = () => {
 
     initializate();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [comments])
 
   useEffect(() => {
     const initLoginedUser = async () => {

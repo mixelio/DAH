@@ -3,7 +3,7 @@
 
 .comment {
   padding: 8px 12px 10px;
-  width: fit-content;
+  width: 100%;
   border: 1px solid $primary-light;
   border-radius: 10px 10px 10px 0;
 
@@ -16,10 +16,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 8px;
+  }
+
+  &__personal-info {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    width: fit-content;
+  }
+
+  &__author-image {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   &-body {
     font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  &-date {
+    color: $secondary-light;
+    font-size: 10px;
+    text-align: right;
   }
 
   &-tools {

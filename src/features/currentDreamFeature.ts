@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDreamComment, getDream, getDreamComments} from "../api/dreams";
+import {createDreamComment, deleteDreamComment, getDream, getDreamComments} from "../api/dreams";
 import {CommentType} from "../types/Comment";
 
 export type currentDreamState = {
@@ -58,6 +58,14 @@ export const currentDreamSlice = createSlice({
       console.log(action.payload);
       state.commentsLoading = false;
     });
+
+    builder.addCase(commentRemove.pending, (state) => {
+      state.commentsLoading = true;
+      state.commentsError = null;
+    }).addCase(commentRemove.fulfilled, (state) => {
+      console.log(state.comments);
+      state.commentsLoading = false;
+    })
   }
 });
 
@@ -89,3 +97,11 @@ export const commentAdd = createAsyncThunk(
     }
   }
 );
+
+export const commentRemove = createAsyncThunk("currentDream/commentRemove", async ({dreamId, commentId, token}: {dreamId: number, commentId: number, token: string}) => {
+  try{
+    await deleteDreamComment(dreamId, commentId, token);
+  } catch (e) {
+    console.log(e);
+  }
+});

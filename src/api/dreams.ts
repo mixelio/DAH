@@ -38,3 +38,7 @@ export const createDreamComment = async (
   const response = await client.post(`dream/${id}/comments/`, data, token);
   return response;
 };
+
+export const deleteDreamComment = async (dreamId: number, commentId: number, token: string) => {
+  client.delete(`dream/${dreamId}/comments/${commentId}/`, token)
+}
