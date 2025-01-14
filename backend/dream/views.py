@@ -55,10 +55,20 @@ class CommentDetailView(RetrieveUpdateDestroyAPIView):
             raise PermissionDenied('You do not have permission to edit this comment.')
         serializer.save()
 
-    def perform_destroy(self, instance):
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
         if instance.user != self.request.user:
             raise PermissionDenied('You do not have permission to delete this comment.')
-        instance.delete()
+
+        serializer = self.get_serializer(instance)
+        response_data = serializer.data
+
+        self.perform_destroy(instance)
+
+        return Response(
+            response_data,
+            status=status.HTTP_200_OK
+        )
 
 
 class DreamViewSet(viewsets.ModelViewSet):
