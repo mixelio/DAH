@@ -36,6 +36,14 @@
   &-body {
     font-size: 16px;
     margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  &-editInput {
+    background-color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    width: 100%;
   }
 
   &-date {

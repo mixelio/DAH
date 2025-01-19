@@ -39,6 +39,16 @@ export const createDreamComment = async (
   return response;
 };
 
+export const editDreamComment = async (
+  dreamId: number, 
+  commentId: number, 
+  data: {text: string}, 
+  token: string
+) => {
+  const response = await client.patch(`dream/${dreamId}/comments/${commentId}/`, data, token);
+  return response;
+}
+
 export const deleteDreamComment = async (dreamId: number, commentId: number, token: string) => {
-  client.delete(`dream/${dreamId}/comments/${commentId}/`, token)
+  await client.delete(`dream/${dreamId}/comments/${commentId}/`, token)
 }

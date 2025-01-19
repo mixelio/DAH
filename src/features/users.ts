@@ -106,15 +106,16 @@ export const currentUserInit = createAsyncThunk("currUser/fetch", async (token: 
 })
 
 export const currentUserUpdate = createAsyncThunk("currentUser/patch", async ({ data, token }: { data: FormData, token: string }) => {
-  const userData: Omit<User, "id" | "is_staff" | "num_of_dreams" | "password" | "photo"> = {
-    email: data.get("email") as string,
-    first_name: data.get("first_name") as string,
-    last_name: data.get("last_name") as string,
-    location: data.get("location") as string,
-    about_me: data.get("about_me") as string,
-    photo_url: data.get("photo_url") as string,
-    // photo: data.get("photo") as File | null,
-  };
+  const userData: Partial<
+    Pick<User, "first_name" | "last_name" | "location" | "about_me" | "photo_url">
+  > = {};
+
+  (["first_name", "last_name", "location", "about_me", "photo_url"] as const).forEach(key => {
+    const value = data.get(key);
+    if(value !== null && value !== undefined && value !== "") {
+      userData[key] = value as string;
+    }
+  })
 
   const response = await changeUser(userData, token);
 

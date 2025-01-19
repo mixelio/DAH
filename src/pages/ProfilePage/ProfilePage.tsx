@@ -124,7 +124,7 @@ export const ProfilePage = () => {
                   <DreamCart key={dream.id} dream={dream} />
                 ))}
               {currentUserId === id && (
-                <Link to="create" className="profile__add-dream-btn">
+                <Link to="create" className="profile__add-dream-btn dream-cart" style={{alignItems: "center", justifyContent: "center", fontSize: "18", letterSpacing: "2px"}}>
                   Add a new dream
                 </Link>
               )}

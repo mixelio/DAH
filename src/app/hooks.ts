@@ -9,7 +9,6 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export const useRefresh = (interval: number) => {
   useEffect(() => {
-    console.log("refresh");
     const timer = setInterval(async () => {
       const newAccsessTocken = await refreshAccess();
 

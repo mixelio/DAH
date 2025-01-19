@@ -32,10 +32,6 @@
     }
   }
 
-  &__item {
-    display: flex;
-  }
-
   &__form {
     display: flex;
     justify-content: space-between;
@@ -59,7 +55,7 @@
 
   &__pagination {
     position: absolute;
-    width: fit-content;
+    width: max-content;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);

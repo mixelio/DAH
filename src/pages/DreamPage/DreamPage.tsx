@@ -10,8 +10,6 @@ import {Dream, DreamCategory} from "../../types/Dream";
 import {isImageAvailable} from "../../utils/isImageAvailable";
 import { getDream } from "../../api/dreams";
 
-// import LinearProgress from "@mui/material/LinearProgress";
-// import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import SendIcon from "@mui/icons-material/Send";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
@@ -22,7 +20,7 @@ import {Comment} from "../../components/Comment/Comment";
 export const DreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const {users} = useAppSelector(store => store.users);
-  const {comments} = useAppSelector(store => store.currentDream);
+  const {comments, commentsLoading} = useAppSelector(store => store.currentDream);
   const { id } = useParams();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
   const [postImage, setPostImage] = useState<string>("");
@@ -44,6 +42,10 @@ export const DreamPage = () => {
     try {
       const formData = new FormData(e.currentTarget);
       const comment = formData.get("text") as string;
+
+      if(comment.trim() === '') {
+        return
+      }
       
       const accessToken = localStorage.getItem("access");
 
@@ -51,7 +53,7 @@ export const DreamPage = () => {
         await dispatch(
           commentAdd({
             dreamId: id,
-            comment: { text: comment },
+            comment: { text: comment.trim() },
             token: accessToken,
           })
         ).unwrap();
@@ -61,17 +63,14 @@ export const DreamPage = () => {
     } catch (e) { 
       console.error(e); 
     } finally {
-      if (id) {
-        await dispatch(commentsInit(id)).unwrap();
-        console.log(commentInputRef.current)
-        if (commentInputRef.current) {
-          commentInputRef.current.value = "";
-        }
-
-        console.log("comment added", comments);
+      if (commentInputRef.current) {
+        commentInputRef.current.value = "";
       }
     }
   };
+
+  useEffect(() => {
+  }, [comments])
 
   useEffect(() => {
     const initializate = async () => {
@@ -88,7 +87,7 @@ export const DreamPage = () => {
 
     initializate();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [comments])
+  }, [])
 
   useEffect(() => {
     const initLoginedUser = async () => {
@@ -137,11 +136,11 @@ export const DreamPage = () => {
         if (res) {
           setPostImage(currentDream.image);
         } else {
-          setPostImage("https://via.placeholder.com/150");
+          setPostImage("https://picsum.photos/200/300?random=1");
         }
       });
     } else {
-      setPostImage("https://via.placeholder.com/150");
+      setPostImage("https://picsum.photos/200/300?random=1");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, dreams, users, setCurrentDream, postImage]);
@@ -189,7 +188,7 @@ export const DreamPage = () => {
               <div className="dream__image-container">
                 <img
                   className="dream__main-image"
-                  src={`https://picsum.photos/id/${id}/1200/600`}
+                  src={`https://picsum.photos/1200/600?random=1`}
                   alt=""
                 />
               </div>
@@ -200,7 +199,7 @@ export const DreamPage = () => {
                 </div>
                 <div className="dream__sub-info dream__sub-info--2">
                   <InsertCommentIcon />
-                  <span></span>
+                  <span>{comments.length}</span>
                 </div>
                 {/* <div className="dream__sub-info dream__sub-info--3 dream__progress">
                   {currentDream.category === DreamCategory.MoneyDonation ? (
@@ -253,6 +252,7 @@ export const DreamPage = () => {
                   onSubmit={handleCommentAdd}
                 >
                   <TextField
+                    // disabled={!commentsLoading}
                     inputRef={commentInputRef}
                     id="outlined-multiline-static"
                     className="dream__comment-input"
@@ -266,19 +266,23 @@ export const DreamPage = () => {
                     className="dream__comment-send"
                     type="submit"
                   >
-                    <SendIcon />
+                    {commentsLoading ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <SendIcon />
+                    )}
                   </IconButton>
                 </form>
               )}
 
-              <div className="dream__comments">
-                <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
-                  Comments
-                </Divider>
+              <Divider textAlign="center" sx={{ mb: 2, mt: 2 }}>
+                Comments
+              </Divider>
 
+              <div className="dream__comments">
                 {comments && comments.length > 0 ? (
-                  comments.map((comment, index) => (
-                    <Comment key={index} comment={comment} />
+                  comments.map((comment) => (
+                    <Comment key={comment.id} comment={comment} />
                   ))
                 ) : (
                   <p className="dream__comments-info-message">no comments</p>

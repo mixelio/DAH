@@ -94,10 +94,11 @@
     opacity: 0.5;
   }
 
-  &__add-dream-btn.MuiButton-root {
-    background-color: $primary-main;
-    display: block;
-    margin: 0 auto;
+  &__add-dream-btn {
+    height: 100%;
+    padding: 50px 0;
+    align-self: center;
+    letter-spacing: 2px;
 
     &:hover {
       background-color: $primary-light;

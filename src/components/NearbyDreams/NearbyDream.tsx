@@ -44,23 +44,24 @@ export const NearbyDream = () => {
       try {
         await dispatch(dreamsInit());
 
-        const updatedDreams = dreams;
+        const updatedDreams =
+          dreams
+            .filter(
+              (dream) =>
+                dream.location.toLowerCase().split(", ")[0] ===
+                adress.city.toLowerCase()
+            )
+            .slice(0, 3).length > 0
+            ? dreams
+                .filter(
+                  (dream) =>
+                    dream.location.toLowerCase().split(", ")[0] ===
+                    adress.city.toLowerCase()
+                )
+                .slice(0, 3)
+            : dreams.slice(0, 3);
 
-        const tempDreams = updatedDreams
-          .filter(
-            (dream) =>
-              dream.location.toLowerCase().split(", ")[0] ===
-              adress.city.toLowerCase()
-          )
-          .slice(0, 3).length > 0 ? updatedDreams
-          .filter(
-            (dream) =>
-              dream.location.toLowerCase().split(", ")[0] ===
-              adress.city.toLowerCase()
-          )
-          .slice(0, 3) : updatedDreams.slice(0, 3);
-
-        setDreamsNearby(tempDreams);
+        setDreamsNearby(updatedDreams);
         setDreamsLoading(false);
       } catch (error) {
         console.error(error);
@@ -69,7 +70,7 @@ export const NearbyDream = () => {
 
     featchNearbyDreams();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, [dispatch, dreams]);
 
   useEffect(() => {
     console.log(!dreamsLoading, dreamsNearby.length);

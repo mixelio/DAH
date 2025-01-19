@@ -5,9 +5,9 @@ export type User = {
   first_name: string,
   last_name: string,
   photo: File | string | null,
-  photo_url: string,
-  location: string,
-  about_me: string,
+  photo_url: string | undefined,
+  location: string | undefined,
+  about_me: string | undefined,
   num_of_dreams: number,
   password: string,
 }

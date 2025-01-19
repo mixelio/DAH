@@ -16,7 +16,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
       <div className="dream-cart__image-box">
         <img
           className="lozad dream-cart__image"
-          src={dream.image_url}
+          src={dream.image_url ?? "https://picsum.photos/1200/600?random=1"}
           alt="dream_image"
           loading="lazy"
         />

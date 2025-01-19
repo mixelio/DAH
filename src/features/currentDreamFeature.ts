@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDreamComment, deleteDreamComment, getDream, getDreamComments} from "../api/dreams";
+import {createDreamComment, deleteDreamComment, editDreamComment, getDream, getDreamComments} from "../api/dreams";
 import {CommentType} from "../types/Comment";
 
 export type currentDreamState = {
@@ -8,6 +8,7 @@ export type currentDreamState = {
   currentDreamLoading: boolean,
   comments: CommentType[],
   commentsLoading: boolean,
+  commentsDeleting: boolean,
   currentDreamError: string | null,
   commentsError: string | null,
 }
@@ -17,6 +18,7 @@ const initialState: currentDreamState = {
   currentDreamLoading: false,
   comments: [],
   commentsLoading: false,
+  commentsDeleting: false,
   currentDreamError: null,
   commentsError: null,
 };
@@ -44,6 +46,7 @@ export const currentDreamSlice = createSlice({
       state.commentsError = null;
     }).addCase(commentsInit.fulfilled, (state, action) => {
       state.comments = [...action.payload as CommentType[]];
+      
       state.commentsLoading = false;
     }).addCase(commentsInit.rejected, (state) => {
       state.commentsLoading = false;
@@ -54,17 +57,24 @@ export const currentDreamSlice = createSlice({
       state.commentsLoading = true;
       state.commentsError = null;
     }).addCase(commentAdd.fulfilled, (state, action) => {
-      state.comments.push(action.payload as CommentType);
-      console.log(action.payload);
+      state.comments = [action.payload as CommentType, ...state.comments];
       state.commentsLoading = false;
     });
 
-    builder.addCase(commentRemove.pending, (state) => {
+    builder.addCase(commentEdit.pending, (state) => {
       state.commentsLoading = true;
       state.commentsError = null;
-    }).addCase(commentRemove.fulfilled, (state) => {
-      console.log(state.comments);
+    }).addCase(commentEdit.fulfilled, (state, action) => {
+      console.log(action.payload)
       state.commentsLoading = false;
+    })
+
+    builder.addCase(commentRemove.pending, (state) => {
+      state.commentsDeleting = true;
+      state.commentsError = null;
+    }).addCase(commentRemove.fulfilled, (state, action) => {
+      state.comments = [...state.comments.filter(comment => comment.id !== action.payload)]
+      state.commentsDeleting = false;
     })
   }
 });
@@ -98,9 +108,19 @@ export const commentAdd = createAsyncThunk(
   }
 );
 
+export const commentEdit = createAsyncThunk("currentDream/commentEdit", async ({dreamId, commentId, data, token}: {dreamId: number, commentId: number, data: {text: string}, token: string}) => {
+  try{
+    const editedComment = await editDreamComment(dreamId, commentId, data, token);
+    return editedComment;
+  } catch (e) {
+    return e;
+  }
+})
+
 export const commentRemove = createAsyncThunk("currentDream/commentRemove", async ({dreamId, commentId, token}: {dreamId: number, commentId: number, token: string}) => {
   try{
     await deleteDreamComment(dreamId, commentId, token);
+    return commentId;
   } catch (e) {
     console.log(e);
   }

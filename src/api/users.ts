@@ -25,8 +25,16 @@ export const getLoginedUser = (token: string) => {
   return response;
 }
 
-export const changeUser = (data: Omit<User, "id" | "is_staff" | "num_of_dreams" | "password" | "photo">, token: string) => {
-  return client.patch<User>(`user/me/`, data, token)
+export const changeUser = (
+  data: Partial<
+    Pick<
+      User,
+      "first_name" | "last_name" | "location" | "about_me" | "photo_url"
+    >
+  >,
+  token: string
+) => {
+  return client.patch<User>(`user/me/`, data, token);
 };
 
 export const changeUserPhoto = (data: FormData, token: string) => {
