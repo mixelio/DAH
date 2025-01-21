@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from dream.models import Dream, Comment, Contribution
+from dream.models import Dream, Comment, Contribution, UserFavorites
 from user.models import User
 
 
@@ -100,3 +100,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'user', 'dream', 'text', 'created_at',]
         read_only_fields = ['id', 'dream', 'user', 'created_at',]
+
+
+class UserFavoritesSerializer(serializers.ModelSerializer):
+    dreams = DreamRetrieveSerializer(many=True)
+
+    class Meta:
+        model = UserFavorites
+        fields = ['id', 'user', 'dreams']

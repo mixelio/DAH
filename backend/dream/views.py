@@ -4,13 +4,14 @@ from decimal import Decimal
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
 from dream.models import Comment, Dream, Contribution
 from payment.models import Payment
@@ -216,3 +217,112 @@ class FulfillDreamView(APIView):
             )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@extend_schema_view(
+    list=extend_schema(
+        summary='Get the list of favorite dreams of authenticated user',
+        description='Retrieve all dreams that the '
+                    'authenticated user has marked as favorites.',
+        responses={
+            200: DreamRetrieveSerializer(many=True),
+        },
+    ),
+    create=extend_schema(
+        summary='Add a dream to favorites',
+        description='Mark a dream as a favorite by '
+                    'providing its ID in the request body.',
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'dream_id': {
+                        'type': 'integer',
+                        'description': 'ID of the dream to add to favorites',
+                        'example': 1
+                    }
+                },
+                'required': ['dream_id']
+            }
+        },
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {
+                        'type': 'string',
+                        'example': 'Dream 1 added to favorites'
+                    }
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'error': {
+                        'type': 'string',
+                        'example': 'Dream 1 not found'
+                    }
+                }
+            },
+        },
+    ),
+    destroy=extend_schema(
+        summary='Remove a dream from favorites',
+        description='Remove a dream from the users '
+                    'favorites list by providing its '
+                    'ID in the path parameter.',
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'message': {
+                        'type': 'string',
+                        'example': 'Dream 1 removed from favorites'
+                    }
+                }
+            },
+            404: {
+                'type': 'object',
+                'properties': {
+                    'error': {
+                        'type': 'string',
+                        'example': 'Dream 1 not found'
+                    }
+                }
+            },
+        },
+    )
+)
+class FavoritesViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        favorites = request.user.favorites.dreams.prefetch_related(
+            'favorited_by').select_related('user').all()
+        serializer = DreamRetrieveSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        dream_id = request.data.get('dream_id')
+        try:
+            dream = Dream.objects.get(id=dream_id)
+            request.user.favorites.dreams.add(dream)
+            return Response(
+                {'message': f'Dream {dream_id} added to favorites'}, status=status.HTTP_200_OK
+            )
+        except Dream.DoesNotExist:
+            return Response(
+                {'error': f'Dream {dream_id} not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def destroy(self, request, pk=None):
+        try:
+            dream = Dream.objects.get(id=pk)
+            request.user.favorites.dreams.remove(dream)
+            return Response(
+                {'message': f'Dream {pk} removed from favorites'}, status=status.HTTP_200_OK
+            )
+        except Dream.DoesNotExist:
+            return Response(
+                {'error': f'Dream {pk} not found'}, status=status.HTTP_404_NOT_FOUND
+            )

@@ -61,7 +61,7 @@ class Comment(models.Model):
 
 
 class Contribution(models.Model):
-    dream = models.ForeignKey(Dream, on_delete=models.CASCADE, related_name="contributions")
+    dream = models.ForeignKey(Dream, on_delete=models.CASCADE, related_name='contributions')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
@@ -71,3 +71,11 @@ class Contribution(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user.email} - {self.dream.name}'
+
+
+class UserFavorites(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorites')
+    dreams = models.ManyToManyField(Dream, related_name='favorited_by')
+
+    def __str__(self):
+        return f'Favorites of {self.user.email}'

@@ -4,7 +4,9 @@ from rest_framework.routers import DefaultRouter
 from dream.views import (
     CommentListCreateView,
     DreamViewSet,
-    FulfillDreamView, CommentDetailView
+    FulfillDreamView,
+    CommentDetailView,
+    FavoritesViewSet
 )
 
 app_name = 'dream'
@@ -20,5 +22,7 @@ urlpatterns = [
         name='comment-update'
     ),
     path('dream/<int:dream_id>/fulfill/', FulfillDreamView.as_view(), name='fulfill-dream'),
+    path('favorites/', FavoritesViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('favorites/<int:pk>/', FavoritesViewSet.as_view({'delete': 'destroy'})),
     path('', include(router.urls))
 ]
