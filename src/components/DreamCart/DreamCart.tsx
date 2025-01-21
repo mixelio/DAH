@@ -1,8 +1,11 @@
-import React  from "react";
+import React, {useEffect}  from "react";
 import {Link} from "react-router-dom";
 import {Dream} from "../../types/Dream";
 import { IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {actions as userActions} from "../../features/users";
 
 
 type Props = {
@@ -10,6 +13,33 @@ type Props = {
 }
 
 export const DreamCart: React.FC<Props> = ({ dream }) => {
+  const dispatch = useAppDispatch();
+  const {userFavouriteList} = useAppSelector(store => store.users);
+  const dreamsFromSrorage = localStorage.getItem("bookmarks");
+  const loginedUser = localStorage.getItem("currentUser");
+
+  const addBookmark = (value: Dream) => dispatch(userActions.addToFavourite(value))
+  const removeBookmark = (value: Dream) => dispatch(userActions.removeFromFavourite(value))
+
+  const handleAddToFavourite = () => {
+    if(!loginedUser) {
+      return
+    }
+    if(userFavouriteList.includes(dream)) {
+      removeBookmark(dream)
+      return
+    }
+    addBookmark(dream)
+    localStorage.setItem("bookmarks", `${dreamsFromSrorage}, ${dream.id}`);
+  }
+
+  useEffect(() => {
+    const temp = dreamsFromSrorage?.split(", ");
+    temp?.forEach(item => {
+      console.log(item)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="dream-cart">
@@ -20,8 +50,15 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
           alt="dream_image"
           loading="lazy"
         />
-        <IconButton className="dream-cart__bookmark">
-          <BookmarkBorderIcon />
+        <IconButton
+          className="dream-cart__bookmark"
+          onClick={handleAddToFavourite}
+        >
+          {userFavouriteList.includes(dream) ? (
+            <BookmarkIcon />
+          ) : (
+            <BookmarkBorderIcon />
+          )}
         </IconButton>
       </div>
       <div className="dream-cart__info-box">

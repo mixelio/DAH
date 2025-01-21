@@ -70,7 +70,7 @@ export const NearbyDream = () => {
 
     featchNearbyDreams();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, dreams]);
+  }, [dispatch, adress]);
 
   useEffect(() => {
     console.log(!dreamsLoading, dreamsNearby.length);

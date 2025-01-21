@@ -1,11 +1,13 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {User} from "../types/User";
 import {changeUser, changeUserPhoto, createUser, getLoginedUser, getUsers} from "../api/users";
+import {Dream} from "../types/Dream";
 
 export type userState = {
   users: User[],
   loginedUser: User | null,
   userAvatar: unknown | null,
+  userFavouriteList: Dream[],
   usersLoading: boolean,
   error: string,
 };
@@ -14,6 +16,7 @@ const initialState: userState = {
   users: [],
   loginedUser: null,
   userAvatar: null,
+  userFavouriteList: [],
   usersLoading: false,
   error: '',
 }
@@ -21,7 +24,10 @@ const initialState: userState = {
 const usersSlice = createSlice({
   name: "users",
   initialState,
-  reducers: {},
+  reducers: {
+    addToFavourite: (state, action: PayloadAction<Dream>) => {state.userFavouriteList = [...state.userFavouriteList, action.payload]},
+    removeFromFavourite: (state, action: PayloadAction<Dream>) => {state.userFavouriteList = state.userFavouriteList.filter(dream => dream.id !== action.payload.id)},
+  },
   extraReducers: (builder) => {
     // geting users from backend
     builder

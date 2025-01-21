@@ -21,14 +21,13 @@ export const refreshAccess = async (): Promise<string | null> => {
 
     const data = await response.json();
 
-    const {accessTocken} = data;
-    if (!accessTocken) {
+    const {access} = data;
+    if (!access) {
       return null;
     }
     
-    localStorage.setItem("access", accessTocken);
-
-    return accessTocken;
+    localStorage.setItem("access", access);
+    return access;
   } catch (error) {
     console.log(error);
     return null;
