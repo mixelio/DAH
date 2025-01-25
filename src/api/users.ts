@@ -48,3 +48,15 @@ export const loginUser = (data: {"email": string, "password": string}) =>{
 export const verifyUser = (token: string) => {
   return client.post<{success: boolean}>('user/token/verify/', {token: token}, token);
 };
+
+export const getUserFavourites = (token: string) => {
+  return client.get<User>(`favorites/`, token);
+}
+
+export const addToFavourite = ({dream_id: dream_id}: {dream_id: number}, token: string) => {
+  return client.post(`favorites/`, {dream_id: dream_id}, token);
+}
+
+export const removeFromFavorite = ({dream_id: dream_id}: {dream_id: number}, token: string) => {
+  return client.delete(`favorites/${dream_id}/`, token);
+}

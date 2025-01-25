@@ -1,11 +1,11 @@
-import React, {useEffect}  from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 import {Dream} from "../../types/Dream";
 import { IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {actions as userActions} from "../../features/users";
+import {actions as userActions, userFavouriteAdd, userFavoriteRemove} from "../../features/users";
 
 
 type Props = {
@@ -15,31 +15,33 @@ type Props = {
 export const DreamCart: React.FC<Props> = ({ dream }) => {
   const dispatch = useAppDispatch();
   const {userFavouriteList} = useAppSelector(store => store.users);
-  const dreamsFromSrorage = localStorage.getItem("bookmarks");
   const loginedUser = localStorage.getItem("currentUser");
+  const access = localStorage.getItem("access");
 
   const addBookmark = (value: Dream) => dispatch(userActions.addToFavourite(value))
   const removeBookmark = (value: Dream) => dispatch(userActions.removeFromFavourite(value))
 
-  const handleAddToFavourite = () => {
+  const handleAddOrRemoveFavourite = () => {
+
     if(!loginedUser) {
       return
     }
     if(userFavouriteList.includes(dream)) {
       removeBookmark(dream)
+      dispatch(
+        userFavoriteRemove({
+          dream_id: dream.id,
+          token: access ?? "",
+        })
+      );
       return
     }
-    addBookmark(dream)
-    localStorage.setItem("bookmarks", `${dreamsFromSrorage}, ${dream.id}`);
+    addBookmark(dream);
+    dispatch(userFavouriteAdd({
+      dream_id: dream.id,
+      token: access ?? "",
+    }));
   }
-
-  useEffect(() => {
-    const temp = dreamsFromSrorage?.split(", ");
-    temp?.forEach(item => {
-      console.log(item)
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <div className="dream-cart">
@@ -52,9 +54,9 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
         />
         <IconButton
           className="dream-cart__bookmark"
-          onClick={handleAddToFavourite}
+          onClick={handleAddOrRemoveFavourite}
         >
-          {userFavouriteList.includes(dream) ? (
+          {userFavouriteList.find((item) => item.id === dream.id) ? (
             <BookmarkIcon />
           ) : (
             <BookmarkBorderIcon />

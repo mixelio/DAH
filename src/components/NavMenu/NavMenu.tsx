@@ -6,8 +6,9 @@ import classNames from 'classnames';
 import {DreamsContext} from '../../DreamsContext';
 import {theme} from '../../utils/theme';
 import {getUser} from '../../utils/getUser';
-import {useAppSelector} from '../../app/hooks';
+import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import {userFavouritesInit} from '../../features/users';
 
 const pages = [
   {id: 1, name: 'Home', path: '/'},
@@ -16,19 +17,36 @@ const pages = [
 ];
 
 const colorsPrimary = theme.palette.primary;
+const colorsText = theme.palette.text;
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const {
     setMainFormActive, 
     setActiveIndex } = useContext(DreamsContext);
-  const {users} = useAppSelector(store => store.users)
+  const {users, userFavouriteList} = useAppSelector(store => store.users);
+  const dispatch = useAppDispatch();
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
 
   useEffect(() => {
-    
+    const featchFavoures = async () => {
+      const access = localStorage.getItem("access");
+
+      console.log("try to init the favorites");
+      try {
+        if(access) {
+            const responce = await dispatch(userFavouritesInit(access));
+            console.log(responce);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+      }
+    }
+
+    featchFavoures();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userFromLocaleStorage]);
 
   const loginedUser = userFromLocaleStorage
@@ -93,12 +111,8 @@ export const NavMenu = () => {
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              <Avatar
-                alt=""
-                src={loginedUser.photo_url}
-              >
-                {!loginedUser.photo &&
-                  <AccountCircleIcon />}
+              <Avatar alt="" src={loginedUser.photo_url}>
+                {!loginedUser.photo && <AccountCircleIcon />}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -112,7 +126,7 @@ export const NavMenu = () => {
               paper: {
                 elevation: 0,
                 sx: {
-                  width: "150px",
+                  width: "160px",
                   overflow: "visible",
                   filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                   mt: 1.5,
@@ -144,16 +158,27 @@ export const NavMenu = () => {
               My Profile
             </MenuItem>
 
-            <MenuItem>Favorite Dreams</MenuItem>
+            <MenuItem
+              className="navigation__favorite-link"
+              onClick={() => navigate(`profile/${loginedUser.id}/favorites`)}
+            >
+              Favorite Dreams
+              <div className="navigation__favorite-count">
+                {userFavouriteList.length}
+              </div>
+            </MenuItem>
 
             <MenuItem>Help&Support</MenuItem>
 
-            <MenuItem onClick={() => {
-              localStorage.setItem("currentUser", "");
-              localStorage.removeItem("access");
-              localStorage.removeItem("refresh");
-              navigate("/");
-            }}>
+            <MenuItem
+              sx={{ color: `${colorsText.secondary}`, fontWeight: 300, marginTop: "10px" }}
+              onClick={() => {
+                localStorage.setItem("currentUser", "");
+                localStorage.removeItem("access");
+                localStorage.removeItem("refresh");
+                navigate("/");
+              }}
+            >
               Logout
             </MenuItem>
           </Menu>
@@ -165,7 +190,7 @@ export const NavMenu = () => {
           onClick={handleSingInOpen}
           sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
         >
-          Singin
+          Sign In
         </Button>
       )}
     </nav>

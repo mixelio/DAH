@@ -52,7 +52,7 @@ export const SingUpInForm = () => {
   });
 
   const [repeatedPassword, setRepeatedPassword] = useState<string>('');
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   const [value, setValue] = useState('1');
   const [contentHeight, setContentHeight] = useState(0);
@@ -148,6 +148,11 @@ export const SingUpInForm = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    console.log("submit", event.target)
+    console.log("FormData:", data.get("first_name"), data.get("last_name"), data.get("email"), data.get("password"));
+    console.log("RegisterData:", registerData.first_name, registerData.last_name, registerData.email, registerData.password);
 
     if (!registerData.email.trim() || !registerData.password.trim()) {
       setErrorMessage(Errors.Empty);
@@ -180,8 +185,6 @@ export const SingUpInForm = () => {
         try {
           const response = await createUser(newUser);
           if (response) {
-            setOpen(true);
-            console.log(open)
             enqueueSnackbar("Registration success", { variant: "success" });
           }
         } catch (error) {

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {User} from "../types/User";
-import {changeUser, changeUserPhoto, createUser, getLoginedUser, getUsers} from "../api/users";
+import {addToFavourite, changeUser, changeUserPhoto, createUser, getLoginedUser, getUserFavourites, getUsers, removeFromFavorite} from "../api/users";
 import {Dream} from "../types/Dream";
 
 export type userState = {
@@ -85,6 +85,36 @@ const usersSlice = createSlice({
           state.error = action.error.message || "";
           state.usersLoading = false;
         });
+
+        // favorite list
+
+      builder
+        .addCase(userFavouritesInit.pending, (state) => {
+          state.usersLoading = true;
+        })
+        .addCase(userFavouritesInit.fulfilled, (state, action) => {
+          state.userFavouriteList = [...action.payload as Dream[]];
+          state.usersLoading = false;
+        });
+
+      builder
+        .addCase(userFavouriteAdd.pending, () => {
+          console.log("favorite is adding...");
+        })
+        .addCase(userFavouriteAdd.fulfilled, (state, action) => {
+          const payload = action.payload as { message: string };
+          console.log(payload.message);
+          console.log(state.userFavouriteList);
+        });
+
+      builder
+        .addCase(userFavoriteRemove.pending, () => {
+          console.log("favorite is removing...");
+        })
+        .addCase(userFavoriteRemove.fulfilled, (state, action) => {
+          console.log(action.payload);
+          state.userFavouriteList = state.userFavouriteList.filter(dream => dream.id !== action.payload);
+        })
   },
 });
 
@@ -96,6 +126,34 @@ export const usersInit = createAsyncThunk("users/fetch", async () => {
   return response;
 });
 
+export const userFavouritesInit = createAsyncThunk("user/favorites", async (token: string) => {
+  console.log("inside userFavouritesInit thunk");
+  try {
+    const response = await getUserFavourites(token);
+    return response;
+  } catch (error) {
+    return error;
+  }
+});
+
+export const userFavouriteAdd = createAsyncThunk("favourite/add", async ({dream_id, token}: {dream_id: number, token: string} ) => {
+  try {
+    const response = await addToFavourite({dream_id: dream_id}, token);
+    return response;
+  } catch (error) {
+    return error;
+  }
+});
+
+export const userFavoriteRemove = createAsyncThunk("favorite/remove", async ({dream_id, token}: {dream_id: number, token: string}) => {
+  try {
+    await removeFromFavorite({dream_id: dream_id}, token);
+    return dream_id;
+  } catch (error) {
+    return error;
+  }
+})
+
 export const userRegister = createAsyncThunk("user/register", async (data: Pick<User, "first_name" | "last_name" | "email" | "password">, thunkAPI) => {
   try {
     const response = await createUser(data);
@@ -104,12 +162,12 @@ export const userRegister = createAsyncThunk("user/register", async (data: Pick<
   } catch (error) {
     return thunkAPI.rejectWithValue(error);
   }
-})
+});
 
 export const currentUserInit = createAsyncThunk("currUser/fetch", async (token: string) => {
     const response = await getLoginedUser(token);
     return response;
-})
+});
 
 export const currentUserUpdate = createAsyncThunk("currentUser/patch", async ({ data, token }: { data: FormData, token: string }) => {
   const userData: Partial<
@@ -126,7 +184,7 @@ export const currentUserUpdate = createAsyncThunk("currentUser/patch", async ({ 
   const response = await changeUser(userData, token);
 
   return response;
-})
+});
 
 export const userPhotoUpdate = createAsyncThunk("user/photo", async ({ data, token }: { data: FormData, token: string }) => {
   const response = await changeUserPhoto(data, token);
