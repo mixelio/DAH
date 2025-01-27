@@ -6,8 +6,8 @@ from user.models import User
 
 class Dream(models.Model):
     class Category(models.TextChoices):
-        MONEY = 'Money donation'
-        SERVICES = 'Volunteer services'
+        MONEY = 'Money_donation'
+        SERVICES = 'Volunteer_services'
         GIFTS = 'Gifts'
 
     class Status(models.TextChoices):
