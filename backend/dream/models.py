@@ -28,7 +28,7 @@ class Dream(models.Model):
     views = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['-date_added']
+        ordering = ['-date_added', '-id']
 
     def __str__(self) -> str:
         return self.name
