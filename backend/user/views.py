@@ -103,7 +103,7 @@ class PasswordResetConfirmView(APIView):
         # Validate and update the new password
         new_password = request.data.get('password')
         if not new_password or len(new_password) < 5:
-            raise ValidationError('Password must be at least 8 characters long')
+            raise ValidationError('Password must be at least 5 characters long')
 
         user.set_password(new_password)
         user.save()

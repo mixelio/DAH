@@ -70,27 +70,7 @@ class DreamListSerializer(DreamCreateSerializer):
 
 
 class DreamRetrieveSerializer(DreamListSerializer):
-    contributions = ContributionSerializer(many=True, read_only=True)
     user = UserDreamRetrieveSerializer(read_only=True)
-
-    class Meta:
-        model = Dream
-        fields = [
-            'id',
-            'name',
-            'description',
-            'image',
-            'image_url',
-            'user',
-            'cost',
-            'accumulated',
-            'status',
-            'category',
-            'date_added',
-            'location',
-            'views',
-            'contributions',
-        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):

@@ -1,10 +1,16 @@
+import logging
 from abc import ABC, abstractmethod
 from decimal import Decimal
 
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_view
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiExample,
+    extend_schema_view
+)
 from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
@@ -26,6 +32,9 @@ from dream.serializers import (
     ContributionSerializer, DreamRetrieveSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
+
+
+logger = logging.getLogger(__name__)
 
 
 class CommentListCreateView(ListCreateAPIView):
@@ -77,7 +86,7 @@ class DreamViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self):
-        queryset = Dream.objects.all().select_related('user')
+        queryset = Dream.objects.all().select_related('user').prefetch_related('contributions')
         category = self.request.query_params.get('category', None)
         if category:
             return queryset.filter(category__icontains=category)
@@ -85,6 +94,15 @@ class DreamViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        logger.error(f"Received data: {request.data}")
+        print("Received data:", request.data)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_serializer_class(self):
         if self.action == 'list':

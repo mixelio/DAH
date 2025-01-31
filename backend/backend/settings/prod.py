@@ -12,11 +12,11 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'dah-production-f4c2.up.railway.app']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['PGDATABASE'],
-        'USER': os.environ['PGUSER'],
-        'PASSWORD': os.environ['PGPASSWORD'],
-        'HOST': os.environ['PGHOST'],
-        'PORT': int(os.environ['PGPORT']),
+        'NAME': os.getenv('PGDATABASE'),
+        'USER': os.getenv('PGUSER'),
+        'PASSWORD': os.getenv('PGPASSWORD'),
+        'HOST': os.getenv('PGHOST'),
+        'PORT': int(os.getenv('PGPORT')),
     }
 }
 
