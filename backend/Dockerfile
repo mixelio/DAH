@@ -22,8 +22,8 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN printenv | grep DJANGO
 RUN DJANGO_SETTINGS_MODULE=backend.settings.prod python manage.py migrate
 RUN python manage.py collectstatic --noinput
 
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "backend.wsgi:application"]
+#CMD ["gunicorn", "-b", "0.0.0.0:8080", "backend.wsgi:application"]
+CMD printenv && gunicorn -b 0.0.0.0:8080 backend.wsgi:application
