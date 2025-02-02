@@ -10,6 +10,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD python manage.py migrate && \
+CMD python manage.py makemigrations &&  \
+    python manage.py migrate && \
     python manage.py collectstatic --noinput && \
     gunicorn -b 0.0.0.0:8080 backend.wsgi:application
