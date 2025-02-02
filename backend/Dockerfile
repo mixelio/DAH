@@ -22,9 +22,9 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN python manage.py collectstatic --noinput
 
 #CMD ["gunicorn", "-b", "0.0.0.0:8080", "backend.wsgi:application"]
 #CMD printenv && gunicorn -b 0.0.0.0:8080 backend.wsgi:application
 
-CMD python manage.py migrate && gunicorn -b 0.0.0.0:8080 backend.wsgi:application
+CMD python manage.py migrate && python manage.py collectstatic --noinput && gunicorn -b 0.0.0.0:8080 backend.wsgi:application
+
