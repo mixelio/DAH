@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 from decimal import Decimal
 
@@ -9,9 +8,9 @@ from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
     OpenApiExample,
-    extend_schema_view
+    extend_schema_view, PolymorphicProxySerializer
 )
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -29,12 +28,9 @@ from dream.serializers import (
     DreamCreateSerializer,
     DreamListSerializer,
     CommentSerializer,
-    ContributionSerializer, DreamRetrieveSerializer
+    ContributionSerializer, DreamRetrieveSerializer, MoneyDreamRequestSerializer, NonMoneyDreamRequestSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
-
-
-logger = logging.getLogger(__name__)
 
 
 class CommentListCreateView(ListCreateAPIView):
@@ -96,7 +92,6 @@ class DreamViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        logger.error(f"Received data: {request.data}")
         print("Received data:", request.data)
 
         serializer = self.get_serializer(data=request.data)
@@ -155,8 +150,20 @@ class DreamViewSet(viewsets.ModelViewSet):
 
 
 class DreamHandler(ABC):
+    """
+    Abstract base class for handling different types of dream fulfillment.
+    """
+
     @abstractmethod
     def handle(self, dream, user, request):
+        """
+        Processes the fulfillment of a given dream.
+
+        :param dream: The dream instance to be fulfilled.
+        :param user: The user making the contribution.
+        :param request: The HTTP request containing necessary data.
+        :raises NotImplementedError: If the method is not implemented in a subclass.
+        """
         raise NotImplementedError('This method should be implemented by subclasses.')
 
 
@@ -194,6 +201,22 @@ class NonMoneyDreamHandler(DreamHandler):
 class FulfillDreamView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=PolymorphicProxySerializer(
+            component_name='Payload for different dream types',
+            serializers=[
+                MoneyDreamRequestSerializer, NonMoneyDreamRequestSerializer,
+            ],
+            resource_type_field_name='person_type',
+        ),
+        responses=PolymorphicProxySerializer(
+            component_name='Response for different dream types',
+            serializers=[
+                ContributionSerializer, PaymentSerializer,
+            ],
+            resource_type_field_name='person_type',
+        )
+    )
     def post(self, request, dream_id):
         dream = get_object_or_404(Dream, id=dream_id)
         user = request.user

@@ -88,3 +88,15 @@ class UserFavoritesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserFavorites
         fields = ['id', 'user', 'dreams']
+
+
+class MoneyDreamRequestSerializer(serializers.Serializer):
+    contribution_amount = serializers.IntegerField(
+        min_value=1, help_text='Amount of money to contribute.'
+    )
+
+
+class NonMoneyDreamRequestSerializer(serializers.Serializer):
+    contribution_description = serializers.CharField(
+        help_text='Description of the contribution.'
+    )
