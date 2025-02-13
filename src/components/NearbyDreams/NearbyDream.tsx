@@ -72,9 +72,7 @@ export const NearbyDream = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, adress]);
 
-  useEffect(() => {
-    console.log(!dreamsLoading, dreamsNearby.length);
-  }, [adress, dreams, dreamsLoading, dreamsNearby]);
+
 
   return (
     <section className="nearby-dreams">

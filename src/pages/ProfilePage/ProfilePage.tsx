@@ -26,9 +26,8 @@ export const ProfilePage = () => {
 
   useEffect(() => {
     dispatch(dreamsInit());
-    console.log(currentUserId, id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id, dreams])
 
   useEffect(() => {
     const fetchCurrentProfile = async () => {
@@ -50,7 +49,7 @@ export const ProfilePage = () => {
   }, [id]);
 
   const dreamsOfUser = dreams.filter(
-    (dream) => dream.user.id === currentProfile?.id
+    (dream) => dream.user?.id === currentProfile?.id
   );
 
   const navigate = useNavigate();

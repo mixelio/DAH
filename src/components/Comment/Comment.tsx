@@ -14,7 +14,6 @@ type Props = {
 export const Comment: React.FC<Props> = ({ comment }) => {
   const {commentsDeleting} = useAppSelector(store => store.currentDream)
   const currentUser = localStorage.getItem('currentUser') || ""
-  const [removingComment, setRemovingComment] = useState<number | null>(null)
   const [editingComment, setEditingComment] = useState<boolean>(false)
   const commentRef = useRef<HTMLDivElement | null>(null)
   const inputForChangeRef = useRef<HTMLInputElement | null>(null)
@@ -59,21 +58,15 @@ export const Comment: React.FC<Props> = ({ comment }) => {
       const token = localStorage.getItem("access");
       
       if(token) {
-        const deletedComment = await dispatch(commentRemove({
+        await dispatch(commentRemove({
           dreamId: comment.dream, 
           commentId: comment.id, 
           token: token
         }));
-        setRemovingComment(() => {
-          const newValue = deletedComment.payload as number;
-          
-          return newValue;
-        });
       }
     } catch (e) {
       console.log(e);
     } finally{
-      console.log(removingComment);
       await dispatch(commentsInit(comment.dream.toString())).unwrap();
     }
   }
@@ -125,10 +118,8 @@ export const Comment: React.FC<Props> = ({ comment }) => {
             ref={inputForChangeRef}
             className="comment-editInput"
             defaultValue={comment.text} 
-            type="text" 
-            onChange={(e) => {
-            console.log(e.target.value)
-          }}/>
+            type="text"
+          />
         ) : (
           comment.text
         )}

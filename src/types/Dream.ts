@@ -1,6 +1,7 @@
 export enum DreamCategory {
-  MoneyDonation = "Money donation",
-  VolunteerServices = "Volunteer services",
+  All = "All",
+  Money_donation = "Money_donation",
+  Volunteer_services = "Volunteer_services",
   Gifts = "Gifts",
 }
 
@@ -20,12 +21,12 @@ export type Dream = {
   };
   name: string;
   description: string;
-  image: string;
+  image: File | string;
   image_url: string;
   cost: number;
   accumulated: number;
   status: DreamStatus;
-  category: "Money donation" | "Volunteer services" | "Gifts";
+  category: DreamCategory | string;
   location: string;
   date_added: string;
   views: number;

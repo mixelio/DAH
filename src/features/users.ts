@@ -99,20 +99,16 @@ const usersSlice = createSlice({
 
       builder
         .addCase(userFavouriteAdd.pending, () => {
-          console.log("favorite is adding...");
         })
         .addCase(userFavouriteAdd.fulfilled, (state, action) => {
-          const payload = action.payload as { message: string };
-          console.log(payload.message);
-          console.log(state.userFavouriteList);
+          const payload = action.payload as Dream;
+          state.userFavouriteList.push(payload as Dream);
         });
 
       builder
         .addCase(userFavoriteRemove.pending, () => {
-          console.log("favorite is removing...");
         })
         .addCase(userFavoriteRemove.fulfilled, (state, action) => {
-          console.log(action.payload);
           state.userFavouriteList = state.userFavouriteList.filter(dream => dream.id !== action.payload);
         })
   },
@@ -127,7 +123,6 @@ export const usersInit = createAsyncThunk("users/fetch", async () => {
 });
 
 export const userFavouritesInit = createAsyncThunk("user/favorites", async (token: string) => {
-  console.log("inside userFavouritesInit thunk");
   try {
     const response = await getUserFavourites(token);
     return response;

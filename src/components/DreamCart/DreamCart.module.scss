@@ -54,6 +54,10 @@
     font-size: 28px;
     font-weight: 800;
     margin-bottom: 16px;
+    word-break: break-all;
+    max-height: 28px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__description {
@@ -66,6 +70,7 @@
     font-weight: 400;
     color: $text-color-light;
     margin-bottom: 36px;
+    word-break: break-all;
   }
 
   &__more {

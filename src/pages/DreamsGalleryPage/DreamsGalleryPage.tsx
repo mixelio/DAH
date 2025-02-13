@@ -6,6 +6,7 @@ import {FormControl, IconButton, InputAdornment, MenuItem, OutlinedInput, Pagina
 import {useSearchParams} from "react-router-dom";
 import {getSearchWith, SearchParams} from "../../utils/searchHelper";
 import SearchIcon from "@mui/icons-material/Search";
+import { Dream, DreamCategory } from "../../types/Dream";
 
 enum PostsPerPage {
   six = 6,
@@ -23,6 +24,17 @@ export const DreamsGalleryPage = () => {
 
   const perPage = searchParams.get("postsPerPage") || PostsPerPage.six.toString();
   const page = searchParams.get("page") ? parseInt(searchParams.get("page") as string, 10) : 1;
+  const category = searchParams.get("category") || DreamCategory.All;
+  const [dreamsForShow, setDreamsForShow] = useState<Dream[]>([]);
+
+  useEffect(() => {
+    if (category !== DreamCategory.All && dreams) {
+      const tempDreams = dreams.filter(dream => !dream.category.localeCompare(category));
+      setDreamsForShow([...tempDreams]);
+    } else {
+      setDreamsForShow([...dreams]);
+    }
+  }, [category, dreams]);
 
   const setSearchWith = (params: SearchParams) => {
     const search = getSearchWith(params, searchParams);
@@ -32,7 +44,7 @@ export const DreamsGalleryPage = () => {
 
   useEffect(() => {
     dispatch(dreamsInit());
-    setSearchParams({ page: "1", postsPerPage: PostsPerPage.six.toString()});
+    setSearchParams({ page: "1", postsPerPage: PostsPerPage.six.toString(), category: DreamCategory.All });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,6 +57,14 @@ export const DreamsGalleryPage = () => {
   const handlePageChange = (_event: ChangeEvent<unknown>, page: number) => {
     document.documentElement.scrollTop = 0;
     setSearchWith({ page: page.toString() });
+  }
+
+  const handleCategorySelect = (e: SelectChangeEvent<DreamCategory>) => {
+    setSearchWith({
+      page: "1",
+      postsPerPage: perPage,
+      category: e.target.value.toString()
+    });
   }
 
   const handlePostsPerPageChange = (e: SelectChangeEvent<PostsPerPage>) => {
@@ -76,6 +96,24 @@ export const DreamsGalleryPage = () => {
               }
             />
           </FormControl>
+          <FormControl className="dreams-gallery__category">
+            <Select
+              defaultValue={DreamCategory.All}
+              onChange={handleCategorySelect}
+              sx={{ width: 200 }}
+            >
+              <MenuItem value={DreamCategory.All} selected>
+                All categories
+              </MenuItem>
+              <MenuItem value={DreamCategory.Money_donation}>
+                Money donation
+              </MenuItem>
+              <MenuItem value={DreamCategory.Gifts}>Gifts</MenuItem>
+              <MenuItem value={DreamCategory.Volunteer_services}>
+                Volunteer services
+              </MenuItem>
+            </Select>
+          </FormControl>
           <FormControl className="dreams-gallery__filter">
             <Select
               defaultValue={PostsPerPage.six}
@@ -93,8 +131,8 @@ export const DreamsGalleryPage = () => {
           </FormControl>
         </form>
         <div className="dreams-gallery__content">
-          {dreams &&
-            dreams
+          {dreamsForShow &&
+            dreamsForShow
               .slice(
                 +perPage * (+page - 1),
                 Math.min(+page * +perPage, dreams.length)

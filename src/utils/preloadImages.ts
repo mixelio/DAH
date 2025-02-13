@@ -8,7 +8,6 @@ export const preloadImages = (imageUrls: string[]): Promise<void[]> => {
 
           // Успешная загрузка
           img.onload = () => {
-            console.log();
             resolve();
           };
 

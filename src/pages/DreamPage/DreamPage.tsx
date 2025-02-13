@@ -80,8 +80,6 @@ export const DreamPage = () => {
         }
       } catch (e) {
         console.error(e);
-      } finally {
-        // console.log("initializate dreams page")
       }
     }
 
@@ -132,9 +130,9 @@ export const DreamPage = () => {
 
   useEffect(() => {
     if (currentDream?.image) {
-      isImageAvailable(currentDream.image).then((res) => {
+      isImageAvailable(typeof currentDream.image === 'string' ? currentDream.image : '').then((res) => {
         if (res) {
-          setPostImage(currentDream.image);
+          setPostImage(typeof currentDream.image === 'string' ? currentDream.image : '');
         } else {
           setPostImage("https://picsum.photos/200/300?random=1");
         }
@@ -145,14 +143,12 @@ export const DreamPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, dreams, users, setCurrentDream, postImage]);
 
-
-  // console.log(author)
   return (
     <section className="dream">
       <div className="container">
         {currentDream && !loading ? (
           <div className="dream__content">
-            <h2 className="dream__title">{currentDream.name}</h2>
+            <h2 className="dream__title">{currentDream.name} {currentDream.category}</h2>
             <Link
               to={`/profile/${currentDream.user.id}`}
               className="dream__author-info"

@@ -16,7 +16,6 @@ export const useRefresh = (interval: number) => {
 
       try{
         const newAccessTocken = await refreshAccess();
-        console.log("start refresh", newAccessTocken)
 
         if (!newAccessTocken) {
           localStorage.setItem("currentUser", "");
@@ -25,7 +24,6 @@ export const useRefresh = (interval: number) => {
           navigate("/");
         } else {
           localStorage.setItem("access", newAccessTocken);
-          console.log("refresh");
         }
       } catch (e) {
         console.error(e)

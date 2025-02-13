@@ -19,6 +19,7 @@
     "@mui/material": "^6.1.6",
     "@react-google-maps/api": "^2.20.3",
     "@reduxjs/toolkit": "^2.3.0",
+    "@types/swiper": "^5.4.3",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "firebase": "^11.1.0",
@@ -36,7 +37,7 @@
     "react-responsive": "^10.0.0",
     "react-router-dom": "^6.28.0",
     "react-share": "^5.1.1",
-    "swiper": "^11.1.15",
+    "swiper": "^11.2.2",
     "uuid": "^11.0.3"
   },
   "devDependencies": {

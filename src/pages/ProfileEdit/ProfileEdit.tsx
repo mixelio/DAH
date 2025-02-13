@@ -18,7 +18,7 @@ export const ProfileEdit = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loader, setLoader] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const formRef = useRef<HTMLFormElement | null>(null);
+  // const formRef = useRef<HTMLFormElement | null>(null);
 
   const [dataForChange, setDataForChange] = useState({
     first_name: loginedUser?.first_name ?? "",
@@ -149,7 +149,7 @@ export const ProfileEdit = () => {
 
     try {
       const chekTocken = localStorage.getItem("access") ?? "";
-      const form = formRef.current;
+      // const form = formRef.current;
 
       const updatedData = new FormData();
 
@@ -166,8 +166,6 @@ export const ProfileEdit = () => {
           }
         }
       });
-
-      console.log(updatedData.get('about_me'), form)
 
       dispatch(
         currentUserUpdate({

@@ -33,12 +33,9 @@ export const NavMenu = () => {
   useEffect(() => {
     const featchFavoures = async () => {
       const access = localStorage.getItem("access");
-
-      console.log("try to init the favorites");
       try {
         if(access) {
-            const responce = await dispatch(userFavouritesInit(access));
-            console.log(responce);
+            await dispatch(userFavouritesInit(access));
           }
         } catch (error) {
           console.error('Error:', error);

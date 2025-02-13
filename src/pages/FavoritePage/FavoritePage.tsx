@@ -4,7 +4,6 @@ import styles from "./Favorites.module.scss";
 
 export const FavoritePage = () => {
   const { userFavouriteList } = useAppSelector(store => store.users);
-  console.log(userFavouriteList);
 
   return (
     <section className={styles.favorites}>

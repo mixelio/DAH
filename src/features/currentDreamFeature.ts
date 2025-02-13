@@ -64,8 +64,7 @@ export const currentDreamSlice = createSlice({
     builder.addCase(commentEdit.pending, (state) => {
       state.commentsLoading = true;
       state.commentsError = null;
-    }).addCase(commentEdit.fulfilled, (state, action) => {
-      console.log(action.payload)
+    }).addCase(commentEdit.fulfilled, (state) => {
       state.commentsLoading = false;
     })
 

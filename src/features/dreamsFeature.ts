@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDream, getDreams} from "../api/dreams";
+import {createDream, createPhotoForDream, getDreams} from "../api/dreams";
 
 export type dreamsState = {
   dreams: Dream[],
@@ -49,8 +49,36 @@ export const dreamsInit = createAsyncThunk("dreams/fetch", async () => {
   return response;
 });
 
-export const dreamCreateInit = createAsyncThunk("dreams/create", async (data: { dreamData: FormData, token: string }) => {
-  const { dreamData, token } = data;
-  const response = await createDream(dreamData, token);
+export const dreamCreateInit = createAsyncThunk("dreams/create", async ({data, token}: { data: FormData, token: string }) => {
+  const dreamInfo: Partial<
+      Record<"name" | "category" | "cost" | "description" | "image" | "location", string | number | File>
+  > = {};
+
+  (["name", "category", "cost", "description","image", "location"] as const).forEach(key => {
+      const value = data.get(key);
+      if(value !== null && value !== undefined && value !== "") {
+        dreamInfo[key] = value as string | number | File;
+      }
+    })
+
+    const formData = new FormData();
+    Object.entries(dreamInfo).forEach(([key, value]) => {
+      if(value !== null && value !== undefined) {
+        if(key !== "image") {
+          formData.append(key, value as string | Blob);
+        } else {
+        formData.append(key, value as File);
+      }
+      
+}});
+    console.log("name", formData.get("name"), "category", formData.get("category"), "cost", formData.get("cost"), "description", formData.get("description"),"image", formData.get("image"));
+    const response = await createDream(formData, token);
+
+    return response;
+  });
+
+export const dreamPhotoCreateInit = createAsyncThunk("dream/photoCreate", async (data: { photoData: FormData, token: string }) => {
+  const { photoData, token } = data;
+  const response = await createPhotoForDream(photoData, token);
   return response;
 });

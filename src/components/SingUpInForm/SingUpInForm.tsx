@@ -1,5 +1,5 @@
 import { Visibility, VisibilityOff} from '@mui/icons-material'
-import {Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField} from '@mui/material'
+import {Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Snackbar, TextField} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -52,7 +52,7 @@ export const SingUpInForm = () => {
   });
 
   const [repeatedPassword, setRepeatedPassword] = useState<string>('');
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const [value, setValue] = useState('1');
   const [contentHeight, setContentHeight] = useState(0);
@@ -149,10 +149,12 @@ export const SingUpInForm = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    console.log("submit", event.target)
-    console.log("FormData:", data.get("first_name"), data.get("last_name"), data.get("email"), data.get("password"));
-    console.log("RegisterData:", registerData.first_name, registerData.last_name, registerData.email, registerData.password);
+    const registerData = {
+      first_name: data.get('first_name')?.toString() || '',
+      last_name: data.get('last_name')?.toString() || '',
+      email: data.get('email')?.toString() || '',
+      password: data.get('password')?.toString() || '',
+    }
 
     if (!registerData.email.trim() || !registerData.password.trim()) {
       setErrorMessage(Errors.Empty);
@@ -180,12 +182,16 @@ export const SingUpInForm = () => {
         return
       }
       if (passwordValidator(newUser.password).length === 0) {
-        
         setLoginWaiting(true);
         try {
           const response = await createUser(newUser);
           if (response) {
             enqueueSnackbar("Registration success", { variant: "success" });
+            setOpen(true);
+            if (event.target) {
+              (event.target as HTMLFormElement).reset();
+              setValue("2");
+            };
           }
         } catch (error) {
           console.log(error, "user not created");
@@ -394,7 +400,7 @@ export const SingUpInForm = () => {
                     onChange={handleChangeReg}
                   />
                 </div>
-                <Divider style={{opacity: "0"}}/>
+                <Divider style={{ opacity: "0" }} />
                 <div className="sign-up-in-form__fields-container">
                   <FormControl
                     sx={{ m: 1 }}
@@ -586,13 +592,14 @@ export const SingUpInForm = () => {
               )}
           </Box>
         </TabContext>
-        {/* <Snackbar
-          open={open}
-          autoHideDuration={5000}
-          onClose={() => setOpen(false)}
-          message="Registration success"
-        /> */}
       </div>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={open}
+        autoHideDuration={5000}
+        onClose={() => setOpen(false)}
+        message="Registration success"
+      />
     </SnackbarProvider>
   );
 }

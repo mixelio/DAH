@@ -4,22 +4,13 @@ interface OptionType {
   description: string;
 }
 
-type DataForCreate = {
-  image: File | null;
-  name: string;
-  category: string;
-  location: string;
-  cost: number;
-  description: string;
-}
-
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import {Autocomplete, Button, FormControl, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from "@mui/material";
 import {DreamCategory} from "../../types/Dream";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {useAppDispatch} from "../../app/hooks";
 import {dreamCreateInit} from "../../features/dreamsFeature";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 export const CreateDreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,23 +18,18 @@ export const CreateDreamPage = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const categorySelectRef = useRef<HTMLSelectElement | null>(null);
+  const { id } = useParams();
 
-  const [category, setCategory] = useState<DreamCategory>(DreamCategory.MoneyDonation);
+  const [category, setCategory] = useState<DreamCategory>(
+    DreamCategory.Money_donation
+  );
 
   const [options, setOptions] = useState<OptionType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   const navigate = useNavigate();
-
-  const [dataForCreate, setDataForCreate] = useState<DataForCreate>({
-    image: null,
-    name: "",
-    category: DreamCategory.MoneyDonation,
-    location: "",
-    cost: 0,
-    description: "",
-  });
 
   useEffect(() => {
     if(!inputValue) {
@@ -77,7 +63,6 @@ export const CreateDreamPage = () => {
 
     if (file) {
       setSelectedFile(file);
-      setDataForCreate((prev) => ({ ...prev, image: file }));
 
       const reader = new FileReader();
 
@@ -89,20 +74,23 @@ export const CreateDreamPage = () => {
     }
   };
 
-  const handleChangeProfileData = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setDataForCreate((prev) => (
-      { ...prev, [event.target.name]: event.target.value }
-    ));
-  }
-
   const handleChangeCategory = (event: SelectChangeEvent) => {
     setCategory(event.target.value as DreamCategory);
-    setDataForCreate((prev) => ({ ...prev, category: event.target.value }));
   };
 
   const handleCreateDreamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const chekTocken = localStorage.getItem("access");
     e.preventDefault();
+    const keys = ["name", "category", "cost", "description", "image", "location"];
+    const currentData: { [key: string]: string | number | DreamCategory} = {};
+
+    keys.forEach(key => {
+      const value = e.currentTarget[key] !== undefined ? e.currentTarget[key].value : "";
+      
+      if (value !== "" && value !== undefined) {
+        currentData[key] = value;
+      }
+    });
 
     setLoading(true);
     const formData = new FormData();
@@ -112,22 +100,22 @@ export const CreateDreamPage = () => {
         return;
       }
 
-      Object.entries(dataForCreate).forEach(([key, value]) => {
+      Object.entries(currentData).forEach(([key, value]) => {
         if(key !== "image") {
           if (value) {
             formData.append(key, value.toString());
-          } else {
-            formData.append(key, "");
+          }
+        } else {
+          console.log("image")
+          console.log(selectedFile);
+          if (selectedFile) {
+            formData.append(key, selectedFile);
           }
         }
       });
 
-      if (selectedFile) {
-        formData.append("image", selectedFile);
-      }
-
-      await dispatch(dreamCreateInit({
-        dreamData: formData,
+      dispatch(dreamCreateInit({
+        data: formData,
         token: chekTocken 
       }));
 
@@ -135,7 +123,7 @@ export const CreateDreamPage = () => {
       console.error(e);
     } finally {
       setLoading(false);
-      navigate("/");
+      navigate(`/profile/${id}`);
     }
   };
 
@@ -174,6 +162,7 @@ export const CreateDreamPage = () => {
                 </Button>
                 <input
                   type="file"
+                  name="image"
                   accept="image/*"
                   ref={fileInputRef}
                   style={{ display: "none" }}
@@ -194,7 +183,6 @@ export const CreateDreamPage = () => {
                   label="Dream name"
                   variant="outlined"
                   name="name"
-                  onChange={handleChangeProfileData}
                 />
               </FormControl>
               <FormControl fullWidth className="create-dream__form-control">
@@ -205,23 +193,25 @@ export const CreateDreamPage = () => {
                   Category*
                 </InputLabel>
                 <Select
+                  ref={categorySelectRef}
                   required
+                  name="category"
                   labelId="category-select"
                   id="simple-select"
-                  defaultValue={DreamCategory.MoneyDonation}
+                  defaultValue={DreamCategory.Money_donation}
                   value={category}
                   sx={{ border: "none", borderRadius: "20" }}
                   label="Category*"
                   onChange={handleChangeCategory}
                 >
-                  <MenuItem value={DreamCategory.MoneyDonation}>
-                    {DreamCategory.MoneyDonation}
+                  <MenuItem value={DreamCategory.Money_donation}>
+                    Money donation
                   </MenuItem>
-                  <MenuItem value={DreamCategory.VolunteerServices}>
-                    {DreamCategory.VolunteerServices}
+                  <MenuItem value={DreamCategory.Volunteer_services}>
+                    Volunteer services
                   </MenuItem>
                   <MenuItem value={DreamCategory.Gifts}>
-                    {DreamCategory.Gifts}
+                    Gifts
                   </MenuItem>
                 </Select>
               </FormControl>
@@ -237,10 +227,10 @@ export const CreateDreamPage = () => {
                   onChange={(_event, value) => {
                     const sity = value?.description || null;
                     setSelectedCity(sity);
-                    setDataForCreate((prev) => ({
-                      ...prev,
-                      location: sity || "",
-                    }));
+                    // setDataForCreate((prev) => ({
+                    //   ...prev,
+                    //   location: sity || "",
+                    // }));
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -270,7 +260,6 @@ export const CreateDreamPage = () => {
                   variant="outlined"
                   name="cost"
                   type="number"
-                  onChange={handleChangeProfileData}
                   slotProps={{
                     input: {
                       endAdornment: (
@@ -291,7 +280,6 @@ export const CreateDreamPage = () => {
                   label="Dream description"
                   variant="outlined"
                   name="description"
-                  onChange={handleChangeProfileData}
                   multiline
                   rows={5}
                 />
