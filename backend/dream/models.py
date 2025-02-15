@@ -33,18 +33,22 @@ class Dream(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def update_accumulated(self, amount: int) -> None:
+    def update_accumulated(self, amount: int = 0) -> None:
         """
         Update the accumulated amount and adjust the status of the dream.
         """
-        self.accumulated += amount
+        if self.category == Dream.Category.MONEY:
 
-        if self.accumulated >= self.cost:
-            self.status = self.Status.COMPLETED
-        elif self.accumulated > 0:
-            self.status = self.Status.PENDING
+            self.accumulated += amount
 
-        self.save(update_fields=['accumulated', 'status'])
+            if self.accumulated >= self.cost:
+                self.status = self.Status.COMPLETED
+            elif self.accumulated > 0:
+                self.status = self.Status.PENDING
+            else:
+                self.status = self.Status.NEW
+
+            self.save(update_fields=['accumulated', 'status'])
 
 
 class Comment(models.Model):
