@@ -8,9 +8,10 @@ from drf_spectacular.utils import (
     extend_schema,
     OpenApiParameter,
     OpenApiExample,
-    extend_schema_view, PolymorphicProxySerializer
+    extend_schema_view,
+    PolymorphicProxySerializer,
 )
-from rest_framework import status, viewsets, serializers
+from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -118,6 +119,15 @@ class DreamViewSet(viewsets.ModelViewSet):
         # Serialize and return the response
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not instance:
+            return Response(
+                {'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+        instance.update_accumulated()
+        return super().update(request, *args, **kwargs)
 
     @extend_schema(
         parameters=[
