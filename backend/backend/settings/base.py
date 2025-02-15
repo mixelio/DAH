@@ -175,5 +175,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'pzkpw31@gmail.com'
 EMAIL_HOST_PASSWORD = 'jyghasykmnblqusr'
+DEFAULT_FROM_EMAIL = 'Dream Site <pzkpw31@gmail.com>'
+SITE_URL = 'https://mixelio.github.io/DAH/#'
 
 INTERNAL_IPS = ['127.0.0.1']
