@@ -4,16 +4,18 @@ import stripe
 from django.conf import settings
 from django.urls import reverse
 
+from dream.models import Dream
 from payment.models import Payment
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def create_stripe_session(
-    dream_id: str, total_amount: Decimal, request
+        dream_id: str, total_amount: Decimal, request
 ) -> Payment:
+    dream = Dream.objects.get(id=dream_id)
 
-    product_name = f'Payment for dream id {dream_id}'
+    product_name = f'Payment for dream {dream.name}'
 
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -31,7 +33,7 @@ def create_stripe_session(
         ],
         mode='payment',
         success_url=request.build_absolute_uri(reverse('payment:checkout-success'))
-        + f'?session_id={{CHECKOUT_SESSION_ID}}',
+        + f'?session_id={{CHECKOUT_SESSION_ID}}&return_url={request.META.get("HTTP_REFERER", "/")}',
         cancel_url=request.build_absolute_uri(reverse('payment:payment-cancel')),
     )
 
