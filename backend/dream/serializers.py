@@ -42,7 +42,6 @@ class DreamCreateSerializer(serializers.ModelSerializer):
 
 
 class DreamListSerializer(DreamCreateSerializer):
-    contributions = ContributionSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     user = UserDreamListSerializer(read_only=True)
 
@@ -73,6 +72,7 @@ class DreamListSerializer(DreamCreateSerializer):
 
 class DreamRetrieveSerializer(DreamListSerializer):
     user = UserDreamRetrieveSerializer(read_only=True)
+    contributions = ContributionSerializer(many=True, read_only=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):
