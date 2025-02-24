@@ -39,10 +39,14 @@ class PaymentSuccessTempView(APIView):
     def get(self, request: HttpRequest) -> HttpResponseRedirect | Response:
         """Handle redirection after temporary payment success."""
         session_id: Optional[str] = request.GET.get('session_id')
+        return_url: Optional[str] = request.GET.get('return_url', '/')
+
         if session_id:
             return redirect(
                 reverse('payment:payment-success', kwargs={'session_id': session_id})
+                + f"?return_url={return_url}"
             )
+
         return Response(
             {'error': 'Session ID not found.'}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -72,7 +76,10 @@ class PaymentSuccessView(APIView):
                     dream.update_accumulated(payment.money_to_pay)
                     dream.save(update_fields=['accumulated'])
 
-                return Response({'message': 'Payment successful.'}, status=200)
+                return_url = request.GET.get('return_url', '/')
+                print(f"Redirecting to: {return_url}")
+                return redirect(return_url)
+
             except Payment.DoesNotExist:
                 return Response({'error': 'Payment not found.'}, status=404)
 
