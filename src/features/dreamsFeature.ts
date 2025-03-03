@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {Dream} from "../types/Dream";
-import {createDream, createPhotoForDream, getDreams} from "../api/dreams";
+import {Dream, DreamStatus} from "../types/Dream";
+import {closeUnpaydDream, createDream, createPhotoForDream, donatePaydDream, getDreams} from "../api/dreams";
 
 export type dreamsState = {
   dreams: Dream[],
@@ -38,6 +38,26 @@ const dreamsSlice = createSlice({
         state.dreamsLoading = false;
         state.dreams = [...state.dreams, action.payload];
       },);
+
+      builder.
+        addCase(closeDream.pending, (state) => {
+          state.dreamsLoading = true;
+        }).
+        addCase(closeDream.fulfilled, (state) => {
+          state.dreamsLoading = false;
+          if (state.currentDream) {
+            state.currentDream = {...state.currentDream, status: DreamStatus.Completed};
+          }
+        });
+
+      builder.
+        addCase(donateToCurrentDream.pending, (state) => {
+          state.dreamsLoading = true;
+        }
+      ).addCase(donateToCurrentDream.fulfilled, (state) => {
+        state.dreamsLoading = false;
+      }
+    );
   },
 });
 
@@ -82,3 +102,35 @@ export const dreamPhotoCreateInit = createAsyncThunk("dream/photoCreate", async 
   const response = await createPhotoForDream(photoData, token);
   return response;
 });
+
+export const closeDream = createAsyncThunk(
+  "dream/close",
+  async ({
+    id,
+    data,
+    token,
+  }: {
+    id: number;
+    data: { contribution_description: string };
+    token: string;
+  }) => {
+    const response = await closeUnpaydDream({ id, data, token });
+    return response;
+  }
+);
+
+export const donateToCurrentDream = createAsyncThunk(
+  "dream/donate",
+  async ({
+    id,
+    data,
+    token,
+  }: {
+    id: number;
+    data: { contribution_amount: number };
+    token: string;
+  }) => {
+    const response = await donatePaydDream({ id, data, token });
+    return response;
+  }
+);

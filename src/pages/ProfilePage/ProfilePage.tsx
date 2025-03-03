@@ -12,6 +12,7 @@ import {getUser} from "../../api/users";
 import {DreamCart} from "../../components/DreamCart/DreamCart";
 
 
+
 export const ProfilePage = () => {
   
   // #region get logined user info
@@ -25,9 +26,18 @@ export const ProfilePage = () => {
   const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(dreamsInit());
+    const getCurrentDreams = async () => {
+      
+      try {
+        await dispatch(dreamsInit());
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    
+    getCurrentDreams()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, dreams])
+  }, [id])
 
   useEffect(() => {
     const fetchCurrentProfile = async () => {

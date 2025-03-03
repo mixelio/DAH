@@ -44,19 +44,26 @@ export const DreamsGalleryPage = () => {
 
   useEffect(() => {
     dispatch(dreamsInit());
-    setSearchParams({ page: "1", postsPerPage: PostsPerPage.six.toString(), category: DreamCategory.All });
+    setSearchParams({ page: localStorage.getItem("currentPage") || "1", postsPerPage: localStorage.getItem("postsPerPage") || PostsPerPage.six.toString(), category: localStorage.getItem("selectedCategory") as DreamCategory || DreamCategory.All
+    });
+
+    const lastScrollPosition = localStorage.getItem("lastScrollPosition");
+    if (lastScrollPosition) {
+      window.scrollTo({ top: +lastScrollPosition });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (dreams) {
-      setPages(Math.ceil(dreams.length / +perPage));
+    if (dreamsForShow) {
+      setPages(Math.ceil(dreamsForShow.length / +perPage));
     }
-  }, [searchParams, dreams, perPage]);
+  }, [searchParams, dreamsForShow, perPage]);
 
   const handlePageChange = (_event: ChangeEvent<unknown>, page: number) => {
     document.documentElement.scrollTop = 0;
     setSearchWith({ page: page.toString() });
+    localStorage.setItem("currentPage", page.toString())
   }
 
   const handleCategorySelect = (e: SelectChangeEvent<DreamCategory>) => {
@@ -65,6 +72,9 @@ export const DreamsGalleryPage = () => {
       postsPerPage: perPage,
       category: e.target.value.toString()
     });
+
+    localStorage.setItem("selectedCategory", e.target.value.toString());
+    localStorage.setItem("currentPage", "1");
   }
 
   const handlePostsPerPageChange = (e: SelectChangeEvent<PostsPerPage>) => {
@@ -72,6 +82,9 @@ export const DreamsGalleryPage = () => {
       page: "1",
       postsPerPage: e.target.value.toString()
     });
+
+    localStorage.setItem("postsPerPage", e.target.value.toString());
+    localStorage.setItem("currentPage", "1");
   }
 
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +111,10 @@ export const DreamsGalleryPage = () => {
           </FormControl>
           <FormControl className="dreams-gallery__category">
             <Select
-              defaultValue={DreamCategory.All}
+              defaultValue={
+                (localStorage.getItem("selectedCategory") as DreamCategory) ??
+                DreamCategory.All
+              }
               onChange={handleCategorySelect}
               sx={{ width: 200 }}
             >
@@ -116,7 +132,11 @@ export const DreamsGalleryPage = () => {
           </FormControl>
           <FormControl className="dreams-gallery__filter">
             <Select
-              defaultValue={PostsPerPage.six}
+              defaultValue={
+                localStorage.getItem("postsPerPage")
+                  ? +(localStorage.getItem("postsPerPage") || PostsPerPage.six)
+                  : PostsPerPage.six
+              }
               onChange={handlePostsPerPageChange}
               sx={{ width: 100 }}
             >
@@ -143,13 +163,15 @@ export const DreamsGalleryPage = () => {
                 </div>
               ))}
         </div>
-        <Pagination
-          className="dreams-gallery__pagination"
-          count={pages}
-          page={page || 1}
-          variant="outlined"
-          onChange={handlePageChange}
-        />
+        {pages > 1 && (
+          <Pagination
+            className="dreams-gallery__pagination"
+            count={pages}
+            page={page || 1}
+            variant="outlined"
+            onChange={handlePageChange}
+          />
+        )}
       </div>
     </section>
   );

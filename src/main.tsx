@@ -32,6 +32,7 @@ createRoot(document.getElementById("root")!).render(
                 <Route path="dreams">
                   <Route index element={<DreamsGalleryPage />} />
                   <Route path=":id?" element={<DreamPage />} />
+                  <Route path=":id/edit" element={<CreateDreamPage />} />
                 </Route>
                 <Route path="aboutus" element={<AboutUsPage />} />
                 <Route path="contacts" element={<ContactsPage />} />

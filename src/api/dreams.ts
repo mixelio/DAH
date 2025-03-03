@@ -1,7 +1,7 @@
 import {Dream} from "../types/Dream";
 import { client } from "../utils/fetchClient";
 
-// dream area
+//#region dream area
 
 export const getDreams = async () => {
   const response = await client.get<Dream[]>("dream/");
@@ -33,7 +33,35 @@ export const countViews = async (id: number, data: Pick<Dream, 'views'>) => {
   return response;
 }
 
-// comment area
+export const closeUnpaydDream = async ({
+  id,
+  data,
+  token,
+}: {
+  id: number;
+  data: { contribution_description: string };
+  token: string;
+}) => {
+  const response = await client.post(`dream/${id}/fulfill/`, data, token);
+  return response;
+};
+
+export const donatePaydDream = async ({
+  id,
+  data,
+  token,
+}: {
+  id: number;
+  data: { contribution_amount: number };
+  token: string;
+}) => {
+  const response = await client.post(`dream/${id}/fulfill/`, data, token);
+  return response;
+};
+
+//#endregion
+
+//#region comment area
 
 export const getDreamComments = async (id: number) => {
   const response = await client.get(`dream/${id}/comments/`);
@@ -62,3 +90,5 @@ export const editDreamComment = async (
 export const deleteDreamComment = async (dreamId: number, commentId: number, token: string) => {
   await client.delete(`dream/${dreamId}/comments/${commentId}/`, token)
 }
+
+//#endregion

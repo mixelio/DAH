@@ -3,7 +3,6 @@ import {User} from './types/User';
 import {getUsers} from './services/users';
 import {Dream} from './types/Dream';
 import {getDreams} from './services/dreams';
-import {preloadImages} from './utils/preloadImages';
 import {getComments} from './services/comments';
 import {CommentType} from './types/Comment';
 
@@ -76,14 +75,6 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
     getComments()
       .then((res) => setComments([...res]));
   }, [])
-
-  useEffect(() => {
-    if (dreams.length > 0) {
-      preloadImages(dreams.map((dream) => dream.image)).then(() => {
-        console.log();
-      });
-    }
-  }, [dreams])
 
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {

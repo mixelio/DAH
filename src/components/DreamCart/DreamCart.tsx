@@ -1,7 +1,7 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {Dream} from "../../types/Dream";
-import { IconButton, LinearProgress } from "@mui/material";
+import {Dream, DreamCategory} from "../../types/Dream";
+import { Divider, IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
@@ -46,7 +46,15 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   return (
     <div className="dream-cart">
       <div className="dream-cart__image-box">
-        <Link to={`/dreams/${dream.id}`}>
+        <Link
+          to={`/dreams/${dream.id}`}
+          onClick={() =>
+            localStorage.setItem(
+              "lastScrollPosition",
+              window.scrollY.toString()
+            )
+          }
+        >
           <img
             className="lozad dream-cart__image"
             src={dream.image_url ?? "https://picsum.photos/1200/600?random=1"}
@@ -76,15 +84,26 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
           </Link>
         </p>
         <p className="dream-cart__author-name">{dream.user.first_name}</p>
-        <LinearProgress
-          className="dream-cart__progress"
-          variant="determinate"
-          value={25}
-          sx={{ width: "100%" }}
-        />
-        <p className="dream-cart__still-need">
-          {`$${dream.cost - dream.accumulated} still need`}
-        </p>
+        {dream.category === DreamCategory.Money_donation ? (
+          <LinearProgress
+            className="dream-cart__progress"
+            variant="determinate"
+            value={(dream.accumulated / dream.cost) * 100}
+            sx={{ height: "3px", margin: 1.5 }}
+          />
+        ) : (
+          <Divider sx={{ height: "3px", margin: 1.5 }} />
+        )}
+
+        {dream.category === DreamCategory.Money_donation ? (
+          <p className="dream-cart__still-need">
+            {`$${dream.cost - dream.accumulated} still need`}
+          </p>
+        ) : (
+          <p className="dream-cart__still-need">
+            not come true yet
+          </p>
+        )}
       </div>
     </div>
   );

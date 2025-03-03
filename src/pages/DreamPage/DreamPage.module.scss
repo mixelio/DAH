@@ -179,3 +179,36 @@ $sub-info-width: 40px;
     transform: translate(-50%, -50%);
   }
 }
+
+.dialog {
+  inline-size: 300px;
+  position:fixed;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  padding: 20px 30px;
+  border-radius: 8px;
+
+  @include on-tablet {
+    inline-size: 450px;
+  }
+
+  @include on-desktop {
+    inline-size: 500px;
+  }
+
+  &__text {
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+
+  &__input {
+    display: block;
+    margin-bottom: 18px;
+  }
+
+  &::backdrop {
+    background-color: #000;
+    opacity: 70%;
+  }
+}

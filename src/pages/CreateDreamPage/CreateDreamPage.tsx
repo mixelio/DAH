@@ -8,18 +8,22 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import {Autocomplete, Button, FormControl, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from "@mui/material";
 import {DreamCategory} from "../../types/Dream";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {useAppDispatch} from "../../app/hooks";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {dreamCreateInit} from "../../features/dreamsFeature";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 export const CreateDreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const {dreams} = useAppSelector(store => store.dreams);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const categorySelectRef = useRef<HTMLSelectElement | null>(null);
   const { id } = useParams();
+  const location = useLocation();
+  const pathSegments = location.pathname.split("/");
+  const slug = pathSegments[pathSegments.length - 1];
 
   const [category, setCategory] = useState<DreamCategory>(
     DreamCategory.Money_donation
@@ -50,6 +54,34 @@ export const CreateDreamPage = () => {
       }
     )
   }, [inputValue]);
+
+  useEffect(() => {
+    const user = localStorage.getItem("currentUser");
+    console.log(user, dreams, id);
+    if(user && id && user !== id && slug === "create") {
+      navigate(`/profile/${id}`);
+    }
+
+    if(user && id && dreams.length > 0) {
+      const userDreams = dreams.filter(dream => dream.user?.id === +user)
+      console.log(userDreams);
+
+      if(userDreams.find(dream => dream.id === +id)) {
+        console.log("dream owner here")
+      } else {
+        console.log("you are not owner of this dream")
+      }
+    }
+    
+    if (slug === "create") {
+      console.log("create page")
+    } else {
+      console.log("edit page")
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
