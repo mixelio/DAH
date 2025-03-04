@@ -17,6 +17,8 @@ def create_stripe_session(
 
     product_name = f'Payment for dream {dream.name}'
 
+    return_url = request.data.get('return_url', '/')
+
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
         line_items=[
@@ -33,7 +35,7 @@ def create_stripe_session(
         ],
         mode='payment',
         success_url=request.build_absolute_uri(reverse('payment:checkout-success'))
-        + f'?session_id={{CHECKOUT_SESSION_ID}}&return_url={request.META.get("HTTP_REFERER", "/")}',
+        + f'?session_id={{CHECKOUT_SESSION_ID}}&return_url={return_url}',
         cancel_url=request.build_absolute_uri(reverse('payment:payment-cancel')),
     )
 

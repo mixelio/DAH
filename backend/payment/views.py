@@ -45,7 +45,7 @@ class PaymentSuccessTempView(APIView):
         if session_id:
             return redirect(
                 reverse('payment:payment-success', kwargs={'session_id': session_id})
-                + f"?return_url={return_url}"
+                + f'?return_url={return_url}'
             )
 
         return Response(
