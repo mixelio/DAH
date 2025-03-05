@@ -1,11 +1,11 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Link} from "react-router-dom";
-import {Dream, DreamCategory} from "../../types/Dream";
+import {Dream, DreamCategory, DreamStatus} from "../../types/Dream";
 import { Divider, IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {actions as userActions, userFavouriteAdd, userFavoriteRemove} from "../../features/users";
+import {userFavouriteAdd, userFavoriteRemove, userFavouritesInit} from "../../features/users";
 
 
 type Props = {
@@ -18,30 +18,31 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   const loginedUser = localStorage.getItem("currentUser");
   const access = localStorage.getItem("access");
 
-  const addBookmark = (value: Dream) => dispatch(userActions.addToFavourite(value))
-  const removeBookmark = (value: Dream) => dispatch(userActions.removeFromFavourite(value))
-
-  const handleAddOrRemoveFavourite = () => {
+  const handleAddOrRemoveFavourite =async () => {
 
     if(!loginedUser) {
       return
     }
-    if(userFavouriteList.includes(dream)) {
-      removeBookmark(dream)
-      dispatch(
+    console.log(userFavouriteList.includes(dream));
+    if(userFavouriteList.find(item => item.id === dream.id)) {
+      await dispatch(
         userFavoriteRemove({
           dream_id: dream.id,
           token: access ?? "",
         })
       );
+      await dispatch(userFavouritesInit(access ?? ""));
       return
     }
-    addBookmark(dream);
     dispatch(userFavouriteAdd({
       dream_id: dream.id,
       token: access ?? "",
     }));
+    dispatch(userFavouritesInit(access ?? ""));
   }
+
+  useEffect(() => {console.log(userFavouriteList)}, [userFavouriteList]);
+
 
   return (
     <div className="dream-cart">
@@ -62,16 +63,18 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             loading="lazy"
           />
         </Link>
-        <IconButton
-          className="dream-cart__bookmark"
-          onClick={handleAddOrRemoveFavourite}
-        >
-          {userFavouriteList.find((item) => item.id === dream.id) ? (
-            <BookmarkIcon />
-          ) : (
-            <BookmarkBorderIcon />
-          )}
-        </IconButton>
+        {localStorage.getItem("currentUser") && (
+          <IconButton
+            className="dream-cart__bookmark"
+            onClick={handleAddOrRemoveFavourite}
+          >
+            {userFavouriteList.find((item) => item.id === dream.id) ? (
+              <BookmarkIcon />
+            ) : (
+              <BookmarkBorderIcon />
+            )}
+          </IconButton>
+        )}
       </div>
       <div className="dream-cart__info-box">
         <h2 className="dream-cart__title">{dream.name}</h2>
@@ -100,9 +103,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             {`$${dream.cost - dream.accumulated} still need`}
           </p>
         ) : (
-          <p className="dream-cart__still-need">
-            not come true yet
-          </p>
+          <p className="dream-cart__still-need">{dream.status !== DreamStatus.Completed ? "not come true yet" : "dream come true"}</p>
         )}
       </div>
     </div>

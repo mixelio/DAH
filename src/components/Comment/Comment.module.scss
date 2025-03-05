@@ -4,7 +4,7 @@
 .comment {
   padding: 8px 12px 10px;
   width: 100%;
-  border: 1px solid $primary-light;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 10px 10px 10px 0;
 
   &:not(:last-child) {

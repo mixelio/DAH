@@ -28,11 +28,11 @@ export const DreamPage = () => {
 
   const [paySuccessSnackbar, setPaySuccessSnackbar] = useState<boolean>(false);
 
+  const [status, setStatus] = useState<DreamStatus | null>(null)
   const [postImage, setPostImage] = useState<string>("");
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [waitDreamClosing, setWaitDreamClosing] = useState<boolean>(false);
-  const [status, setStatus] = useState<DreamStatus>(DreamStatus.New);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
@@ -138,6 +138,7 @@ export const DreamPage = () => {
             token: localStorage.getItem("access") ?? "",
           })
         )
+        setStatus(DreamStatus.Completed);
       } catch (e) {
         console.error(e)
         return
@@ -145,7 +146,6 @@ export const DreamPage = () => {
 
       setWaitDreamClosing(false);
       closeDialog();
-      setStatus(DreamStatus.Completed)
     }
   }
 
@@ -162,19 +162,18 @@ export const DreamPage = () => {
         const response = await dispatch(
           donateToCurrentDream({
             id: +id,
-            data: {contribution_amount: +(formData.get("contribution_amount") ?? 0)},
+            data: {
+              contribution_amount: +(formData.get("contribution_amount") ?? 1),
+              return_url: window.location.href,
+            },
             token: localStorage.getItem("access") ?? "",
           })
-        )
+        );
 
-        const {session_url, session_id} = response.payload as { 
-          session_url: string 
-          session_id: string
+        const {session_url} = response.payload as { 
+          session_url: string
         };
-
-        localStorage.setItem("session_id", session_id);
-        const returnedPath = window.location.href.split("/").slice(-2).join("/");
-        localStorage.setItem("returnUrl", returnedPath);
+        localStorage.setItem("payingDream", `${id} payed`);
         window.open(session_url, "_self");
       } catch (e) {
         console.error(e)
@@ -220,7 +219,6 @@ export const DreamPage = () => {
         if (id) {
           await Promise.all([dispatch(dreamsInit()).unwrap(), dispatch(usersInit()).unwrap(), dispatch(commentsInit(id)).unwrap()]);
         }
-        setStatus(currentDream?.status ?? DreamStatus.New);
       } catch (e) {
         console.error(e);
       }
@@ -228,10 +226,9 @@ export const DreamPage = () => {
 
     initializate();
     
-    if (localStorage.getItem("paySuccess")) {
-      console.log("pay success");
+    if (localStorage.getItem("payingDream")) {
       setPaySuccessSnackbar(true);
-      localStorage.removeItem("paySuccess");
+      localStorage.removeItem("payingDream");
     }
 
     return () => {
@@ -275,8 +272,7 @@ export const DreamPage = () => {
     };
 
     fetchDream();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [status, id]);
 
   useEffect(() => {
     if (currentDream?.image) {
@@ -395,21 +391,30 @@ export const DreamPage = () => {
                 className={styles.dialog}
                 onClick={handleBackdropClick}
               >
-                <p className={styles.dialog__text}>
-                  Some text for the first contact
-                </p>
-                <form method="POST" action="/" onSubmit={handleCloseDream}>
-                  <TextField
-                    className={styles.dialog__input}
-                    name="contribution_description"
-                    sx={{ width: "100%", marginBlockEnd: "18px" }}
-                    multiline
-                    minRows={2}
-                  />
-                  <Button type="submit" variant="outlined">
-                    {waitDreamClosing ? "Loading..." : "Send"}
-                  </Button>
-                </form>
+                {localStorage.getItem("currentUser") ? (
+                  <>
+                    <p className={styles.dialog__text}>
+                      Some text for the first contact
+                    </p>
+                    <form method="POST" action="/" onSubmit={handleCloseDream}>
+                      <TextField
+                        className={styles.dialog__input}
+                        name="contribution_description"
+                        sx={{ width: "100%", marginBlockEnd: "18px" }}
+                        multiline
+                        minRows={2}
+                      />
+                      <Button type="submit" variant="outlined">
+                        {waitDreamClosing ? "Loading..." : "Send"}
+                      </Button>
+                    </form>
+                  </>
+                ) : (
+                  <p className={styles.dialog__text}>
+                    Only authorized users can help
+                  </p>
+                )}
+                
               </dialog>
 
               {/* Dialog for donate */}
@@ -440,7 +445,7 @@ export const DreamPage = () => {
               </dialog>
 
               <div className="dream__after-info">
-                {status !== DreamStatus.Completed
+                {currentDream.status !== DreamStatus.Completed
                   ? buttonForRealize
                   : "Dream come true"}
                 <div className="dream__date">{currentDream.date_added}</div>

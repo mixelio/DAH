@@ -4,22 +4,22 @@ import {useAppDispatch} from "../../app/hooks";
 import {usersInit} from "../../features/users";
 import Styles from "./HomePage.module.scss";
 import {resetFilters} from "../../utils/resetFilters";
-import {useNavigate} from "react-router-dom";
+// import {useNavigate} from "react-router-dom";
 
 
 
 export const HomePage = () => {
   const dispatch = useAppDispatch();
-  const url = localStorage.getItem("returnUrl");
-  const navigate = useNavigate();
+  // const url = localStorage.getItem("returnUrl");
+  // const navigate = useNavigate();
 
   useEffect(() => {
-    if (url) {
-      localStorage.removeItem("returnUrl");
-      localStorage.removeItem("session_id");
-      localStorage.setItem("paySuccess", "success");
-      navigate(url);
-    }
+    // if (url) {
+    //   localStorage.removeItem("returnUrl");
+    //   localStorage.removeItem("session_id");
+    //   localStorage.setItem("paySuccess", "success");
+    //   navigate(url);
+    // }
 
     const fetchUsers = async () => {
       try {
@@ -40,7 +40,7 @@ export const HomePage = () => {
         <div className="container">
           <div className="first-screen__content">
             <img
-              src="https://picsum.photos/1200/600?random=2"
+              src="https://picsum.photos/2400/1200?random=2"
               alt=""
               className={Styles.slideImage}
             />

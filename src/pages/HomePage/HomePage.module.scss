@@ -29,6 +29,7 @@
     // background-repeat: no-repeat;
     height: 40vh;
     border-radius: 0 0 40px 40px;
+    overflow: hidden;
 
     @include on-tablet {
       height: 50vh;

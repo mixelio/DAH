@@ -98,6 +98,12 @@
     }
   }
 
+  &__button-container {
+    display: flex;
+    justify-content: end;
+    margin-block-start: 8px;
+  }
+
   & &__password {
     width: 100%;
     margin: 0 auto;

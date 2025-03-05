@@ -82,15 +82,7 @@ $underline-width: attr(data-width);
     }
 
     &.is-active {
-      font-size: 18px;
-
-      @include on-tablet {
-        font-size: 24px;
-      }
-
-      @include on-desktop {
-        font-size: 30px;
-      }
+      font-weight: 700;
     }
   }
 

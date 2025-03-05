@@ -52,7 +52,7 @@ export const donatePaydDream = async ({
   token,
 }: {
   id: number;
-  data: { contribution_amount: number };
+  data: { contribution_amount: number, return_url: string };
   token: string;
 }) => {
   const response = await client.post(`dream/${id}/fulfill/`, data, token);

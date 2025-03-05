@@ -127,7 +127,10 @@ export const donateToCurrentDream = createAsyncThunk(
     token,
   }: {
     id: number;
-    data: { contribution_amount: number };
+    data: { 
+      contribution_amount: number,
+      return_url: string 
+    };
     token: string;
   }) => {
     const response = await donatePaydDream({ id, data, token });

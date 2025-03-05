@@ -475,31 +475,34 @@ export const SingUpInForm = () => {
                     />
                   </FormControl>
                 </div>
-                <Button
-                  variant="contained"
-                  type="submit"
-                  sx={{
-                    backgroundColor: colorsPrimary.main,
-                    position: "relative",
-                    width: "auto",
-                    transitionDuration: "0.3s",
-                    "&:hover": {
-                      backgroundColor: colorsSecondary.main,
-                    },
-                  }}
-                >
-                  {loginWaiting ? (
-                    <CircularProgress
-                      size={18}
-                      sx={{
-                        color: colorsSecondary.light,
-                        height: "100%",
-                      }}
-                    />
-                  ) : (
-                    "Sign Up"
-                  )}
-                </Button>
+                <Divider style={{ opacity: "0" }} />
+                <div className="sign-up-in-form__button-container">
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                      backgroundColor: colorsPrimary.main,
+                      position: "relative",
+                      width: "auto",
+                      transitionDuration: "0.3s",
+                      "&:hover": {
+                        backgroundColor: colorsPrimary.light,
+                      },
+                    }}
+                  >
+                    {loginWaiting ? (
+                      <CircularProgress
+                        size={18}
+                        sx={{
+                          color: colorsSecondary.light,
+                          height: "100%",
+                        }}
+                      />
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
+                </div>
               </Box>
             </TabPanel>
 
@@ -561,7 +564,7 @@ export const SingUpInForm = () => {
                     sx={{
                       backgroundColor: colorsPrimary.main,
                       "&:hover": {
-                        backgroundColor: colorsSecondary.main,
+                        backgroundColor: colorsPrimary.light,
                       },
                     }}
                   >
