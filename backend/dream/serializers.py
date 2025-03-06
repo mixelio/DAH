@@ -96,6 +96,7 @@ class MoneyDreamRequestSerializer(serializers.Serializer):
     contribution_amount = serializers.IntegerField(
         min_value=1, help_text='Amount of money to contribute.'
     )
+    return_url = serializers.CharField(help_text='Url for redirecting')
 
 
 class NonMoneyDreamRequestSerializer(serializers.Serializer):
