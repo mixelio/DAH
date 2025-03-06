@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
+from typing import Optional, Union
 
-from django.db.models import F
+from django.contrib.auth import get_user_model
+from django.db.models import F, QuerySet
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
@@ -15,6 +18,8 @@ from rest_framework import status, viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.request import Request
+from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -29,7 +34,10 @@ from dream.serializers import (
     DreamCreateSerializer,
     DreamListSerializer,
     CommentSerializer,
-    ContributionSerializer, DreamRetrieveSerializer, MoneyDreamRequestSerializer, NonMoneyDreamRequestSerializer
+    ContributionSerializer,
+    DreamRetrieveSerializer,
+    MoneyDreamRequestSerializer,
+    NonMoneyDreamRequestSerializer
 )
 from user.permissions import IsOwnerAdminOrReadOnly
 
@@ -38,12 +46,12 @@ class CommentListCreateView(ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = CommentSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return Comment.objects.filter(
             dream_id=self.kwargs['dream_id']
         ).select_related('dream', 'user')
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: ModelSerializer) -> None:
         serializer.save(dream_id=self.kwargs['dream_id'], user=self.request.user)
 
 
@@ -51,18 +59,18 @@ class CommentDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = CommentSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return Comment.objects.filter(
             dream_id=self.kwargs['dream_id']
         ).select_related('dream', 'user')
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer: ModelSerializer) -> None:
         comment = self.get_object()
         if comment.user != self.request.user:
             raise PermissionDenied('You do not have permission to edit this comment.')
         serializer.save()
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request: Request, *args, **kwargs) -> Response:
         instance = self.get_object()
         if instance.user != self.request.user:
             raise PermissionDenied('You do not have permission to delete this comment.')
@@ -82,45 +90,41 @@ class DreamViewSet(viewsets.ModelViewSet):
     serializer_class = DreamCreateSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = Dream.objects.all().select_related('user').prefetch_related('contributions')
         category = self.request.query_params.get('category', None)
         if category:
             return queryset.filter(category__icontains=category)
         return queryset
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: ModelSerializer) -> None:
         serializer.save(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
-        print("Received data:", request.data)
-
+    def create(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            print("Serializer errors:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> type[ModelSerializer]:
         if self.action == 'list':
             return DreamListSerializer
         if self.action == 'retrieve':
             return DreamRetrieveSerializer
         return DreamCreateSerializer
 
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request: Request, *args, **kwargs) -> Response:
         """Retrieve a dream and increment its views count."""
         instance = self.get_object()
-        # Increment views count
+
         instance.views = (instance.views or 0) + 1
         instance.save(update_fields=['views'])
 
-        # Serialize and return the response
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request: Request, *args, **kwargs) -> Response:
         instance = self.get_object()
         if not instance:
             return Response(
@@ -154,7 +158,7 @@ class DreamViewSet(viewsets.ModelViewSet):
             )
         ]
     )
-    def list(self, request, *args, **kwargs):
+    def list(self, request: Request, *args, **kwargs) -> Response:
         """Get list of dreams"""
         return super().list(request, *args, **kwargs)
 
@@ -165,7 +169,9 @@ class DreamHandler(ABC):
     """
 
     @abstractmethod
-    def handle(self, dream, user, request):
+    def handle(
+            self, dream: Dream, user: get_user_model(), request: Request
+    ) -> Optional[Union[Contribution, Payment]]:
         """
         Processes the fulfillment of a given dream.
 
@@ -178,7 +184,7 @@ class DreamHandler(ABC):
 
 
 class MoneyDreamHandler(DreamHandler):
-    def handle(self, dream, user, request):
+    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Optional[Payment]:
         if not request:
             raise ValueError('Request object is required for this operation.')
 
@@ -198,7 +204,7 @@ class MoneyDreamHandler(DreamHandler):
 
 
 class NonMoneyDreamHandler(DreamHandler):
-    def handle(self, dream, user, request):
+    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Contribution:
         contribution_description = request.data.get('contribution_description', '')
         if not contribution_description:
             raise ValueError('Description of contribution is required for this category.')
@@ -227,7 +233,7 @@ class FulfillDreamView(APIView):
             resource_type_field_name='person_type',
         )
     )
-    def post(self, request, dream_id):
+    def post(self, request: Request, dream_id: int) -> Response:
         dream = get_object_or_404(Dream, id=dream_id)
         user = request.user
 
@@ -349,13 +355,13 @@ class FulfillDreamView(APIView):
 class FavoritesViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
 
-    def list(self, request):
+    def list(self, request: Request) -> Response:
         favorites = request.user.favorites.dreams.prefetch_related(
             'favorited_by').select_related('user').all()
         serializer = DreamRetrieveSerializer(favorites, many=True)
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request: Request) -> Response:
         dream_id = request.data.get('dream_id')
         try:
             dream = Dream.objects.get(id=dream_id)
@@ -368,7 +374,7 @@ class FavoritesViewSet(ViewSet):
                 {'error': f'Dream {dream_id} not found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request: Request, pk: int = None) -> Response:
         try:
             dream = Dream.objects.get(id=pk)
             request.user.favorites.dreams.remove(dream)
