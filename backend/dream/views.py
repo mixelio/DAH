@@ -4,7 +4,6 @@ from typing import Optional, Union
 
 from django.contrib.auth import get_user_model
 from django.db.models import F, QuerySet
-from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
