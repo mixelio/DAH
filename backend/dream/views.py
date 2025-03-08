@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from decimal import Decimal
 from typing import Optional, Union
 
+import stripe
 from django.contrib.auth import get_user_model
 from django.db.models import F, QuerySet
 from django.shortcuts import get_object_or_404
@@ -13,15 +14,12 @@ from drf_spectacular.utils import (
     extend_schema_view,
     PolymorphicProxySerializer,
 )
-from rest_framework import status, viewsets
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework import status, viewsets, views, generics
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.request import Request
 from rest_framework.serializers import ModelSerializer
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet
 
 from dream.models import Comment, Dream, Contribution
 from payment.models import Payment
@@ -41,7 +39,7 @@ from dream.serializers import (
 from user.permissions import IsOwnerAdminOrReadOnly
 
 
-class CommentListCreateView(ListCreateAPIView):
+class CommentListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = CommentSerializer
 
@@ -54,7 +52,7 @@ class CommentListCreateView(ListCreateAPIView):
         serializer.save(dream_id=self.kwargs['dream_id'], user=self.request.user)
 
 
-class CommentDetailView(RetrieveUpdateDestroyAPIView):
+class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = CommentSerializer
 
@@ -117,18 +115,14 @@ class DreamViewSet(viewsets.ModelViewSet):
         """Retrieve a dream and increment its views count."""
         instance = self.get_object()
 
-        instance.views = (instance.views or 0) + 1
-        instance.save(update_fields=['views'])
+        Dream.objects.filter(id=instance.id).update(views=F('views') + 1)
+        instance.refresh_from_db()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def update(self, request: Request, *args, **kwargs) -> Response:
         instance = self.get_object()
-        if not instance:
-            return Response(
-                {'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND
-            )
         instance.update_accumulated()
         return super().update(request, *args, **kwargs)
 
@@ -183,7 +177,7 @@ class DreamHandler(ABC):
 
 
 class MoneyDreamHandler(DreamHandler):
-    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Optional[Payment]:
+    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Optional[Payment] | Response:
         if not request:
             raise ValueError('Request object is required for this operation.')
 
@@ -198,8 +192,14 @@ class MoneyDreamHandler(DreamHandler):
         try:
             payment = create_stripe_session(dream.id, Decimal(contribution_amount), request)
             return payment
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except stripe.error.StripeError as e:
+            return Response(
+                {"error": "Payment error. Please try again."}, status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
         except Exception as e:
-            print(f'stripe_exception: {e}')
+            return Response({"error": "Unexpected server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class NonMoneyDreamHandler(DreamHandler):
@@ -213,7 +213,7 @@ class NonMoneyDreamHandler(DreamHandler):
         return contribution
 
 
-class FulfillDreamView(APIView):
+class FulfillDreamView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -351,7 +351,7 @@ class FulfillDreamView(APIView):
         },
     )
 )
-class FavoritesViewSet(ViewSet):
+class FavoritesViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request: Request) -> Response:
