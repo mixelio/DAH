@@ -29,7 +29,7 @@ class ContributionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Contribution
-        fields = ['dream', 'user', 'description', 'date']
+        fields = ['id', 'user', 'description', 'date']
 
 
 class DreamCreateSerializer(serializers.ModelSerializer):
