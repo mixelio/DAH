@@ -40,7 +40,6 @@ class PaymentSuccessTempView(APIView):
         """Handle redirection after temporary payment success."""
         session_id: Optional[str] = request.GET.get('session_id')
         return_url: Optional[str] = request.GET.get('return_url', '/')
-        print(f" Return url: {return_url}")
 
         if session_id:
             return redirect(
@@ -78,7 +77,6 @@ class PaymentSuccessView(APIView):
                     dream.save(update_fields=['accumulated'])
 
                 return_url = request.GET.get('return_url', '/')
-                print(f"Redirecting to: {return_url}")
                 return redirect(return_url)
 
             except Payment.DoesNotExist:
