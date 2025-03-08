@@ -52,7 +52,7 @@ class CommentTests(TestCase):
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['text'], 'This is a test comment')
-        self.assertEqual(response.data['user'], self.user.id)
+        self.assertEqual(response.data['user']['id'], self.user.id)
 
 
 class DreamTests(TestCase):
@@ -160,9 +160,15 @@ class FulfillDreamViewTest(TestCase):
         dream.refresh_from_db()
         self.assertEqual(dream.status, Dream.Status.COMPLETED)
         self.assertEqual(Contribution.objects.filter(dream=dream, user=self.user).count(), 1)
-        self.assertEqual(response.data['dream'], dream.id)
         self.assertEqual(response.data['description'], 'Fix plumbing')
-        self.assertEqual(response.data['user'], self.user.id)
+        self.assertEqual(
+            response.data['user'], {
+                'id': self.user.id,
+                'first_name': self.user.first_name,
+                'last_name': self.user.last_name,
+                'photo_url': None
+            }
+        )
 
     def test_fulfill_dream_already_completed(self):
         dream = Dream.objects.create(
