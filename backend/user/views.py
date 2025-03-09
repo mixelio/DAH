@@ -8,6 +8,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
@@ -28,7 +29,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
-    def get_object(self):
+    def get_object(self) -> get_user_model():
         return self.request.user
 
 
@@ -48,7 +49,7 @@ class PasswordResetRequestView(APIView):
     View to handle password reset email requests.
     """
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         email = request.data.get('email')
         if not email:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -58,11 +59,9 @@ class PasswordResetRequestView(APIView):
         except get_user_model().DoesNotExist:
             return Response({'error': 'User with this email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Generate a password reset token
         token_generator = PasswordResetTokenGenerator()
         token = token_generator.make_token(user)
 
-        # Build the password reset URL
         reset_url = request.build_absolute_uri(
             reverse(
                 'user:password_reset_confirm', kwargs={
@@ -71,7 +70,6 @@ class PasswordResetRequestView(APIView):
             )
         )
 
-        # Send the email
         send_mail(
             subject='Password Reset Request',
             message=f'Click the link below to reset your password:\n{reset_url}',
@@ -87,20 +85,17 @@ class PasswordResetConfirmView(APIView):
     View to handle password reset confirmation.
     """
 
-    def post(self, request, uidb64, token):
+    def post(self, request: Request, uidb64: str, token: str) -> Response:
         try:
-            # Decode the user ID
             uid = urlsafe_base64_decode(uidb64).decode()
             user = get_user_model().objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
             return Response({'error': 'Invalid token or user'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check token validity
         token_generator = PasswordResetTokenGenerator()
         if not token_generator.check_token(user, token):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Validate and update the new password
         new_password = request.data.get('password')
         if not new_password or len(new_password) < 5:
             raise ValidationError('Password must be at least 5 characters long')

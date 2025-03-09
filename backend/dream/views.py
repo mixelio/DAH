@@ -79,7 +79,7 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(
             response_data,
-            status=status.HTTP_200_OK
+            status=status.HTTP_204_NO_CONTENT
         )
 
 

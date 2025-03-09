@@ -81,5 +81,5 @@ class UserFavorites(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorites')
     dreams = models.ManyToManyField(Dream, related_name='favorited_by')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Favorites of {self.user.email}'

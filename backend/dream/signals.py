@@ -1,3 +1,5 @@
+from typing import Type
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
@@ -6,7 +8,13 @@ from .models import Contribution
 
 
 @receiver(post_save, sender=Contribution)
-def send_contribution_notification(sender, instance, created, **kwargs):
+def send_contribution_notification(
+        sender: Type[Contribution],
+        instance: Contribution,
+        created: bool,
+        *args,
+        **kwargs
+) -> None:
     if created:
         dream_owner = instance.dream.user
         contributor = instance.user

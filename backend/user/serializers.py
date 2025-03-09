@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from django.utils.translation import gettext as _
@@ -62,7 +64,7 @@ class AuthTokenSerializer(serializers.Serializer):
     )
     token = serializers.CharField(label=_('Token'), read_only=True)
 
-    def validate(self, attrs):
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, Any]:
         email = attrs.get('email')
         password = attrs.get('password')
 
