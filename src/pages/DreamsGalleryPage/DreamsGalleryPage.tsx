@@ -1,6 +1,6 @@
 import {DreamCart} from "../../components/DreamCart/DreamCart"
 import {useAppDispatch, useAppSelector} from "../../app/hooks"
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {dreamsInit} from "../../features/dreamsFeature";
 import {FormControl, IconButton, InputAdornment, MenuItem, OutlinedInput, Pagination, Select, SelectChangeEvent} from "@mui/material";
 import {useSearchParams} from "react-router-dom";
@@ -19,6 +19,7 @@ export const DreamsGalleryPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [pages, setPages] = useState<number>(0);
   const [currentQuery, setCurrentQuery] = useState<string>("");
+  const paginationRef = useRef(null)
   
   const dispatch = useAppDispatch();
 
@@ -165,9 +166,12 @@ export const DreamsGalleryPage = () => {
         </div>
         {pages > 1 && (
           <Pagination
+            ref={paginationRef}
             className="dreams-gallery__pagination"
             count={pages}
             page={page || 1}
+            siblingCount={0}
+            boundaryCount={1}
             variant="outlined"
             onChange={handlePageChange}
           />

@@ -37,7 +37,7 @@
 
     & .title {
       text-align: center;
-      font-size: 38px;
+      font-size: clamp(1.5rem, 8vw, 2.375rem);
       font-weight: 700;
       color: $primary-main;
 

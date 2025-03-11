@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream, DreamStatus} from "../types/Dream";
-import {closeUnpaydDream, createDream, createPhotoForDream, donatePaydDream, getDreams} from "../api/dreams";
+import {closeUnpaydDream, createDream, createPhotoForDream, donatePaydDream, getDream, getDreams} from "../api/dreams";
 
 export type dreamsState = {
   dreams: Dream[],
@@ -58,6 +58,14 @@ const dreamsSlice = createSlice({
         state.dreamsLoading = false;
       }
     );
+      
+      builder.addCase(currentDreamInit.pending, (state) => {
+        state.dreamsLoading = true;
+      }).addCase(currentDreamInit.fulfilled, (state, action) => {
+        state.dreamsLoading = false;
+        console.log(action.payload)
+        state.currentDream = action.payload;
+      })
   },
 });
 
@@ -68,6 +76,11 @@ export const dreamsInit = createAsyncThunk("dreams/fetch", async () => {
   const response = await getDreams();
   return response;
 });
+
+export const currentDreamInit = createAsyncThunk("currDream/fetch", async (id: number) => {
+  const dream = await getDream(id);
+  return dream;
+})
 
 export const dreamCreateInit = createAsyncThunk("dreams/create", async ({data, token}: { data: FormData, token: string }) => {
   const dreamInfo: Partial<
@@ -95,7 +108,7 @@ export const dreamCreateInit = createAsyncThunk("dreams/create", async ({data, t
     const response = await createDream(formData, token);
 
     return response;
-  });
+});
 
 export const dreamPhotoCreateInit = createAsyncThunk("dream/photoCreate", async (data: { photoData: FormData, token: string }) => {
   const { photoData, token } = data;

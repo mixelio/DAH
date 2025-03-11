@@ -17,10 +17,21 @@ export const createDream = async (
   data: FormData, 
   token: string
   ) => {
-  console.log("info to send to the server",data.get("name"), data.get("category"), data.get("cost"), data.get("description"), data.get("image"), data.get("location"));
   const response = await client.post<Dream>('dream/', data, token);
-  console.log("response from the server", response);
   return response;
+}
+
+// TODO: editDream
+
+// TODO: deleteDream
+
+export const deleteDream = async (id: number, token: string) => {
+  try {
+    await client.delete(`dream/${id}/`, token);
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
 }
 
 export const createPhotoForDream = async (data: FormData, token: string) => {

@@ -7,12 +7,53 @@ $sub-info-width: 40px;
   padding: 45px 0;
   margin-bottom: 20px;
 
+
   @include on-tablet {
     margin-bottom: 30px;
   }
 
   @include on-desktop {
     margin-bottom: 40px;
+  }
+
+  &__content {
+    position: relative;
+  }
+
+  &__root-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+
+    @include on-tablet {
+      top: 6px;
+      right: 6px;
+    }
+  }
+
+  &__root-button {
+
+    &:is(button, a) {
+      flex: 0 0 25px;
+      display: flex;
+      padding: 0;
+      min-width: fit-content;
+    }
+  }
+
+  &__edit-icon:is(svg) {
+    color: $text-color-dark;
+    width: 25px;
+    height: 25px;
+
+    @include on-tablet {
+      width: 32px;
+      height: 32px;
+    }
   }
 
   &__author-info {
@@ -42,6 +83,7 @@ $sub-info-width: 40px;
     margin-bottom: 20px;
     font-size: 32px;
     font-weight: 700;
+    padding-inline-end: 60px;
 
     @include on-tablet {
       font-size: 40px;

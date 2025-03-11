@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDreamComment, deleteDreamComment, editDreamComment, getDream, getDreamComments} from "../api/dreams";
+import {createDreamComment, deleteDream, deleteDreamComment, editDreamComment, getDream, getDreamComments} from "../api/dreams";
 import {CommentType} from "../types/Comment";
 
 export type currentDreamState = {
@@ -16,6 +16,7 @@ export type currentDreamState = {
 const initialState: currentDreamState = {
   currentDream: null,
   currentDreamLoading: false,
+  
   comments: [],
   commentsLoading: false,
   commentsDeleting: false,
@@ -38,8 +39,16 @@ export const currentDreamSlice = createSlice({
       state.currentDreamLoading = false;
     }).addCase(currentDreamInit.rejected, (state) => {
       state.currentDreamLoading = false;
+      console.log("error is here")
       state.currentDreamError = "Failed to load dream";
     });
+
+    builder.addCase(removeCurrentDream.pending, state => {
+      state.currentDreamLoading = true;
+    }).addCase(removeCurrentDream.fulfilled, (state, action) => {
+      state.currentDreamLoading = false;
+      console.log(action.payload)
+    })
 
     builder.addCase(commentsInit.pending, (state) => {
       state.commentsLoading = true;
@@ -86,6 +95,14 @@ export const {actions} = currentDreamSlice;
 export const currentDreamInit = createAsyncThunk("currentDream/fetch", async (dreamId: string) => {
   const dream = await getDream(+dreamId);
   return dream;
+});
+
+export const removeCurrentDream = createAsyncThunk("currenntDream/remove", async ({dreamId, token}: {dreamId: number, token: string}) => {
+  try {
+    await deleteDream(dreamId, token);
+  } catch (e) {
+    console.error(e)
+  }
 });
 
 // all about comments

@@ -10,7 +10,7 @@ import {resetFilters} from "../../utils/resetFilters";
 
 export const HomePage = () => {
   const dispatch = useAppDispatch();
-  // const url = localStorage.getItem("returnUrl");
+  const url = localStorage.getItem("lastPlaceOnSite");
   // const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +26,13 @@ export const HomePage = () => {
         await dispatch(usersInit());
       } catch (error) {
         console.log(error);
+      } finally {
+        if (url && url.localeCompare(window.location.href) === 0) {
+          window.scrollTo({
+            top: Number(localStorage.getItem("lastScrollPosition")),
+            behavior: "smooth"
+          })
+        }
       }
     }
 

@@ -23,7 +23,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
     if(!loginedUser) {
       return
     }
-    console.log(userFavouriteList.includes(dream));
+    
     if(userFavouriteList.find(item => item.id === dream.id)) {
       await dispatch(
         userFavoriteRemove({
@@ -41,7 +41,9 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
     dispatch(userFavouritesInit(access ?? ""));
   }
 
-  useEffect(() => {console.log(userFavouriteList)}, [userFavouriteList]);
+  useEffect(() => {
+    console.log("favoritesList is chenged")
+  }, [userFavouriteList]);
 
 
   return (
@@ -49,12 +51,13 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
       <div className="dream-cart__image-box">
         <Link
           to={`/dreams/${dream.id}`}
-          onClick={() =>
+          onClick={() => {
             localStorage.setItem(
               "lastScrollPosition",
               window.scrollY.toString()
             )
-          }
+            localStorage.setItem("lastPlaceOnSite", window.location.href);
+          }}
         >
           <img
             className="lozad dream-cart__image"

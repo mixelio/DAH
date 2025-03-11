@@ -6,10 +6,9 @@ interface OptionType {
 
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import {Autocomplete, Button, FormControl, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, TextField} from "@mui/material";
-import {DreamCategory} from "../../types/Dream";
-import LoadingButton from "@mui/lab/LoadingButton";
+import {Dream, DreamCategory} from "../../types/Dream";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {dreamCreateInit} from "../../features/dreamsFeature";
+import {currentDreamInit, dreamCreateInit} from "../../features/dreamsFeature";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 export const CreateDreamPage = () => {
@@ -18,6 +17,7 @@ export const CreateDreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editingDream, setEditingDream] = useState<Dream | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const categorySelectRef = useRef<HTMLSelectElement | null>(null);
   const { id } = useParams();
@@ -31,9 +31,57 @@ export const CreateDreamPage = () => {
 
   const [options, setOptions] = useState<OptionType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  const [editingData, setEditingData] = useState({
+    image: editingDream?.image_url ?? "",
+    name: editingDream?.name ?? "",
+    category: editingDream?.category ?? "",
+    location: editingDream?.location ?? "",
+    cost: editingDream?.cost ?? 0,
+    description: editingDream?.description ?? ""
+  });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCurrentDream = async (id: number) => {
+      setLoading(true)
+      try {
+        const dream = await dispatch(currentDreamInit(id));
+
+        setEditingDream(dream.payload as Dream);
+        
+      } catch (e) {
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    };
+
+    if(id) {
+      fetchCurrentDream(+id);
+    }
+    
+  }, [id, dispatch])
+
+  // useEffect(() => {
+  //   if(editingDream) {
+  //       setEditingData((prevState) => ({
+  //         ...prevState,
+  //         image: editingDream.image_url ?? "",
+  //         name: editingDream.name ?? "",
+  //         category: editingDream.category ?? "",
+  //         location: editingDream.location ?? "",
+  //         cost: editingDream.cost ?? 0,
+  //         description: editingDream.description ?? "",
+  //       }));
+  //       setInputValue(editingDream.location)
+  //   }
+  // }, [editingDream])
+
+  useEffect(() => {
+    console.log("connect!")
+  }, [editingDream])
 
   useEffect(() => {
     if(!inputValue) {
@@ -57,31 +105,52 @@ export const CreateDreamPage = () => {
 
   useEffect(() => {
     const user = localStorage.getItem("currentUser");
-    console.log(user, dreams, id);
     if(user && id && user !== id && slug === "create") {
       navigate(`/profile/${id}`);
     }
-
-    if(user && id && dreams.length > 0) {
-      const userDreams = dreams.filter(dream => dream.user?.id === +user)
-      console.log(userDreams);
-
-      if(userDreams.find(dream => dream.id === +id)) {
-        console.log("dream owner here")
-      } else {
-        console.log("you are not owner of this dream")
-      }
-    }
     
     if (slug === "create") {
-      console.log("create page")
+      console.log("create page");
     } else {
-      console.log("edit page")
+      console.log("edit page");
+      const editingDream = dreams.find((dream) =>
+        dream && id ? +dream.id === +id : null
+      );
+
+      if(editingDream) {
+        setPreviewUrl(editingDream.image_url);
+        setEditingData({
+          image: editingDream.image_url,
+          name: editingDream.name,
+          category: editingDream.category,
+          location: editingDream.location,
+          cost: editingDream.cost,
+          description: editingDream.description,
+        });
+        setPreviewUrl(editingDream.image_url);
+        setInputValue(editingDream.location);
+      }
+
+      
+
+      if (user && id && dreams.length > 0) {
+        const userDreams = dreams.filter(
+          (dream) => dream.user?.id === +user
+        );
+
+        if (userDreams.find((dream) => dream.id === +id)) {
+          console.log("dream owner here");
+        } else {
+          console.log("you are not owner of this dream");
+          navigate(`/dreams/${id}`);
+        }
+      }
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
+  console.log(editingData);
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
@@ -163,7 +232,11 @@ export const CreateDreamPage = () => {
     <section className="create-dream page__section">
       <div className="container">
         <div className="create-dream__content">
-          <h2 className="title create-dream__title">Creating new dream</h2>
+          <h2 className="title create-dream__title">
+            {slug.localeCompare("edit")
+              ? "Creating new Dream"
+              : "Editing the Dream"}
+          </h2>
 
           <form
             className="create-dream__form"
@@ -173,6 +246,12 @@ export const CreateDreamPage = () => {
               {selectedFile ? (
                 <img
                   src={previewUrl ?? ""}
+                  alt=""
+                  className="create-dream__image"
+                />
+              ) : slug.localeCompare("create") ? (
+                <img
+                  src={editingData.image ?? ""}
                   alt=""
                   className="create-dream__image"
                 />
@@ -211,10 +290,17 @@ export const CreateDreamPage = () => {
                 ></InputLabel>
                 <TextField
                   required
+                  value={editingData.name}
                   id="dream-name"
                   label="Dream name"
                   variant="outlined"
                   name="name"
+                  onChange={(e) =>
+                    setEditingData((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
                 />
               </FormControl>
               <FormControl fullWidth className="create-dream__form-control">
@@ -230,7 +316,9 @@ export const CreateDreamPage = () => {
                   name="category"
                   labelId="category-select"
                   id="simple-select"
-                  defaultValue={DreamCategory.Money_donation}
+                  defaultValue={
+                    editingDream?.category ?? DreamCategory.Money_donation
+                  }
                   value={category}
                   sx={{ border: "none", borderRadius: "20" }}
                   label="Category*"
@@ -242,9 +330,7 @@ export const CreateDreamPage = () => {
                   <MenuItem value={DreamCategory.Volunteer_services}>
                     Volunteer services
                   </MenuItem>
-                  <MenuItem value={DreamCategory.Gifts}>
-                    Gifts
-                  </MenuItem>
+                  <MenuItem value={DreamCategory.Gifts}>Gifts</MenuItem>
                 </Select>
               </FormControl>
               <FormControl fullWidth className="create-dream__form-control">
@@ -255,10 +341,14 @@ export const CreateDreamPage = () => {
                 <Autocomplete
                   options={options}
                   getOptionLabel={(option) => option.description}
-                  onInputChange={(_event, value) => setInputValue(value)}
+                  inputValue={inputValue}
+                  onInputChange={(_event, value) => {
+                    if (value) {
+                      setInputValue(value);
+                    }
+                  }}
                   onChange={(_event, value) => {
-                    const sity = value?.description || null;
-                    setSelectedCity(sity);
+                    setInputValue(value?.description || "");
                     // setDataForCreate((prev) => ({
                     //   ...prev,
                     //   location: sity || "",
@@ -269,7 +359,6 @@ export const CreateDreamPage = () => {
                       {...params}
                       required
                       placeholder="Start enter a city"
-                      value={selectedCity}
                       id="location"
                       label="Location"
                       variant="outlined"
@@ -278,9 +367,7 @@ export const CreateDreamPage = () => {
                   )}
                 />
               </FormControl>
-              <FormControl 
-                fullWidth className="create-dream__form-control"
-              >
+              <FormControl fullWidth className="create-dream__form-control">
                 <InputLabel
                   htmlFor="dream-cost"
                   sx={{ border: "none", borderRadius: "20" }}
@@ -288,10 +375,17 @@ export const CreateDreamPage = () => {
                 <TextField
                   required
                   id="dream-cost"
+                  value={editingData.cost}
                   label="Dream cost"
                   variant="outlined"
                   name="cost"
                   type="number"
+                  onChange={(e) =>
+                    setEditingData((prev) => ({
+                      ...prev,
+                      cost: +e.target.value,
+                    }))
+                  }
                   slotProps={{
                     input: {
                       endAdornment: (
@@ -309,28 +403,40 @@ export const CreateDreamPage = () => {
                 <TextField
                   required
                   id="dream-description"
+                  value={editingData.description}
                   label="Dream description"
                   variant="outlined"
                   name="description"
                   multiline
                   rows={5}
+                  onChange={(e) =>
+                    setEditingData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                 />
               </FormControl>
             </div>
-            {loading ? (
-              <LoadingButton loading variant="contained">
-                Create Dream
-              </LoadingButton>
-            ) : (
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className="create-dream__button"
-              >
-                Create Dream
-              </Button>
-            )}
+            <Button
+              type="submit"
+              loading={loading}
+              variant="contained"
+              color="primary"
+              className="create-dream__button"
+              sx={{mr: ".625rem", width: "135px"}}
+            >
+              {slug} Dream
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              className="create-dream__button"
+              sx={{width: "135px"}}
+              onClick={() => navigate(slug.localeCompare("create") ? `/dreams/${id}` : `/profile/${id}`)}
+            >
+              Canel
+            </Button>
           </form>
         </div>
       </div>

@@ -1,6 +1,8 @@
 import {useEffect, useState, useRef} from "react"
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Avatar, Button, CircularProgress, Divider, IconButton, InputAdornment, LinearProgress, OutlinedInput, Snackbar, TextField} from "@mui/material";
+import CreateIcon from '@mui/icons-material/Create';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {User} from "../../types/User";
 import {FacebookShareButton} from "react-share";
@@ -15,14 +17,14 @@ import styles from "./DreamPage.module.scss";
 import SendIcon from "@mui/icons-material/Send";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
-import {commentAdd, commentsInit} from "../../features/currentDreamFeature";
+import {commentAdd, commentsInit, removeCurrentDream} from "../../features/currentDreamFeature";
 import {getUser} from "../../api/users";
 import {Comment} from "../../components/Comment/Comment";
 
 export const DreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const {users} = useAppSelector(store => store.users);
-  const {comments, commentsLoading} = useAppSelector(store => store.currentDream);
+  const {comments, commentsLoading, currentDreamError} = useAppSelector(store => store.currentDream);
   const { id } = useParams();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
 
@@ -34,8 +36,10 @@ export const DreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [waitDreamClosing, setWaitDreamClosing] = useState<boolean>(false);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
+  const [isOwnerHere, setIsOwnerHere] = useState<boolean>(false)
   const commentInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // * work with dialog
 
@@ -72,6 +76,20 @@ export const DreamPage = () => {
 
     const handleCloseSnackbar = () => {
       setPaySuccessSnackbar(false);
+    };
+
+    const handleRemoveDream = async (id: number) => {
+      try {
+        await dispatch(removeCurrentDream({
+          dreamId: id, 
+          token: localStorage.getItem("access") ?? ""
+        }));
+      } catch (e) {
+        console.error(e)
+      } finally {
+        navigate(`/profile/${userFromLocaleStorage}`);
+      }
+
     };
 
   // * handler for adding comment to the dream
@@ -149,7 +167,7 @@ export const DreamPage = () => {
     }
   }
 
-  // TODO handler for donating to the dream
+  // * handler for donating to the dream
 
   const handleDonate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -221,6 +239,10 @@ export const DreamPage = () => {
         }
       } catch (e) {
         console.error(e);
+        console.log(e)
+      } finally {
+        console.log(currentDreamError)
+
       }
     }
 
@@ -236,6 +258,17 @@ export const DreamPage = () => {
     } 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const user = localStorage.getItem("currentUser");
+    const dream = dreams.find(dream => dream && id ? +dream.id === +id : null);
+
+    console.log(dream && user && +dream.user.id === +user);
+    if (dream && user && +dream.user.id === +user) {
+      setIsOwnerHere(true)
+    } else {setIsOwnerHere(false)}
+
+  }, [dreams, id])
 
   useEffect(() => {
     const initLoginedUser = async () => {
@@ -262,7 +295,14 @@ export const DreamPage = () => {
 
           setCurrentDream(dream);
         } catch (e) {
-          console.error(e);
+          if (e instanceof Error) {
+            if(e.message.includes("404")){
+              navigate("/notFound")
+            };
+          } else {
+            console.error(e);
+          }
+          
         } finally {
           setLoading(false);
         }
@@ -272,7 +312,7 @@ export const DreamPage = () => {
     };
 
     fetchDream();
-  }, [status, id]);
+  }, [status, id, navigate]);
 
   useEffect(() => {
     if (currentDream?.image) {
@@ -303,7 +343,26 @@ export const DreamPage = () => {
         />
         {currentDream && !loading ? (
           <div className="dream__content">
-            <h2 className="dream__title">{currentDream.name}</h2>
+            <h2 className="dream__title">{currentDream.name} </h2>
+            {isOwnerHere && id && (
+              <div className="dream__root-buttons">
+                <Link
+                  to={`./edit`}
+                  className="dream__edit-button dream__root-button"
+                >
+                  <CreateIcon className="dream__edit-icon" />
+                </Link>
+                <Button
+                  className="dream__delete-button dream__root-button"
+                  onClick={() => {
+                    console.log()
+                    handleRemoveDream(+id)
+                  }}
+                >
+                  <DeleteIcon className="dream__edit-icon"/>
+                </Button>
+              </div>
+            )}
 
             <Link
               to={`/profile/${currentDream.user.id}`}
@@ -414,7 +473,6 @@ export const DreamPage = () => {
                     Only authorized users can help
                   </p>
                 )}
-                
               </dialog>
 
               {/* Dialog for donate */}

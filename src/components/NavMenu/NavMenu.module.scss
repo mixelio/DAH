@@ -34,8 +34,8 @@ $underline-width: attr(data-width);
     height: 100%;
     flex: 1;
     display: flex;
-    column-gap: 20px;
     align-items: center;
+    
 
     @include on-tablet {
       column-gap: 30px;
@@ -47,12 +47,15 @@ $underline-width: attr(data-width);
   }
 
   &__pages {
+    flex-grow: 1;
     display: flex;
     column-gap: 16px;
     align-items: center;
     height: 100%;
+    justify-content: center;
 
     @include on-tablet {
+      justify-content: flex-start;
       column-gap: 20px;
     }
 
@@ -66,19 +69,22 @@ $underline-width: attr(data-width);
     display: flex;
     align-items: center;
     height: 100%;
-    font-size: 14px;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     font-weight: 400;
     text-transform: capitalize;
     transition-duration: 300ms;
     color: $text-color-dark;
     z-index: 2;
 
-    @include on-tablet {
-      font-size: 16px;
+    &:first-child {
+      display: none;
     }
 
-    @include on-desktop {
-      font-size: 20px;
+    @include on-tablet {
+
+      &:first-child {
+        display: flex;
+      }
     }
 
     &.is-active {
