@@ -48,3 +48,53 @@ export default tseslint.config({
   },
 })
 ```
+
+
+# Dream-Project
+
+Dream Are Here is a Django-based web application for dreamers and contributors. We managing your dream, payments, and notifications. 
+## Features
+
+- **JWT authenticated**: Secure API access with JSON Web Tokens.
+- **Postgres database**
+- **Cloudinary service for images**
+- **Admin panel /admin/**: Access the admin panel at `/admin/`.
+- **Documentation is located at /api/doc/swagger/**
+- **Managing and fulfilling dreams, comments and payments**
+- **"CRUD" for all dream objects for owners**
+- **Email notifications**: Alerts for fulfilling your dream, change password
+- **Stripe payments**: Secure online payments for borrowings.
+- **Dockerized Environment**: The project is fully dockerized for easy deployment and development.
+
+## Installation
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+
+### Getting Started
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/mixelio/DAH
+   cd DAH
+
+2. **Build and run docker containers:**
+   ```bash
+    docker build -t your_image_name .
+    docker run -d -p 8000:8000 your_image_name
+    ```
+
+3. **Create a superuser**:
+
+    ```bash
+    python manage.py createsuperuser
+   ```
+
+### Usage
+
+- **Register a user**: Use the `/api/user/register/` endpoint to register a new user.
+- **Obtain tokens**: Use `/api/user/token/` to get access and refresh tokens.
+- **Authenticated requests**: Include the access token in the header of your HTTP requests for authentication. Use the key "Authorize"
+
