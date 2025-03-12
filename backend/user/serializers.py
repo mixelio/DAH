@@ -48,6 +48,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(UserSerializer):
+    password = serializers.CharField(
+        write_only=True,
+        label=_('Password'),
+        style={'input_type': 'password'},
+        trim_whitespace=False,
+    )
+
     class Meta:
         model = get_user_model()
         fields = ('email', 'password', 'first_name', 'last_name')
