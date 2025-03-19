@@ -51,8 +51,14 @@ class PasswordResetRequestView(APIView):
 
     def post(self, request: Request) -> Response:
         email = request.data.get('email')
-        if not email:
-            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        return_url = request.data.get('return_url')
+
+        if not email or not return_url:
+            return Response(
+                {
+                    'error': 'Email and return_url are required'
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             user = get_user_model().objects.get(email=email)
@@ -62,13 +68,9 @@ class PasswordResetRequestView(APIView):
         token_generator = PasswordResetTokenGenerator()
         token = token_generator.make_token(user)
 
-        reset_url = request.build_absolute_uri(
-            reverse(
-                'user:password_reset_confirm', kwargs={
-                    'uidb64': urlsafe_base64_encode(force_bytes(user.pk)), 'token': token
-                }
-            )
-        )
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+        reset_url = f'{return_url}?uidb64={uidb64}&token={token}&email={email}'
 
         send_mail(
             subject='Password Reset Request',
@@ -85,7 +87,18 @@ class PasswordResetConfirmView(APIView):
     View to handle password reset confirmation.
     """
 
-    def post(self, request: Request, uidb64: str, token: str) -> Response:
+    def post(self, request: Request) -> Response:
+        uidb64 = request.data.get('uidb64')
+        token = request.data.get('token')
+        new_password = request.data.get('password')
+
+        if not uidb64 or not token or not new_password:
+            return Response(
+                {
+                    'error': 'All fields are required'
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = get_user_model().objects.get(pk=uid)
@@ -96,8 +109,7 @@ class PasswordResetConfirmView(APIView):
         if not token_generator.check_token(user, token):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
 
-        new_password = request.data.get('password')
-        if not new_password or len(new_password) < 5:
+        if len(new_password) < 5:
             raise ValidationError('Password must be at least 5 characters long')
 
         user.set_password(new_password)

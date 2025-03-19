@@ -25,5 +25,5 @@ urlpatterns = [
     path('', ListUserView.as_view(), name='users'),
     path('me/', ManageUserView.as_view(), name='manage'),
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
-    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]
