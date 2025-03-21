@@ -10,6 +10,7 @@ import {Dream, DreamCategory} from "../../types/Dream";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {currentDreamInit, dreamCreateInit} from "../../features/dreamsFeature";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {editCurrentDream} from "../../features/currentDreamFeature";
 
 export const CreateDreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -25,9 +26,9 @@ export const CreateDreamPage = () => {
   const pathSegments = location.pathname.split("/");
   const slug = pathSegments[pathSegments.length - 1];
 
-  const [category, setCategory] = useState<DreamCategory>(
-    DreamCategory.Money_donation
-  );
+  // const [category, setCategory] = useState<DreamCategory>(
+  //   DreamCategory.Money_donation
+  // );
 
   const [options, setOptions] = useState<OptionType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
@@ -149,8 +150,6 @@ export const CreateDreamPage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  
-  console.log(editingData);
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
@@ -176,7 +175,8 @@ export const CreateDreamPage = () => {
   };
 
   const handleChangeCategory = (event: SelectChangeEvent) => {
-    setCategory(event.target.value as DreamCategory);
+    setEditingData(prev => ({...prev, category: event.target.value}))
+    // setCategory(event.target.value as DreamCategory);
   };
 
   const handleCreateDreamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -228,6 +228,71 @@ export const CreateDreamPage = () => {
     }
   };
 
+  const handleEditDreamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const chekTocken = localStorage.getItem("access");
+    e.preventDefault();
+    const keys = ["name", "category", "cost", "description", "image", "location"];
+    const currentData: { [key: string]: string | number | DreamCategory} = {};
+
+    keys.forEach(key => {
+      const value = e.currentTarget[key] !== undefined ? e.currentTarget[key].value : "";
+      
+      if (value !== "" && value !== undefined) {
+        currentData[key] = value;
+      }
+    });
+
+    setLoading(true);
+    const formData = new FormData();
+
+    try {
+      if (!chekTocken) {
+        return;
+      }
+
+      Object.entries(currentData).forEach(([key, value]) => {
+        if (key !== "image") {
+          if (value) {
+            formData.append(key, value.toString());
+          }
+        } else {
+          console.log("image");
+          console.log(selectedFile);
+          if (selectedFile) {
+            formData.append(key, selectedFile);
+          }
+        }
+      });
+
+      if(id) {
+        dispatch(
+          editCurrentDream({
+            dreamId: +id,
+            data: formData,
+            token: chekTocken,
+          })
+        );
+      }
+
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+      navigate(`/dreams/${id}`);
+    }
+}
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (slug.localeCompare("create")) {
+      handleEditDreamSubmit(e);
+    } else {
+      handleCreateDreamSubmit(e);
+    }
+  }
+
+  console.log(selectedFile, editingData.image)
+
   return (
     <section className="create-dream page__section">
       <div className="container">
@@ -238,10 +303,7 @@ export const CreateDreamPage = () => {
               : "Editing the Dream"}
           </h2>
 
-          <form
-            className="create-dream__form"
-            onSubmit={handleCreateDreamSubmit}
-          >
+          <form className="create-dream__form" onSubmit={handleSubmit}>
             <div className="create-dream__image-block">
               {selectedFile ? (
                 <img
@@ -249,9 +311,9 @@ export const CreateDreamPage = () => {
                   alt=""
                   className="create-dream__image"
                 />
-              ) : slug.localeCompare("create") ? (
+              ) : slug.localeCompare("create") && editingData.image ? (
                 <img
-                  src={editingData.image ?? ""}
+                  src={editingData.image}
                   alt=""
                   className="create-dream__image"
                 />
@@ -319,7 +381,7 @@ export const CreateDreamPage = () => {
                   defaultValue={
                     editingDream?.category ?? DreamCategory.Money_donation
                   }
-                  value={category}
+                  value={editingData.category}
                   sx={{ border: "none", borderRadius: "20" }}
                   label="Category*"
                   onChange={handleChangeCategory}
@@ -424,7 +486,7 @@ export const CreateDreamPage = () => {
               variant="contained"
               color="primary"
               className="create-dream__button"
-              sx={{mr: ".625rem", width: "135px"}}
+              sx={{ mr: ".625rem", width: "135px" }}
             >
               {slug} Dream
             </Button>
@@ -432,8 +494,14 @@ export const CreateDreamPage = () => {
               variant="contained"
               color="primary"
               className="create-dream__button"
-              sx={{width: "135px"}}
-              onClick={() => navigate(slug.localeCompare("create") ? `/dreams/${id}` : `/profile/${id}`)}
+              sx={{ width: "135px" }}
+              onClick={() =>
+                navigate(
+                  slug.localeCompare("create")
+                    ? `/dreams/${id}`
+                    : `/profile/${id}`
+                )
+              }
             >
               Canel
             </Button>

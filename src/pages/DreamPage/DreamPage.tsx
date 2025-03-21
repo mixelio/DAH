@@ -173,7 +173,6 @@ export const DreamPage = () => {
     e.preventDefault();
     setWaitDreamClosing(true);
     const formData = new FormData(e.currentTarget);
-    console.log(e.currentTarget);
 
     if (id && formData.get("contribution_amount")) {
       try {

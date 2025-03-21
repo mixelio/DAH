@@ -23,7 +23,15 @@ export const createDream = async (
 
 // TODO: editDream
 
-// TODO: deleteDream
+export const editDream = async (id: number, data: FormData, token: string) => {
+  try {
+    await client.patch(`dream/${id}/`, data, token)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+// ? deleteDream
 
 export const deleteDream = async (id: number, token: string) => {
   try {

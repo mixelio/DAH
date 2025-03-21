@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {User} from "../types/User";
-import {addToFavourite, changeUser, changeUserPhoto, createUser, getLoginedUser, getUserFavourites, getUsers, removeFromFavorite} from "../api/users";
+import {addToFavourite, changeUser, changeUserPhoto, createUser, getLoginedUser, getUserFavourites, getUsers, removeFromFavorite, resetPassword, setNewPassword} from "../api/users";
 import {Dream} from "../types/Dream";
 
 export type userState = {
@@ -110,6 +110,22 @@ const usersSlice = createSlice({
         })
         .addCase(userFavoriteRemove.fulfilled, (state, action) => {
           state.userFavouriteList = state.userFavouriteList.filter(dream => dream.id !== action.payload);
+        });
+
+      builder
+        .addCase(userPasswordReset.fulfilled, (state, action) => {
+          const payload = action.payload as { message: string };
+          if (!payload.message.toLowerCase().includes("error")) {
+            state.error = payload.message;
+          }
+        });
+      builder
+        .addCase(userPasswordUpdate.fulfilled, (state, action) => {
+          const payload = action.payload as { message: string };
+          console.log(payload.message)
+          if (!payload.message.toLowerCase().includes("error")) {
+            state.error = payload.message;
+          }
         })
   },
 });
@@ -186,3 +202,32 @@ export const userPhotoUpdate = createAsyncThunk("user/photo", async ({ data, tok
 
   return response;
 });
+
+export const userPasswordReset = createAsyncThunk("user/passReset", async (data: {
+  email: string,
+  return_url: string
+}) => {
+  try {
+    const response = await resetPassword({email: data.email, return_url: data.return_url});
+    return response;
+  } catch (error) {
+    return error;
+  }
+});
+
+export const userPasswordUpdate = createAsyncThunk("user/passUpdate", async (data: {
+  "password": string, 
+  "token": string, 
+  "uidb64": string
+}) => {
+  try {
+    const response = await setNewPassword({
+      password: data.password,
+      token: data.token,
+      uidb64: data.uidb64,
+    });
+    return response;
+  } catch (error) {
+    return error;
+  }
+})

@@ -8,6 +8,9 @@ import {getSearchWith, SearchParams} from "../../utils/searchHelper";
 import SearchIcon from "@mui/icons-material/Search";
 import { Dream, DreamCategory } from "../../types/Dream";
 
+// search
+import Fuse from "fuse.js";
+
 enum PostsPerPage {
   six = 6,
   tvelw = 12,
@@ -15,22 +18,41 @@ enum PostsPerPage {
 }
 
 export const DreamsGalleryPage = () => {
-  const {dreams} = useAppSelector(store => store.dreams);
+  //#region declaration
+
+  const { dreams } = useAppSelector((store) => store.dreams);
   const [searchParams, setSearchParams] = useSearchParams();
   const [pages, setPages] = useState<number>(0);
   const [currentQuery, setCurrentQuery] = useState<string>("");
-  const paginationRef = useRef(null)
-  
+  const paginationRef = useRef(null);
+  const currentQueryRef = useRef(null);
+
   const dispatch = useAppDispatch();
 
-  const perPage = searchParams.get("postsPerPage") || PostsPerPage.six.toString();
-  const page = searchParams.get("page") ? parseInt(searchParams.get("page") as string, 10) : 1;
+  // const searchDreams = new Fuse(dreams);
+  // const options = {
+  //   includeScore: true,
+  //   limit: 10, // or any other number you prefer
+  // };
+
+  const perPage =
+    searchParams.get("postsPerPage") || PostsPerPage.six.toString();
+  const page = searchParams.get("page")
+    ? parseInt(searchParams.get("page") as string, 10)
+    : 1;
   const category = searchParams.get("category") || DreamCategory.All;
+
   const [dreamsForShow, setDreamsForShow] = useState<Dream[]>([]);
+
+  //#endregion
+
+  //#region hooks
 
   useEffect(() => {
     if (category !== DreamCategory.All && dreams) {
-      const tempDreams = dreams.filter(dream => !dream.category.localeCompare(category));
+      const tempDreams = dreams.filter(
+        (dream) => !dream.category.localeCompare(category)
+      );
       setDreamsForShow([...tempDreams]);
     } else {
       setDreamsForShow([...dreams]);
@@ -45,7 +67,13 @@ export const DreamsGalleryPage = () => {
 
   useEffect(() => {
     dispatch(dreamsInit());
-    setSearchParams({ page: localStorage.getItem("currentPage") || "1", postsPerPage: localStorage.getItem("postsPerPage") || PostsPerPage.six.toString(), category: localStorage.getItem("selectedCategory") as DreamCategory || DreamCategory.All
+    setSearchParams({
+      page: localStorage.getItem("currentPage") || "1",
+      postsPerPage:
+        localStorage.getItem("postsPerPage") || PostsPerPage.six.toString(),
+      category:
+        (localStorage.getItem("selectedCategory") as DreamCategory) ||
+        DreamCategory.All,
     });
 
     const lastScrollPosition = localStorage.getItem("lastScrollPosition");
@@ -61,37 +89,65 @@ export const DreamsGalleryPage = () => {
     }
   }, [searchParams, dreamsForShow, perPage]);
 
+  //#endregion
+
+  //#region handlers
+
   const handlePageChange = (_event: ChangeEvent<unknown>, page: number) => {
     document.documentElement.scrollTop = 0;
     setSearchWith({ page: page.toString() });
-    localStorage.setItem("currentPage", page.toString())
-  }
+    localStorage.setItem("currentPage", page.toString());
+  };
 
   const handleCategorySelect = (e: SelectChangeEvent<DreamCategory>) => {
     setSearchWith({
       page: "1",
       postsPerPage: perPage,
-      category: e.target.value.toString()
+      category: e.target.value.toString(),
     });
 
     localStorage.setItem("selectedCategory", e.target.value.toString());
     localStorage.setItem("currentPage", "1");
-  }
+  };
 
   const handlePostsPerPageChange = (e: SelectChangeEvent<PostsPerPage>) => {
     setSearchWith({
       page: "1",
-      postsPerPage: e.target.value.toString()
+      postsPerPage: e.target.value.toString(),
     });
 
     localStorage.setItem("postsPerPage", e.target.value.toString());
     localStorage.setItem("currentPage", "1");
-  }
+  };
 
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentQuery(e.target.value);
-    console.log(currentQuery)
+
   };
+
+  const handleAplyQuery = () => {
+    console.log(currentQuery);
+        if (!dreams || dreams.length === 0) return;
+        const keys = Object.keys(dreams[0]);
+
+        const searchDreams = new Fuse(dreams, {
+          keys: keys,
+          includeScore: true,
+        });
+
+        const result = searchDreams.search(currentQuery);
+        console.log(result, dreamsForShow)
+        setDreamsForShow(result.map(item => item.item));
+        setSearchWith({
+          page: "1",
+          postsPerPage: perPage,
+          category: category,
+          query: currentQuery,
+        });
+        setCurrentQuery('');
+  }
+
+  //#endregion
 
   return (
     <section className="dreams-gallery">
@@ -99,17 +155,20 @@ export const DreamsGalleryPage = () => {
         <form className="dreams-gallery__form">
           <FormControl className="dreams-gallery__search">
             <OutlinedInput
+              ref={currentQueryRef}
+              value={currentQuery}
               placeholder="Search"
               onChange={handleChangeQuery}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton onClick={() => {}}>
+                  <IconButton onClick={handleAplyQuery}>
                     <SearchIcon />
                   </IconButton>
                 </InputAdornment>
               }
             />
           </FormControl>
+
           <FormControl className="dreams-gallery__category">
             <Select
               defaultValue={
@@ -131,6 +190,7 @@ export const DreamsGalleryPage = () => {
               </MenuItem>
             </Select>
           </FormControl>
+          
           <FormControl className="dreams-gallery__filter">
             <Select
               defaultValue={
@@ -151,6 +211,7 @@ export const DreamsGalleryPage = () => {
             </Select>
           </FormControl>
         </form>
+
         <div className="dreams-gallery__content">
           {dreamsForShow &&
             dreamsForShow
@@ -164,6 +225,7 @@ export const DreamsGalleryPage = () => {
                 </div>
               ))}
         </div>
+
         {pages > 1 && (
           <Pagination
             ref={paginationRef}

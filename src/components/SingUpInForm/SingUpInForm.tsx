@@ -16,6 +16,7 @@ import {usersInit} from '../../features/users';
 import {createUser, getLoginedUser, loginUser, verifyUser} from '../../api/users';
 import LoadingButton from "@mui/lab/LoadingButton";
 import { SnackbarProvider, useSnackbar } from "notistack";
+
 const colorsPrimary = theme.palette.primary;
 const colorsSecondary = theme.palette.secondary;
 
@@ -576,7 +577,10 @@ export const SingUpInForm = () => {
                   </LoadingButton>
                 )}
 
-                <Link to="/" className="sign-up-in-form__foget">
+                <Link to="/pass-reset" className="sign-up-in-form__foget" onClick={() => {
+                  setErrorMessage("");
+                  setMainFormActive(false);
+                }}>
                   forget password?
                 </Link>
               </Box>
@@ -596,6 +600,7 @@ export const SingUpInForm = () => {
           </Box>
         </TabContext>
       </div>
+      
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}

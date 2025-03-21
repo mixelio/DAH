@@ -11,10 +11,14 @@
 @use './components/NavMenu/NavMenu.module' as *;
 @use './components/Footer/Footer.module' as *;
 @use './components/DreamCart/DreamCart.module' as *;
+
 @use './pages/DreamsGalleryPage/DreamsGalleryPage.module' as *;
 @use './pages/DreamPage/DreamPage.module' as *;
 @use './components/Comment/Comment.module' as *;
 @use './pages/ProfilePage/ProfilePage.module' as *;
+@use './pages/PasswordReset/PasswordReset.module' as *;
+
+
 @use 'swiper/css' as *;
 @use 'swiper/css/navigation' as *;
 @use './pages/HomePage/HomePage.module' as *;

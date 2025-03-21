@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDreamComment, deleteDream, deleteDreamComment, editDreamComment, getDream, getDreamComments} from "../api/dreams";
+import {createDreamComment, deleteDream, deleteDreamComment, editDream, editDreamComment, getDream, getDreamComments} from "../api/dreams";
 import {CommentType} from "../types/Comment";
 
 export type currentDreamState = {
@@ -31,6 +31,8 @@ export const currentDreamSlice = createSlice({
 
   },
   extraReducers: (builder) => {
+
+    // * Dream init
     builder.addCase(currentDreamInit.pending, (state) => {
       state.currentDreamLoading = true;
       state.currentDreamError = null;
@@ -43,6 +45,15 @@ export const currentDreamSlice = createSlice({
       state.currentDreamError = "Failed to load dream";
     });
 
+    // * Dream edit
+    builder.addCase(editCurrentDream.pending, state => {
+      state.currentDreamLoading = true
+    }).addCase(editCurrentDream.fulfilled, (state, action) => {
+      state.currentDreamLoading = false;
+      console.log(action.payload)
+    })
+
+    // * Dream remove
     builder.addCase(removeCurrentDream.pending, state => {
       state.currentDreamLoading = true;
     }).addCase(removeCurrentDream.fulfilled, (state, action) => {
@@ -50,6 +61,7 @@ export const currentDreamSlice = createSlice({
       console.log(action.payload)
     })
 
+    // * Comment init
     builder.addCase(commentsInit.pending, (state) => {
       state.commentsLoading = true;
       state.commentsError = null;
@@ -62,6 +74,7 @@ export const currentDreamSlice = createSlice({
       state.commentsError = "Failed to load comments";
     });
 
+    // * Comment add
     builder.addCase(commentAdd.pending, (state) => {
       state.commentsLoading = true;
       state.commentsError = null;
@@ -70,6 +83,7 @@ export const currentDreamSlice = createSlice({
       state.commentsLoading = false;
     });
 
+    // * Comment edit 
     builder.addCase(commentEdit.pending, (state) => {
       state.commentsLoading = true;
       state.commentsError = null;
@@ -77,6 +91,7 @@ export const currentDreamSlice = createSlice({
       state.commentsLoading = false;
     })
 
+    // * Comment remove
     builder.addCase(commentRemove.pending, (state) => {
       state.commentsDeleting = true;
       state.commentsError = null;
@@ -104,6 +119,15 @@ export const removeCurrentDream = createAsyncThunk("currenntDream/remove", async
     console.error(e)
   }
 });
+
+export const editCurrentDream = createAsyncThunk("currentDream/patch", async ({dreamId, data, token}: {dreamId: number, data: FormData, token: string}) => {
+  try {
+    const response = await editDream(dreamId, data, token);
+    return response;
+  } catch (e) {
+    console.error(e)
+  }
+})
 
 // all about comments
 

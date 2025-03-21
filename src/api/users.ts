@@ -60,3 +60,11 @@ export const addToFavourite = ({dream_id: dream_id}: {dream_id: number}, token: 
 export const removeFromFavorite = ({dream_id: dream_id}: {dream_id: number}, token: string) => {
   return client.delete(`favorites/${dream_id}/`, token);
 }
+
+export const resetPassword = (data: {"email": string, "return_url": string}) => {
+  return client.post("user/password-reset/", data);
+}
+
+export const setNewPassword = (data: {"password": string, "token": string, "uidb64": string}) => {
+  return client.post("user/password-reset-confirm/", data);
+}

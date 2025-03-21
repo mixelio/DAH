@@ -18,6 +18,7 @@ import {store} from './app/store.ts'
 import {ProfileEdit} from './pages/ProfileEdit/ProfileEdit.tsx'
 import {CreateDreamPage} from './pages/CreateDreamPage/CreateDreamPage.tsx'
 import {FavoritePage} from './pages/FavoritePage/FavoritePage.tsx'
+import {PasswordReset} from './pages/PasswordReset/PasswordReset.tsx'
 
 
 createRoot(document.getElementById("root")!).render(
@@ -42,6 +43,7 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="create" element={<CreateDreamPage />} />
                   <Route path="favorites" element={<FavoritePage />} />
                 </Route>
+                <Route path="pass-reset" element={<PasswordReset/>} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
             </Routes>
