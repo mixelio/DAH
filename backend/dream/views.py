@@ -237,7 +237,7 @@ class NonMoneyDreamHandler(DreamHandler):
         contribution = Contribution.objects.create(
             dream=dream, user=user, description=contribution_description
         )
-        dream.status = Dream.Status.COMPLETED
+        dream.status = Dream.Status.PENDING
         dream.save(update_fields=['status'])
         return contribution
 
