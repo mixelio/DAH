@@ -16,9 +16,29 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserFavorites',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dreams', models.ManyToManyField(related_name='favorited_by', to='dream.dream')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='favorites', to=settings.AUTH_USER_MODEL)),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'dreams',
+                    models.ManyToManyField(
+                        related_name='favorited_by', to='dream.dream'
+                    ),
+                ),
+                (
+                    'user',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='favorites',
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

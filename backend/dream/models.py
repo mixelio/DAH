@@ -21,7 +21,9 @@ class Dream(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cost = models.PositiveIntegerField(null=True, blank=True)
     accumulated = models.PositiveIntegerField(null=True, blank=True, default=0)
-    status = models.CharField(choices=Status.choices, default=Status.NEW, max_length=15)
+    status = models.CharField(
+        choices=Status.choices, default=Status.NEW, max_length=15
+    )
     category = models.CharField(choices=Category.choices, max_length=50)
     date_added = models.DateField(auto_now_add=True)
     location = models.CharField(max_length=200)
@@ -65,7 +67,9 @@ class Comment(models.Model):
 
 
 class Contribution(models.Model):
-    dream = models.ForeignKey(Dream, on_delete=models.CASCADE, related_name='contributions')
+    dream = models.ForeignKey(
+        Dream, on_delete=models.CASCADE, related_name='contributions'
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
@@ -78,7 +82,9 @@ class Contribution(models.Model):
 
 
 class UserFavorites(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorites')
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='favorites'
+    )
     dreams = models.ManyToManyField(Dream, related_name='favorited_by')
 
     def __str__(self) -> str:

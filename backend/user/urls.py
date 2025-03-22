@@ -11,8 +11,8 @@ from user.views import (
     ListUserView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
-
 )
+
 app_name = 'user'
 
 urlpatterns = [
@@ -24,6 +24,14 @@ urlpatterns = [
     path('<int:id>/', RetrieveDetailUserView.as_view(), name='retrieve_user'),
     path('', ListUserView.as_view(), name='users'),
     path('me/', ManageUserView.as_view(), name='manage'),
-    path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
-    path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path(
+        'password-reset/',
+        PasswordResetRequestView.as_view(),
+        name='password_reset',
+    ),
+    path(
+        'password-reset-confirm/',
+        PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm',
+    ),
 ]

@@ -13,6 +13,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='dream',
             name='category',
-            field=models.CharField(choices=[('Money_donation', 'Money'), ('Volunteer_services', 'Services'), ('Gifts', 'Gifts')], max_length=50),
+            field=models.CharField(
+                choices=[
+                    ('Money_donation', 'Money'),
+                    ('Volunteer_services', 'Services'),
+                    ('Gifts', 'Gifts'),
+                ],
+                max_length=50,
+            ),
         ),
     ]

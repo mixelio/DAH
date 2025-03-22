@@ -7,19 +7,35 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
             name='Payment',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('PENDING', 'Pending'), ('PAID', 'Paid')], max_length=10)),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
+                (
+                    'status',
+                    models.CharField(
+                        choices=[('PENDING', 'Pending'), ('PAID', 'Paid')],
+                        max_length=10,
+                    ),
+                ),
                 ('dream_id', models.PositiveIntegerField()),
                 ('session_url', models.URLField(max_length=500)),
                 ('session_id', models.CharField(max_length=100)),
-                ('money_to_pay', models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    'money_to_pay',
+                    models.DecimalField(decimal_places=2, max_digits=10),
+                ),
             ],
         ),
     ]

@@ -5,6 +5,7 @@ class Payment(models.Model):
     class StatusChoices(models.TextChoices):
         PENDING = 'PENDING'
         PAID = 'PAID'
+
     user_id = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=10, choices=StatusChoices.choices)
     dream_id = models.PositiveIntegerField()
@@ -14,4 +15,3 @@ class Payment(models.Model):
 
     def __str__(self) -> str:
         return f'{self.id}: {self.status}'
-

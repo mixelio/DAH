@@ -16,7 +16,10 @@ from drf_spectacular.utils import (
 )
 from rest_framework import status, viewsets, views, generics
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.request import Request
 from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
@@ -34,7 +37,7 @@ from dream.serializers import (
     ContributionSerializer,
     DreamRetrieveSerializer,
     MoneyDreamRequestSerializer,
-    NonMoneyDreamRequestSerializer
+    NonMoneyDreamRequestSerializer,
 )
 from user.permissions import IsOwnerAdminOrReadOnly
 
@@ -49,11 +52,13 @@ class CommentListCreateView(generics.ListCreateAPIView):
         ).select_related('dream', 'user')
 
     def perform_create(self, serializer: ModelSerializer) -> None:
-        serializer.save(dream_id=self.kwargs['dream_id'], user=self.request.user)
+        serializer.save(
+            dream_id=self.kwargs['dream_id'], user=self.request.user
+        )
 
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
     serializer_class = CommentSerializer
 
     def get_queryset(self) -> QuerySet:
@@ -61,26 +66,19 @@ class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
             dream_id=self.kwargs['dream_id']
         ).select_related('dream', 'user')
 
-    def perform_update(self, serializer: ModelSerializer) -> None:
-        comment = self.get_object()
-        if comment.user != self.request.user:
-            raise PermissionDenied('You do not have permission to edit this comment.')
-        serializer.save()
-
     def destroy(self, request: Request, *args, **kwargs) -> Response:
         instance = self.get_object()
         if instance.user != self.request.user:
-            raise PermissionDenied('You do not have permission to delete this comment.')
+            raise PermissionDenied(
+                'You do not have permission ' 'to delete this comment.'
+            )
 
         serializer = self.get_serializer(instance)
         response_data = serializer.data
 
         self.perform_destroy(instance)
 
-        return Response(
-            response_data,
-            status=status.HTTP_204_NO_CONTENT
-        )
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
 class DreamViewSet(viewsets.ModelViewSet):
@@ -88,7 +86,11 @@ class DreamViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerAdminOrReadOnly)
 
     def get_queryset(self) -> QuerySet:
-        queryset = Dream.objects.all().select_related('user').prefetch_related('contributions')
+        queryset = (
+            Dream.objects.all()
+            .select_related('user')
+            .prefetch_related('contributions')
+        )
         category = self.request.query_params.get('category', None)
         if category:
             return queryset.filter(category__icontains=category)
@@ -100,7 +102,9 @@ class DreamViewSet(viewsets.ModelViewSet):
     def create(self, request: Request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -131,7 +135,8 @@ class DreamViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 name='category',
                 description='Filter by categories. Available '
-                            'values: Money donation, Volunteer services, Gifts.',
+                'values: Money donation, '
+                'Volunteer services, Gifts.',
                 required=False,
                 type=OpenApiTypes.STR,
                 examples=[
@@ -146,8 +151,8 @@ class DreamViewSet(viewsets.ModelViewSet):
                     OpenApiExample(
                         'Gifts',
                         value='Gifts',
-                    )
-                ]
+                    ),
+                ],
             )
         ]
     )
@@ -163,7 +168,7 @@ class DreamHandler(ABC):
 
     @abstractmethod
     def handle(
-            self, dream: Dream, user: get_user_model(), request: Request
+        self, dream: Dream, user: get_user_model(), request: Request
     ) -> Optional[Union[Contribution, Payment]]:
         """
         Processes the fulfillment of a given dream.
@@ -171,13 +176,18 @@ class DreamHandler(ABC):
         :param dream: The dream instance to be fulfilled.
         :param user: The user making the contribution.
         :param request: The HTTP request containing necessary data.
-        :raises NotImplementedError: If the method is not implemented in a subclass.
+        :raises NotImplementedError:
+        If the method is not implemented in a subclass.
         """
-        raise NotImplementedError('This method should be implemented by subclasses.')
+        raise NotImplementedError(
+            'This method should be implemented by subclasses.'
+        )
 
 
 class MoneyDreamHandler(DreamHandler):
-    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Optional[Payment] | Response:
+    def handle(
+        self, dream: Dream, user: get_user_model(), request: Request
+    ) -> Optional[Payment] | Response:
         if not request:
             raise ValueError('Request object is required for this operation.')
 
@@ -188,26 +198,45 @@ class MoneyDreamHandler(DreamHandler):
         remaining_balance = dream.cost - (dream.accumulated or 0)
 
         if contribution_amount > remaining_balance:
-            raise ValueError(f'Contribution exceeds the remaining balance: {remaining_balance}.')
+            raise ValueError(
+                f'Contribution exceeds the '
+                f'remaining balance: {remaining_balance}.'
+            )
         try:
-            payment = create_stripe_session(dream.id, Decimal(contribution_amount), request)
+            payment = create_stripe_session(
+                dream.id, Decimal(contribution_amount), request
+            )
             return payment
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
         except stripe.error.StripeError as e:
             return Response(
-                {"error": "Payment error. Please try again."}, status=status.HTTP_503_SERVICE_UNAVAILABLE
+                {"error": f"Payment error. Please try again. {e}"},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
         except Exception as e:
-            return Response({"error": "Unexpected server error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": f"Unexpected server error. {e}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class NonMoneyDreamHandler(DreamHandler):
-    def handle(self, dream: Dream, user: get_user_model(), request: Request) -> Contribution:
-        contribution_description = request.data.get('contribution_description', '')
+    def handle(
+        self, dream: Dream, user: get_user_model(), request: Request
+    ) -> Contribution:
+        contribution_description = request.data.get(
+            'contribution_description', ''
+        )
         if not contribution_description:
-            raise ValueError('Description of contribution is required for this category.')
-        contribution = Contribution.objects.create(dream=dream, user=user, description=contribution_description)
+            raise ValueError(
+                'Description of contribution ' 'is required for this category.'
+            )
+        contribution = Contribution.objects.create(
+            dream=dream, user=user, description=contribution_description
+        )
         dream.status = Dream.Status.COMPLETED
         dream.save(update_fields=['status'])
         return contribution
@@ -220,17 +249,19 @@ class FulfillDreamView(views.APIView):
         request=PolymorphicProxySerializer(
             component_name='Payload for different dream types',
             serializers=[
-                MoneyDreamRequestSerializer, NonMoneyDreamRequestSerializer,
+                MoneyDreamRequestSerializer,
+                NonMoneyDreamRequestSerializer,
             ],
             resource_type_field_name='person_type',
         ),
         responses=PolymorphicProxySerializer(
             component_name='Response for different dream types',
             serializers=[
-                ContributionSerializer, PaymentSerializer,
+                ContributionSerializer,
+                PaymentSerializer,
             ],
             resource_type_field_name='person_type',
-        )
+        ),
     )
     def post(self, request: Request, dream_id: int) -> Response:
         dream = get_object_or_404(Dream, id=dream_id)
@@ -239,7 +270,7 @@ class FulfillDreamView(views.APIView):
         if dream.status == Dream.Status.COMPLETED:
             return Response(
                 {'error': 'This dream has already been fulfilled.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         handlers = {
@@ -252,13 +283,15 @@ class FulfillDreamView(views.APIView):
         if not handler:
             return Response(
                 {'error': 'Unsupported dream category.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             response = handler.handle(dream, user, request)
         except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         dream.save()
         user.num_of_dreams = F('num_of_dreams') + 1
@@ -271,7 +304,7 @@ class FulfillDreamView(views.APIView):
         else:
             return Response(
                 {'error': 'Unexpected response type from handler.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -281,7 +314,7 @@ class FulfillDreamView(views.APIView):
     list=extend_schema(
         summary='Get the list of favorite dreams of authenticated user',
         description='Retrieve all dreams that the '
-                    'authenticated user has marked as favorites.',
+        'authenticated user has marked as favorites.',
         responses={
             200: DreamRetrieveSerializer(many=True),
         },
@@ -289,7 +322,7 @@ class FulfillDreamView(views.APIView):
     create=extend_schema(
         summary='Add a dream to favorites',
         description='Mark a dream as a favorite by '
-                    'providing its ID in the request body.',
+        'providing its ID in the request body.',
         request={
             'application/json': {
                 'type': 'object',
@@ -297,10 +330,10 @@ class FulfillDreamView(views.APIView):
                     'dream_id': {
                         'type': 'integer',
                         'description': 'ID of the dream to add to favorites',
-                        'example': 1
+                        'example': 1,
                     }
                 },
-                'required': ['dream_id']
+                'required': ['dream_id'],
             }
         },
         responses={
@@ -309,54 +342,51 @@ class FulfillDreamView(views.APIView):
                 'properties': {
                     'message': {
                         'type': 'string',
-                        'example': 'Dream 1 added to favorites'
+                        'example': 'Dream 1 added to favorites',
                     }
-                }
+                },
             },
             404: {
                 'type': 'object',
                 'properties': {
-                    'error': {
-                        'type': 'string',
-                        'example': 'Dream 1 not found'
-                    }
-                }
+                    'error': {'type': 'string', 'example': 'Dream 1 not found'}
+                },
             },
         },
     ),
     destroy=extend_schema(
         summary='Remove a dream from favorites',
         description='Remove a dream from the users '
-                    'favorites list by providing its '
-                    'ID in the path parameter.',
+        'favorites list by providing its '
+        'ID in the path parameter.',
         responses={
             200: {
                 'type': 'object',
                 'properties': {
                     'message': {
                         'type': 'string',
-                        'example': 'Dream 1 removed from favorites'
+                        'example': 'Dream 1 removed from favorites',
                     }
-                }
+                },
             },
             404: {
                 'type': 'object',
                 'properties': {
-                    'error': {
-                        'type': 'string',
-                        'example': 'Dream 1 not found'
-                    }
-                }
+                    'error': {'type': 'string', 'example': 'Dream 1 not found'}
+                },
             },
         },
-    )
+    ),
 )
 class FavoritesViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request: Request) -> Response:
-        favorites = request.user.favorites.dreams.prefetch_related(
-            'favorited_by').select_related('user').all()
+        favorites = (
+            request.user.favorites.dreams.prefetch_related('favorited_by')
+            .select_related('user')
+            .all()
+        )
         serializer = DreamRetrieveSerializer(favorites, many=True)
         return Response(serializer.data)
 
@@ -366,11 +396,13 @@ class FavoritesViewSet(viewsets.ViewSet):
             dream = Dream.objects.get(id=dream_id)
             request.user.favorites.dreams.add(dream)
             return Response(
-                {'message': f'Dream {dream_id} added to favorites'}, status=status.HTTP_200_OK
+                {'message': f'Dream {dream_id} added to favorites'},
+                status=status.HTTP_200_OK,
             )
         except Dream.DoesNotExist:
             return Response(
-                {'error': f'Dream {dream_id} not found'}, status=status.HTTP_404_NOT_FOUND
+                {'error': f'Dream {dream_id} not found'},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
     def destroy(self, request: Request, pk: int = None) -> Response:
@@ -378,9 +410,11 @@ class FavoritesViewSet(viewsets.ViewSet):
             dream = Dream.objects.get(id=pk)
             request.user.favorites.dreams.remove(dream)
             return Response(
-                {'message': f'Dream {pk} removed from favorites'}, status=status.HTTP_200_OK
+                {'message': f'Dream {pk} removed from favorites'},
+                status=status.HTTP_200_OK,
             )
         except Dream.DoesNotExist:
             return Response(
-                {'error': f'Dream {pk} not found'}, status=status.HTTP_404_NOT_FOUND
+                {'error': f'Dream {pk} not found'},
+                status=status.HTTP_404_NOT_FOUND,
             )

@@ -35,7 +35,16 @@ class ContributionSerializer(serializers.ModelSerializer):
 class DreamCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dream
-        fields = ['id', 'name', 'description', 'image', 'cost', 'category', 'status', 'location']
+        fields = [
+            'id',
+            'name',
+            'description',
+            'image',
+            'cost',
+            'category',
+            'status',
+            'location',
+        ]
         read_only_fields = ['id']
 
     category = serializers.ChoiceField(choices=Dream.Category.choices)
@@ -96,8 +105,19 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'dream', 'text', 'created_at',]
-        read_only_fields = ['id', 'dream', 'user', 'created_at',]
+        fields = [
+            'id',
+            'user',
+            'dream',
+            'text',
+            'created_at',
+        ]
+        read_only_fields = [
+            'id',
+            'dream',
+            'user',
+            'created_at',
+        ]
 
 
 class UserFavoritesSerializer(serializers.ModelSerializer):

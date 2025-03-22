@@ -8,14 +8,21 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
             name='Comment',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('text', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('likes', models.PositiveIntegerField(default=0)),
@@ -27,7 +34,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Contribution',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('description', models.TextField()),
                 ('date', models.DateTimeField(auto_now_add=True)),
             ],
@@ -38,14 +53,56 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Dream',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('name', models.CharField(max_length=200)),
                 ('description', models.TextField()),
-                ('image', cloudinary.models.CloudinaryField(blank=True, max_length=255, null=True, verbose_name='image')),
+                (
+                    'image',
+                    cloudinary.models.CloudinaryField(
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name='image',
+                    ),
+                ),
                 ('cost', models.PositiveIntegerField(blank=True, null=True)),
-                ('accumulated', models.PositiveIntegerField(blank=True, default=0, null=True)),
-                ('status', models.CharField(choices=[('New', 'New'), ('Pending', 'Pending'), ('Completed', 'Completed')], default='New', max_length=15)),
-                ('category', models.CharField(choices=[('Money donation', 'Money'), ('Volunteer services', 'Services'), ('Gifts', 'Gifts')], max_length=50)),
+                (
+                    'accumulated',
+                    models.PositiveIntegerField(
+                        blank=True, default=0, null=True
+                    ),
+                ),
+                (
+                    'status',
+                    models.CharField(
+                        choices=[
+                            ('New', 'New'),
+                            ('Pending', 'Pending'),
+                            ('Completed', 'Completed'),
+                        ],
+                        default='New',
+                        max_length=15,
+                    ),
+                ),
+                (
+                    'category',
+                    models.CharField(
+                        choices=[
+                            ('Money donation', 'Money'),
+                            ('Volunteer services', 'Services'),
+                            ('Gifts', 'Gifts'),
+                        ],
+                        max_length=50,
+                    ),
+                ),
                 ('date_added', models.DateTimeField(auto_now_add=True)),
                 ('location', models.CharField(max_length=200)),
                 ('views', models.PositiveIntegerField(default=0)),

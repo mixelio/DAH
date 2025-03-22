@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -82,16 +83,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth'
+        '.password_validation'
+        '.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth'
+        '.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth'
+        '.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth'
+        '.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -112,7 +118,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = 'staticfiles/'
 
-MEDIA_URL = "https://res.cloudinary.com/{}/".format(os.getenv('CLOUDINARY_CLOUD_NAME'))
+MEDIA_URL = "https://res.cloudinary.com/{}/".format(
+    os.getenv('CLOUDINARY_CLOUD_NAME')
+)
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
@@ -132,9 +140,9 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Dream Are Here API',
     'DESCRIPTION': 'Dream Site is a platform where people '
-                   'can share their dreams and receive help '
-                   'to fulfill them through donations, '
-                   'services, or gifts',
+    'can share their dreams and receive help '
+    'to fulfill them through donations, '
+    'services, or gifts',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_SETTINGS': {
@@ -150,23 +158,21 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51Q2wgyGRVZqdEvS6t3QA0h8jEt4pYncOCvcjESl1UzVCie3MSlJkmm8oCI2JBMR8HcppxsLxF43hiskcHvZyhxG200U74C7ePe'
+STRIPE_PUBLISHABLE_KEY = (
+    'pk_test_51Q2wgyGRVZqdEvS6t3QA0h8j'
+    'Et4pYncOCvcjESl1UzVCie3M'
+    'SlJkmm8oCI2JBMR8HcppxsLxF43hiskcHvZyhxG200U74C7ePe'
+)
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'https://mixelio.github.io'
-]
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173', 'https://mixelio.github.io']
 
 CLOUDINARY = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
     'SECURE': True,
-    'DEFAULT_TRANSFORMATION': {
-        'fetch_format': 'webp',
-        'quality': 'auto'
-    }
+    'DEFAULT_TRANSFORMATION': {'fetch_format': 'webp', 'quality': 'auto'},
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

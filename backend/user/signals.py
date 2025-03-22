@@ -8,7 +8,10 @@ from dream.models import UserFavorites
 
 User = get_user_model()
 
+
 @receiver(post_save, sender=User)
-def create_user_favorites(sender: Type[User], instance: User, created: bool, **kwargs: Any) -> None:
+def create_user_favorites(
+    sender: Type[User], instance: User, created: bool, **kwargs: Any
+) -> None:
     if created:
         UserFavorites.objects.create(user=instance)

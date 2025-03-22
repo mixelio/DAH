@@ -9,11 +9,11 @@ from .models import Contribution
 
 @receiver(post_save, sender=Contribution)
 def send_contribution_notification(
-        sender: Type[Contribution],
-        instance: Contribution,
-        created: bool,
-        *args,
-        **kwargs
+    sender: Type[Contribution],
+    instance: Contribution,
+    created: bool,
+    *args,
+    **kwargs,
 ) -> None:
     if created:
         dream_owner = instance.dream.user
@@ -21,9 +21,13 @@ def send_contribution_notification(
         subject = 'New Contribution to Your Dream!'
         message = (
             f'Hello {dream_owner.first_name},\n\n'
-            f'You have received a new contribution for your dream "{instance.dream.name}".\n\n'
+            f'You have received a new contribution for '
+            f'your dream "{instance.dream.name}".\n\n'
             f'Description: {instance.description}\n\n'
-            f"Contributor's profile: {settings.SITE_URL}/profile/{contributor.id}/\n\n"
+            f"Contributor's profile: "
+            f"{settings.SITE_URL}/profile/{contributor.id}/\n\n"
             f'Best regards,\nDream Site Team'
         )
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dream_owner.email])
+        send_mail(
+            subject, message, settings.DEFAULT_FROM_EMAIL, [dream_owner.email]
+        )

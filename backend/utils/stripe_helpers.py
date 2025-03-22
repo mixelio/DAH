@@ -11,7 +11,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def create_stripe_session(
-        dream_id: str, total_amount: Decimal, request
+    dream_id: int, total_amount: Decimal, request
 ) -> Payment:
     dream = Dream.objects.get(id=dream_id)
 
@@ -34,9 +34,13 @@ def create_stripe_session(
             }
         ],
         mode='payment',
-        success_url=request.build_absolute_uri(reverse('payment:checkout-success'))
+        success_url=request.build_absolute_uri(
+            reverse('payment:checkout-success')
+        )
         + f'?session_id={{CHECKOUT_SESSION_ID}}&return_url={return_url}',
-        cancel_url=request.build_absolute_uri(reverse('payment:payment-cancel')),
+        cancel_url=request.build_absolute_uri(
+            reverse('payment:payment-cancel')
+        ),
     )
 
     payment = Payment.objects.create(

@@ -13,7 +13,8 @@ class PaymentSuccessViewTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            email='testuser@example.com', password='password123')
+            email='testuser@example.com', password='password123'
+        )
         self.dream = Dream.objects.create(
             name='Test Dream',
             description='Test description',
@@ -21,7 +22,7 @@ class PaymentSuccessViewTestCase(TestCase):
             accumulated=100,
             user=self.user,
             category=Dream.Category.MONEY,
-            location='Test Location'
+            location='Test Location',
         )
 
     def test_payment_success(self):
@@ -61,7 +62,9 @@ class PaymentSuccessViewTestCase(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['message'], 'Payment already processed.')
+        self.assertEqual(
+            response.data['message'], 'Payment already processed.'
+        )
 
     def test_payment_not_completed(self):
         stripe.checkout.Session.retrieve = MagicMock(
@@ -79,14 +82,18 @@ class PaymentSuccessViewTestCase(TestCase):
             return_value=MagicMock(payment_status='paid')
         )
 
-        url = reverse('payment:payment-success', args=['non_existing_session_id'])
+        url = reverse(
+            'payment:payment-success', args=['non_existing_session_id']
+        )
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data['error'], 'Payment not found.')
 
     def test_stripe_error(self):
-        stripe.checkout.Session.retrieve = MagicMock(side_effect=StripeError('Stripe API error'))
+        stripe.checkout.Session.retrieve = MagicMock(
+            side_effect=StripeError('Stripe API error')
+        )
 
         url = reverse('payment:payment-success', args=['test_session_id'])
         response = self.client.get(url)
@@ -95,7 +102,9 @@ class PaymentSuccessViewTestCase(TestCase):
         self.assertIn('stripe_error', response.data)
 
     def test_other_error(self):
-        stripe.checkout.Session.retrieve = MagicMock(side_effect=Exception('Some other error'))
+        stripe.checkout.Session.retrieve = MagicMock(
+            side_effect=Exception('Some other error')
+        )
 
         url = reverse('payment:payment-success', args=['test_session_id'])
         response = self.client.get(url)

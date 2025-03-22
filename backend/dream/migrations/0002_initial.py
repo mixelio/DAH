@@ -18,26 +18,41 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='contribution',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='dream',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name='contribution',
             name='dream',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contributions', to='dream.dream'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='contributions',
+                to='dream.dream',
+            ),
         ),
         migrations.AddField(
             model_name='comment',
             name='dream',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dream.dream'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to='dream.dream'
+            ),
         ),
     ]

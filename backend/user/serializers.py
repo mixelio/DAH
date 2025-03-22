@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             'photo_url',
             'location',
             'num_of_dreams',
-            'about_me'
+            'about_me',
         )
         read_only_fields = ("is_staff",)
         extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
@@ -36,7 +36,9 @@ class UserSerializer(serializers.ModelSerializer):
         """Create a new users with encrypted password and return it"""
         return get_user_model().objects.create_user(**validated_data)
 
-    def update(self, instance: get_user_model(), validated_data: dict) -> get_user_model():
+    def update(
+        self, instance: get_user_model(), validated_data: dict
+    ) -> get_user_model():
         """Update a users, set the password correctly and return it"""
         password = validated_data.pop('password', None)
         user = super().update(instance, validated_data)
@@ -56,7 +58,7 @@ class CreateUserSerializer(UserSerializer):
             'password': {
                 'write_only': True,
                 'min_length': 5,
-                'style': {'input_type': 'password'}
+                'style': {'input_type': 'password'},
             }
         }
 

@@ -18,8 +18,12 @@ urlpatterns = [
         PaymentSuccessView.as_view(),
         name='payment-success',
     ),
-    path('payment/cancel/', PaymentCancelView.as_view(), name='payment-cancel'),
-    path('checkout/', PaymentSuccessTempView.as_view(), name='checkout-success'),
+    path(
+        'payment/cancel/', PaymentCancelView.as_view(), name='payment-cancel'
+    ),
+    path(
+        'checkout/', PaymentSuccessTempView.as_view(), name='checkout-success'
+    ),
 ]
 
 app_name = 'payment'

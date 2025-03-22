@@ -19,7 +19,9 @@ from payment.models import Payment
 from payment.serializers import PaymentSerializer
 
 
-class PaymentViewSet(ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet):
+class PaymentViewSet(
+    ListModelMixin, RetrieveModelMixin, viewsets.GenericViewSet
+):
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
 
@@ -43,12 +45,16 @@ class PaymentSuccessTempView(APIView):
 
         if session_id:
             return redirect(
-                reverse('payment:payment-success', kwargs={'session_id': session_id})
+                reverse(
+                    'payment:payment-success',
+                    kwargs={'session_id': session_id},
+                )
                 + f'?return_url={return_url}'
             )
 
         return Response(
-            {'error': 'Session ID not found.'}, status=status.HTTP_400_BAD_REQUEST
+            {'error': 'Session ID not found.'},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
 
@@ -61,13 +67,20 @@ class PaymentSuccessView(APIView):
             session = stripe.checkout.Session.retrieve(session_id)
 
             if session.payment_status != 'paid':
-                return Response({'message': 'Payment not completed.'}, status=400)
+                return Response(
+                    {'message': 'Payment not completed.'}, status=400
+                )
 
             try:
                 with transaction.atomic():
-                    payment = Payment.objects.select_for_update().get(session_id=session_id)
+                    payment = Payment.objects.select_for_update().get(
+                        session_id=session_id
+                    )
                     if payment.status == Payment.StatusChoices.PAID:
-                        return Response({'message': 'Payment already processed.'}, status=400)
+                        return Response(
+                            {'' 'message': 'Payment ' 'already ' 'processed.'},
+                            status=400,
+                        )
 
                     payment.status = Payment.StatusChoices.PAID
                     payment.save()
@@ -94,5 +107,8 @@ class PaymentCancelView(APIView):
     def get(self, request) -> Response:
         """Handle payment cancellation."""
         return Response(
-            {'message': 'Payment was cancelled. You can pay again within 24 hours.'}
+            {
+                'message': 'Payment was cancelled. '
+                'You can pay again within 24 hours.'
+            }
         )

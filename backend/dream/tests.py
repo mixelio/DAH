@@ -62,7 +62,6 @@ class DreamTests(TestCase):
         self.client.force_authenticate(self.user)
         self.dream = sample_dream(user=self.user)
 
-
     def test_connection(self):
         list_response = self.client.get('/api/dream/')
         retrieve_response = self.client.get(f'/api/dream/{self.dream.id}/')
@@ -70,7 +69,7 @@ class DreamTests(TestCase):
         self.assertEqual(retrieve_response.status_code, 200)
 
     def test_post_dream(self):
-        url = f'/api/dream/'
+        url = '/api/dream/'
         with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
             img = Image.new('RGB', (10, 10))
             img.save(ntf, format='JPEG')
@@ -118,7 +117,7 @@ class FulfillDreamViewTest(TestCase):
             category=Dream.Category.MONEY,
             cost=100,
             accumulated=50,
-            user=self.user
+            user=self.user,
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         data = {'contribution_amount': 30}
@@ -138,19 +137,21 @@ class FulfillDreamViewTest(TestCase):
             category=Dream.Category.MONEY,
             cost=100,
             accumulated=90,
-            user=self.user
+            user=self.user,
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         data = {'contribution_amount': 20}
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('Contribution exceeds the remaining balance', response.data['error'])
+        self.assertIn(
+            'Contribution exceeds the remaining balance',
+            response.data['error'],
+        )
 
     def test_fulfill_services_dream_success(self):
         dream = Dream.objects.create(
-            category=Dream.Category.SERVICES,
-            user=self.user
+            category=Dream.Category.SERVICES, user=self.user
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         data = {'contribution_description': 'Fix plumbing'}
@@ -159,34 +160,38 @@ class FulfillDreamViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         dream.refresh_from_db()
         self.assertEqual(dream.status, Dream.Status.COMPLETED)
-        self.assertEqual(Contribution.objects.filter(dream=dream, user=self.user).count(), 1)
+        self.assertEqual(
+            Contribution.objects.filter(dream=dream, user=self.user).count(), 1
+        )
         self.assertEqual(response.data['description'], 'Fix plumbing')
         self.assertEqual(
-            response.data['user'], {
+            response.data['user'],
+            {
                 'id': self.user.id,
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
-                'photo_url': None
-            }
+                'photo_url': None,
+            },
         )
 
     def test_fulfill_dream_already_completed(self):
         dream = Dream.objects.create(
             category=Dream.Category.MONEY,
             status=Dream.Status.COMPLETED,
-            user=self.user
+            user=self.user,
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         data = {'contribution_amount': 20}
         response = self.client.post(url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('This dream has already been fulfilled', response.data['error'])
+        self.assertIn(
+            'This dream has already been fulfilled', response.data['error']
+        )
 
     def test_fulfill_unsupported_category(self):
         dream = Dream.objects.create(
-            category='UNSUPPORTED_CATEGORY',
-            user=self.user
+            category='UNSUPPORTED_CATEGORY', user=self.user
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         response = self.client.post(url, {})
@@ -196,8 +201,7 @@ class FulfillDreamViewTest(TestCase):
 
     def test_unauthorized_access(self):
         dream = Dream.objects.create(
-            category=Dream.Category.MONEY,
-            user=self.user
+            category=Dream.Category.MONEY, user=self.user
         )
         self.client.force_authenticate(user=None)
         url = reverse('dream:fulfill-dream', args=[dream.id])
