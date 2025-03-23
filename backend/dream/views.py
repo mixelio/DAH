@@ -237,7 +237,7 @@ class NonMoneyDreamHandler(DreamHandler):
         contribution = Contribution.objects.create(
             dream=dream, user=user, description=contribution_description
         )
-        dream.status = Dream.Status.PENDING
+        dream.status = Dream.StatusChoices.PENDING
         dream.save(update_fields=['status'])
         return contribution
 
@@ -267,16 +267,16 @@ class FulfillDreamView(views.APIView):
         dream = get_object_or_404(Dream, id=dream_id)
         user = request.user
 
-        if dream.status == Dream.Status.COMPLETED:
+        if dream.status == Dream.StatusChoices.COMPLETED:
             return Response(
                 {'error': 'This dream has already been fulfilled.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         handlers = {
-            Dream.Category.MONEY: MoneyDreamHandler(),
-            Dream.Category.SERVICES: NonMoneyDreamHandler(),
-            Dream.Category.GIFTS: NonMoneyDreamHandler(),
+            Dream.CategoryChoices.MONEY: MoneyDreamHandler(),
+            Dream.CategoryChoices.SERVICES: NonMoneyDreamHandler(),
+            Dream.CategoryChoices.GIFTS: NonMoneyDreamHandler(),
         }
 
         handler = handlers.get(dream.category)

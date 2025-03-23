@@ -5,12 +5,12 @@ from user.models import User
 
 
 class Dream(models.Model):
-    class Category(models.TextChoices):
+    class CategoryChoices(models.TextChoices):
         MONEY = 'Money_donation'
         SERVICES = 'Volunteer_services'
         GIFTS = 'Gifts'
 
-    class Status(models.TextChoices):
+    class StatusChoices(models.TextChoices):
         NEW = 'New'
         PENDING = 'Pending'
         COMPLETED = 'Completed'
@@ -22,9 +22,9 @@ class Dream(models.Model):
     cost = models.PositiveIntegerField(null=True, blank=True)
     accumulated = models.PositiveIntegerField(null=True, blank=True, default=0)
     status = models.CharField(
-        choices=Status.choices, default=Status.NEW, max_length=15
+        choices=StatusChoices.choices, default=StatusChoices.NEW, max_length=15
     )
-    category = models.CharField(choices=Category.choices, max_length=50)
+    category = models.CharField(choices=CategoryChoices.choices, max_length=50)
     date_added = models.DateField(auto_now_add=True)
     location = models.CharField(max_length=200)
     views = models.PositiveIntegerField(default=0)
@@ -39,18 +39,18 @@ class Dream(models.Model):
         """
         Update the accumulated amount and adjust the status of the dream.
         """
-        if self.category == Dream.Category.MONEY:
+        if self.category == Dream.CategoryChoices.MONEY:
 
             self.accumulated += amount
 
             if self.accumulated >= self.cost:
-                self.status = self.Status.COMPLETED
+                self.status = self.StatusChoices.COMPLETED
             elif self.accumulated > 0:
-                self.status = self.Status.PENDING
+                self.status = self.StatusChoices.PENDING
             else:
-                self.status = self.Status.NEW
+                self.status = self.StatusChoices.NEW
 
-            self.save(update_fields=['accumulated', 'status'])
+            7
 
 
 class Comment(models.Model):

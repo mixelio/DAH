@@ -21,7 +21,7 @@ class PaymentSuccessViewTestCase(TestCase):
             cost=1000,
             accumulated=100,
             user=self.user,
-            category=Dream.Category.MONEY,
+            category=Dream.CategoryChoices.MONEY,
             location='Test Location',
         )
 

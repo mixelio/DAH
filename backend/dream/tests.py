@@ -80,7 +80,7 @@ class DreamTests(TestCase):
                     'name': 'This',
                     'description': 'This is a test description',
                     'image': ntf,
-                    'category': Dream.Category.SERVICES,
+                    'category': Dream.CategoryChoices.SERVICES,
                     'location': 'test location',
                 },
                 format='multipart',
@@ -91,7 +91,7 @@ class DreamTests(TestCase):
         dream = Dream.objects.get(name='This')
         self.assertTrue(dream.image)
         self.assertEqual(dream.description, 'This is a test description')
-        self.assertEqual(dream.category, Dream.Category.SERVICES)
+        self.assertEqual(dream.category, Dream.CategoryChoices.SERVICES)
         self.assertEqual(dream.location, 'test location')
         self.assertEqual(dream.user.id, self.user.id)
 
@@ -114,7 +114,7 @@ class FulfillDreamViewTest(TestCase):
 
     def test_fulfill_money_dream_success(self):
         dream = Dream.objects.create(
-            category=Dream.Category.MONEY,
+            category=Dream.CategoryChoices.MONEY,
             cost=100,
             accumulated=50,
             user=self.user,
@@ -134,7 +134,7 @@ class FulfillDreamViewTest(TestCase):
 
     def test_fulfill_money_dream_exceeds_balance(self):
         dream = Dream.objects.create(
-            category=Dream.Category.MONEY,
+            category=Dream.CategoryChoices.MONEY,
             cost=100,
             accumulated=90,
             user=self.user,
@@ -151,7 +151,7 @@ class FulfillDreamViewTest(TestCase):
 
     def test_fulfill_services_dream_success(self):
         dream = Dream.objects.create(
-            category=Dream.Category.SERVICES, user=self.user
+            category=Dream.CategoryChoices.SERVICES, user=self.user
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
         data = {'contribution_description': 'Fix plumbing'}
@@ -159,7 +159,7 @@ class FulfillDreamViewTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         dream.refresh_from_db()
-        self.assertEqual(dream.status, Dream.Status.COMPLETED)
+        self.assertEqual(dream.status, Dream.StatusChoices.COMPLETED)
         self.assertEqual(
             Contribution.objects.filter(dream=dream, user=self.user).count(), 1
         )
@@ -176,8 +176,8 @@ class FulfillDreamViewTest(TestCase):
 
     def test_fulfill_dream_already_completed(self):
         dream = Dream.objects.create(
-            category=Dream.Category.MONEY,
-            status=Dream.Status.COMPLETED,
+            category=Dream.CategoryChoices.MONEY,
+            status=Dream.StatusChoices.COMPLETED,
             user=self.user,
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
@@ -201,7 +201,7 @@ class FulfillDreamViewTest(TestCase):
 
     def test_unauthorized_access(self):
         dream = Dream.objects.create(
-            category=Dream.Category.MONEY, user=self.user
+            category=Dream.CategoryChoices.MONEY, user=self.user
         )
         self.client.force_authenticate(user=None)
         url = reverse('dream:fulfill-dream', args=[dream.id])

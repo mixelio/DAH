@@ -47,7 +47,7 @@ class DreamCreateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
 
-    category = serializers.ChoiceField(choices=Dream.Category.choices)
+    category = serializers.ChoiceField(choices=Dream.CategoryChoices.choices)
 
 
 class DreamListSerializer(DreamCreateSerializer):
