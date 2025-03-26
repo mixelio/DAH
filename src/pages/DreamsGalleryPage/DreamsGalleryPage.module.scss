@@ -22,6 +22,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px 20px;
+    margin-block-end: 46px;
     
     @include on-tablet {
       grid-template-columns: 1fr 1fr;
@@ -29,6 +30,7 @@
 
     @include on-desktop {
       grid-template-columns: repeat(3, minmax(100px, 1fr));
+      margin-block-end: 56px;
     }
   }
 
@@ -37,6 +39,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
 
     margin-bottom: 28px;
 
@@ -50,7 +53,36 @@
   }
 
   &__search {
+    width: 100%;
+
+    @include on-tablet {
+      width: auto;
+      flex: 1;
+    }
+  }
+
+  &__category {
     flex: 1;
+
+    div {
+      width: 100%;
+    }
+
+    @include on-tablet {
+      flex: 0 0 25%;
+    } 
+  }
+
+  &__filter {
+    width: 30%;
+
+    div {
+      width: 100%;
+    }
+
+    @include on-tablet {
+      width: auto;
+    }
   }
 
   &__pagination {
@@ -59,5 +91,10 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
+    margin-block-end: 46px;
+
+    @include on-desktop {
+      margin-block-end: 56px;
+    }
   }
 }

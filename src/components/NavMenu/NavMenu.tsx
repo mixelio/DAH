@@ -10,6 +10,8 @@ import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {userFavouritesInit} from '../../features/users';
 
+import LoginIcon from "@mui/icons-material/Login";
+
 const pages = [
   {id: 1, name: 'Home', path: '/'},
   {id: 2, name: 'Dreams', path: '/dreams'},
@@ -167,7 +169,11 @@ export const NavMenu = () => {
             <MenuItem>Help&Support</MenuItem>
 
             <MenuItem
-              sx={{ color: `${colorsText.secondary}`, fontWeight: 300, marginTop: "10px" }}
+              sx={{
+                color: `${colorsText.secondary}`,
+                fontWeight: 300,
+                marginTop: "10px",
+              }}
               onClick={() => {
                 localStorage.setItem("currentUser", "");
                 localStorage.removeItem("access");
@@ -180,14 +186,24 @@ export const NavMenu = () => {
           </Menu>
         </div>
       ) : (
-        <Button
-          className="navigation__in-btn"
-          variant="contained"
-          onClick={handleSingInOpen}
-          sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
-        >
-          Sign In
-        </Button>
+        <>
+          <Button
+            className="navigation__in-btn navigation__in-btn_mobile"
+            variant="contained"
+            onClick={handleSingInOpen}
+            sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
+          >
+            <LoginIcon />
+          </Button>
+          <Button
+            className="navigation__in-btn navigation__in-btn_desktop"
+            variant="contained"
+            onClick={handleSingInOpen}
+            sx={{ fontFamily: "inherit", color: `${colorsPrimary.main}` }}
+          >
+            Sign In
+          </Button>
+        </>
       )}
     </nav>
   );

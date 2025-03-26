@@ -28,6 +28,23 @@ $underline-width: attr(data-width);
     transition-duration: 300ms;
     color: $main-background;
     border-radius: 20px;
+
+    &_desktop {
+      display: none;
+
+      @include on-tablet {
+        display: flex;
+      }
+    }
+
+    &_mobile {
+      display: flex;
+      padding: 14px 0;
+
+      @include on-tablet {
+        display: none;
+      }
+    }
   }
 
   &__links {

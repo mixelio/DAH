@@ -1,6 +1,11 @@
 @use '../../assets/styles/utils/vars' as *;
 @use '../../assets/styles/utils/mixins' as *;
 
+.homePage {
+  &__nearbyDreams {
+    margin-block-end: 56px
+  }
+}
 
 .slideImage {
   width: 100%;
@@ -20,23 +25,55 @@
     margin-bottom: 80px;
   }
 
+  &__quote {
+    position: absolute;
+    max-width: 70vw;
+    padding: 30px 20px;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    backdrop-filter: blur(5px);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 1px 1px 3px $text-color-dark, -1px -1px 3px $main-background;
 
+    @include on-tablet {
+      max-width: 50vw;
+      padding: 40px 40px;
+    }
+
+    @include on-desktop {
+      max-width: 960px;
+    }
+    
+    .title {
+      font-size: clamp(2.5rem, 6vw, 7rem);
+      margin-bottom: 20px;
+      text-wrap: balance;
+    }
+
+    .author {
+      font-size: clamp(1rem, 3vw, 4rem);
+      color: $main-background;
+      text-align: right;
+    }
+  }
 
   &__content {
     // background-image: url('assets/images/content/main-page/first-screen.webp');
     // background-size: cover;
     // background-position: center;
     // background-repeat: no-repeat;
-    height: 40vh;
+    min-height: 40vh;
     border-radius: 0 0 40px 40px;
     overflow: hidden;
 
     @include on-tablet {
-      height: 50vh;
+      min-height: 50vh;
     }
 
     @include on-desktop {
-      height: 60vh;
+      min-height: 60vh;
     }
   }
 

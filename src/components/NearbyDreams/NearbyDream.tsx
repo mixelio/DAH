@@ -5,8 +5,8 @@ import {Dream} from "../../types/Dream";
 import {DreamCart} from "../DreamCart/DreamCart";
 import {dreamsInit} from "../../features/dreamsFeature";
 
-export const NearbyDream = () => {
-  const {dreams} = useAppSelector(store => store.dreams);
+export const NearbyDream = ({ className = "" }) => {
+  const { dreams } = useAppSelector((store) => store.dreams);
   const dispatch = useAppDispatch();
 
   const [adress, setAdress] = useState({
@@ -16,7 +16,6 @@ export const NearbyDream = () => {
   const [adressLoading, setAdressLoading] = useState<boolean>(false);
   const [dreamsLoading, setDreamsLoading] = useState<boolean>(false);
   const [dreamsNearby, setDreamsNearby] = useState<Dream[]>([]);
-
 
   useEffect(() => {
     setAdressLoading(true);
@@ -31,12 +30,10 @@ export const NearbyDream = () => {
       } catch (error) {
         console.error(error);
       }
-    }
+    };
 
     fetchAdress();
   }, []);
-
-  
 
   useEffect(() => {
     const featchNearbyDreams = async () => {
@@ -69,20 +66,16 @@ export const NearbyDream = () => {
     };
 
     featchNearbyDreams();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, adress]);
 
-
-
   return (
-    <section className="nearby-dreams">
+    <section className={`nearby-dreams ${className}`}>
       <div className="container">
         <div className="nearby-dreams__title-block">
           <h2 className="title nearby-dreams__title">Nearby Dreams</h2>
           {adressLoading && !adress.city && !adress.country ? (
-            <p className="nearby-dreams__location">
-              loading...
-            </p>
+            <p className="nearby-dreams__location">loading...</p>
           ) : (
             <p className="nearby-dreams__location">
               Near <strong>{`${adress.city}, ${adress.country}`}</strong>

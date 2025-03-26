@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
 import {NearbyDream} from "../../components/NearbyDreams/NearbyDream";
 import {useAppDispatch} from "../../app/hooks";
 import {usersInit} from "../../features/users";
@@ -11,6 +11,10 @@ import {resetFilters} from "../../utils/resetFilters";
 export const HomePage = () => {
   const dispatch = useAppDispatch();
   const url = localStorage.getItem("lastPlaceOnSite");
+  const [currentHeight, setCurrentHeight] = useState(0)
+
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
   // const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +38,10 @@ export const HomePage = () => {
           })
         }
       }
+
+      if (contentRef.current) {
+        setCurrentHeight(contentRef.current.getBoundingClientRect().height + 40);
+      }
     }
 
     fetchUsers();
@@ -45,16 +53,25 @@ export const HomePage = () => {
     <>
       <section className="first-screen">
         <div className="container">
-          <div className="first-screen__content">
+          <div
+            className="first-screen__content"
+            style={{ height: currentHeight }}
+          >
             <img
               src="https://picsum.photos/2400/1200?random=2"
               alt=""
               className={Styles.slideImage}
             />
+            <div ref={contentRef} className="first-screen__quote">
+              <h1 className="title">
+                Dreams are the touchstones of our character.
+              </h1>
+              <p className="author">Henry David Thoreau</p>
+            </div>
           </div>
         </div>
       </section>
-      <NearbyDream />
+      <NearbyDream className="homePage__nearbyDreams" />
     </>
   );
 };

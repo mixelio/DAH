@@ -133,6 +133,7 @@ export const DreamsGalleryPage = () => {
         const searchDreams = new Fuse(dreams, {
           keys: keys,
           includeScore: true,
+          threshold: 0.3,
         });
 
         const result = searchDreams.search(currentQuery);

@@ -1,4 +1,4 @@
-import {Button, TextField} from "@mui/material";
+import {Button, IconButton, InputAdornment, OutlinedInput, TextField} from "@mui/material";
 import {FormEvent, useEffect, useState} from "react"
 
 import { theme } from "../../utils/theme";
@@ -6,6 +6,7 @@ import {userPasswordReset, userPasswordUpdate} from "../../features/users";
 import {useAppDispatch} from "../../app/hooks";
 import {useSearchParams} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 const colorsPrimary = theme.palette.primary;
 
 enum PasswordResetStatus {
@@ -25,6 +26,7 @@ export const PasswordReset = () => {
   const user = localStorage.getItem("currentUser");
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch()
   const [whatShow, setWhatShow] = useState<PasswordResetStatus>(PasswordResetStatus.EMAIL_INPUT);
   
@@ -96,6 +98,10 @@ export const PasswordReset = () => {
         }
       })
     }
+  }
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   }
 
   useEffect(() => {
@@ -182,10 +188,24 @@ export const PasswordReset = () => {
               onSubmit={handleNewPasswordSubmit}
               className="password-reset__form"
             >
-              <TextField
+              <OutlinedInput
                 name="password"
-                label="Enter new password"
-                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={
+                        showPassword
+                          ? "hide the password"
+                          : "display the password"
+                      }
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
                 className="password-reset__input"
               />
               <div className="password-reset__button-container">
