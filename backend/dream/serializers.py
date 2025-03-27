@@ -78,7 +78,7 @@ class DreamListSerializer(DreamCreateSerializer):
 
 class DreamRetrieveSerializer(DreamListSerializer):
     user = UserDreamRetrieveSerializer(read_only=True)
-    contributions = ContributionSerializer(many=True, read_only=True)
+    contributions = ContributionSerializer(read_only=True)
 
     class Meta:
         model = Dream
