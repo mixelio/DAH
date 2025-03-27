@@ -131,6 +131,36 @@ class DreamViewSet(viewsets.ModelViewSet):
         instance.update_accumulated()
         return super().update(request, *args, **kwargs)
 
+    @extend_schema(
+        summary='Marks a non-money dream as completed.',
+        methods=['PATCH'],
+        request=None,
+        responses={
+            200: {
+              'type': 'object',
+              'properties': {
+                  'detail': {
+                      'type': 'string',
+                      'example': 'Dream 1 marked as completed.'
+                  }
+              }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'error': {
+                        'type': 'string',
+                        'example': 'Dream 1 is already completed.'
+                    },
+                    'error2': {
+                        'type': 'string',
+                        'example': 'Dream with category "MONEY" unsupported.'
+
+                    }
+                }
+            }
+        }
+    )
     @action(
         detail=True,
         methods=['PATCH'],

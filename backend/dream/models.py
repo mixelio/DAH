@@ -68,7 +68,7 @@ class Comment(models.Model):
 
 class Contribution(models.Model):
     dream = models.OneToOneField(
-        Dream, on_delete=models.CASCADE, related_name='contribution'
+        Dream, on_delete=models.CASCADE, related_name='contributions'
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
