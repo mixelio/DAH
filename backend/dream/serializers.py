@@ -42,7 +42,6 @@ class DreamCreateSerializer(serializers.ModelSerializer):
             'image',
             'cost',
             'category',
-            'status',
             'location',
         ]
         read_only_fields = ['id']
