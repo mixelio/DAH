@@ -200,10 +200,6 @@ class DreamViewSet(viewsets.ModelViewSet):
                 'properties': {
                     'error': {
                         'type': 'string',
-                        'example': 'Dream 1 is already rejected.'
-                    },
-                    'error2': {
-                        'type': 'string',
                         'example': 'Dream with category "MONEY" unsupported.'
                     }
                 }
