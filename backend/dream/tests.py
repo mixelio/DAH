@@ -159,7 +159,7 @@ class FulfillDreamViewTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         dream.refresh_from_db()
-        self.assertEqual(dream.status, Dream.StatusChoices.COMPLETED)
+        self.assertEqual(dream.status, Dream.StatusChoices.PENDING)
         self.assertEqual(
             Contribution.objects.filter(dream=dream, user=self.user).count(), 1
         )

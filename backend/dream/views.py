@@ -164,9 +164,9 @@ class DreamViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['PATCH'],
-        url_path='complete-dream',
+        url_path='accept-contribution',
     )
-    def complete_non_money_dream(self, request: Request, *args, **kwargs) -> Response:
+    def accept_contribution(self, request: Request, *args, **kwargs) -> Response:
         """Marks a non-money dream as completed."""
         dream = self.get_object()
 
@@ -180,6 +180,57 @@ class DreamViewSet(viewsets.ModelViewSet):
         dream.save(update_fields=['status'])
 
         return Response({'detail': f'Dream {dream.id} marked as completed.'}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary='Marks a non-money dream as rejected and removes the related contribution.',
+        methods=['PATCH'],
+        request=None,
+        responses={
+            200: {
+                'type': 'object',
+                'properties': {
+                    'detail': {
+                        'type': 'string',
+                        'example': 'Dream 1 marked as rejected and contribution removed.'
+                    }
+                }
+            },
+            400: {
+                'type': 'object',
+                'properties': {
+                    'error': {
+                        'type': 'string',
+                        'example': 'Dream 1 is already rejected.'
+                    },
+                    'error2': {
+                        'type': 'string',
+                        'example': 'Dream with category "MONEY" unsupported.'
+                    }
+                }
+            }
+        }
+    )
+    @action(
+        detail=True,
+        methods=['PATCH'],
+        url_path='reject-contribution',
+    )
+    def reject_contribution(self, request: Request, *args, **kwargs) -> Response:
+        """Marks a non-money dream as rejected and removes the associated contribution."""
+        dream = self.get_object()
+
+        if dream.category == 'MONEY':
+            return Response({'detail': 'Dream with category "MONEY" unsupported.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        dream.status = 'NEW'
+
+        if hasattr(dream, 'contributions') and dream.contributions:
+            dream.contributions.delete()
+
+        dream.save(update_fields=['status'])
+
+        return Response({'detail': f'Dream {dream.id} marked as rejected and contribution removed.'},
+                        status=status.HTTP_200_OK)
 
     @extend_schema(
         parameters=[
@@ -281,10 +332,15 @@ class NonMoneyDreamHandler(DreamHandler):
         contribution_description = request.data.get(
             'contribution_description', ''
         )
+
         if not contribution_description:
             raise ValueError(
                 'Description of contribution ' 'is required for this category.'
             )
+
+        if hasattr(dream, 'contributions') and dream.contributions:
+            raise ValidationError('This dream already has an associated contribution.')
+
         contribution = Contribution.objects.create(
             dream=dream, user=user, description=contribution_description
         )
