@@ -15,6 +15,7 @@ from drf_spectacular.utils import (
     PolymorphicProxySerializer,
 )
 from rest_framework import status, viewsets, views, generics
+from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import (
     IsAuthenticated,
@@ -129,6 +130,26 @@ class DreamViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.update_accumulated()
         return super().update(request, *args, **kwargs)
+
+    @action(
+        detail=True,
+        methods=['PATCH'],
+        url_path='complete-dream',
+    )
+    def complete_non_money_dream(self, request: Request, *args, **kwargs) -> Response:
+        """Marks a non-money dream as completed."""
+        dream = self.get_object()
+
+        if dream.category == 'MONEY':
+            return Response({'detail': 'Dream with category "MONEY" unsupported.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if dream.status == 'COMPLETED':
+            return Response({'detail': f'Dream {dream.id} is already completed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        dream.status = 'COMPLETED'
+        dream.save(update_fields=['status'])
+
+        return Response({'detail': f'Dream {dream.id} marked as completed.'}, status=status.HTTP_200_OK)
 
     @extend_schema(
         parameters=[
