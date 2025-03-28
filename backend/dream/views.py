@@ -212,7 +212,7 @@ class DreamViewSet(viewsets.ModelViewSet):
         url_path='reject-contribution',
     )
     def reject_contribution(self, request: Request, *args, **kwargs) -> Response:
-        """Marks a non-money dream as rejected and removes the associated contribution."""
+        """Change status in non-money dream as NEW and removes the associated contribution."""
         dream = self.get_object()
 
         if dream.category == 'MONEY':

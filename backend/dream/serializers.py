@@ -52,6 +52,7 @@ class DreamCreateSerializer(serializers.ModelSerializer):
 class DreamListSerializer(DreamCreateSerializer):
     image_url = serializers.SerializerMethodField()
     user = UserDreamListSerializer(read_only=True)
+    contributions = ContributionSerializer(read_only=True)
 
     class Meta:
         model = Dream
@@ -68,6 +69,7 @@ class DreamListSerializer(DreamCreateSerializer):
             'date_added',
             'location',
             'views',
+            'contributions',
         ]
 
     def get_image_url(self, obj: Dream) -> str | None:
