@@ -14,6 +14,7 @@ import {isImageAvailable} from "../../utils/isImageAvailable";
 import { getDream } from "../../api/dreams";
 import styles from "./DreamPage.module.scss";
 
+import EmailIcon from "@mui/icons-material/Email";
 import SendIcon from "@mui/icons-material/Send";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
@@ -36,7 +37,8 @@ export const DreamPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [waitDreamClosing, setWaitDreamClosing] = useState<boolean>(false);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
-  const [isOwnerHere, setIsOwnerHere] = useState<boolean>(false)
+  const [isOwnerHere, setIsOwnerHere] = useState<boolean>(false);
+  // const [currentDreamState, setCurrentDreamState] = useState<HTMLElement | null>(null)
   const commentInputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -215,13 +217,17 @@ export const DreamPage = () => {
           Donate
         </Button>
       ) : (
-        <Button
-          variant="contained"
-          className="dream__help-btn button"
-          onClick={() => openDialog()}
-        >
-          {"I am with you"}
-        </Button>
+        currentDream?.status === DreamStatus.Pending ? (
+          <p>in progress...</p>
+        ) : (
+          <Button
+            variant="contained"
+            className="dream__help-btn button"
+            onClick={() => openDialog()}
+          >
+            I am with you
+          </Button>
+        )
       );
 
   //#region hooks
@@ -354,11 +360,10 @@ export const DreamPage = () => {
                 <Button
                   className="dream__delete-button dream__root-button"
                   onClick={() => {
-                    console.log()
-                    handleRemoveDream(+id)
+                    handleRemoveDream(+id);
                   }}
                 >
-                  <DeleteIcon className="dream__edit-icon"/>
+                  <DeleteIcon className="dream__edit-icon" />
                 </Button>
               </div>
             )}
@@ -501,12 +506,31 @@ export const DreamPage = () => {
                 </form>
               </dialog>
 
-              <div className="dream__after-info">
-                {currentDream.status !== DreamStatus.Completed
-                  ? buttonForRealize
-                  : "Dream come true"}
-                <div className="dream__date">{currentDream.date_added}</div>
-              </div>
+              {}
+
+              {currentDream.status !== DreamStatus.Completed ? (
+                <div className="dream__after-info">
+                  {!isOwnerHere ? (
+                    currentDream.status === DreamStatus.New ? (
+                      buttonForRealize
+                    ) : (
+                      <p>in progress...</p>
+                    )
+                  ) : (
+                    currentDream.status === DreamStatus.Pending ? (
+                      <IconButton className="dream-cart__button" size="large">
+                        <EmailIcon sx={{ color: "#9fd986", fontSize: "32px" }} />
+                      </IconButton>
+                    ) : (
+                      <p className="dream__realized">Waiting for answer...</p>
+                    )
+
+                  )}
+                  <div className="dream__date">{currentDream.date_added}</div>
+                </div>
+              ) : (
+                <p>Dream come true</p>
+              )}
             </div>
             <div className="dream__comments-box">
               {!loginedUser ? (

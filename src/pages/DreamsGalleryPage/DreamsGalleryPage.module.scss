@@ -20,12 +20,12 @@
 
   &__content {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(100px, 1fr);
     gap: 16px 20px;
     margin-block-end: 46px;
     
     @include on-tablet {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(40%, 1fr));
     }
 
     @include on-desktop {
@@ -83,6 +83,10 @@
     @include on-tablet {
       width: auto;
     }
+  }
+
+  &__item {
+    width: 100%;
   }
 
   &__pagination {

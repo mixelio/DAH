@@ -6,6 +6,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {userFavouriteAdd, userFavoriteRemove, userFavouritesInit} from "../../features/users";
+import EmailIcon from "@mui/icons-material/Email";
 
 
 type Props = {
@@ -17,6 +18,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   const {userFavouriteList} = useAppSelector(store => store.users);
   const loginedUser = localStorage.getItem("currentUser");
   const access = localStorage.getItem("access");
+  const allertClass = !dream.status.localeCompare(DreamStatus.Pending) && loginedUser && +dream.user.id === +loginedUser && dream.category !== DreamCategory.Money_donation ? "_pending" : "";
 
   const handleAddOrRemoveFavourite =async () => {
 
@@ -42,12 +44,13 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   }
 
   useEffect(() => {
-    console.log("favoritesList is chenged")
-  }, [userFavouriteList]);
+    console.log(dream.contributions)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   return (
-    <div className="dream-cart">
+    <div className={`dream-cart ${allertClass}`}>
       <div className="dream-cart__image-box">
         <Link
           to={`/dreams/${dream.id}`}
@@ -55,7 +58,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             localStorage.setItem(
               "lastScrollPosition",
               window.scrollY.toString()
-            )
+            );
             localStorage.setItem("lastPlaceOnSite", window.location.href);
           }}
         >
@@ -80,7 +83,14 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
         )}
       </div>
       <div className="dream-cart__info-box">
-        <h2 className="dream-cart__title">{dream.name}</h2>
+        <h2 className="dream-cart__title">
+          {dream.name}{" "}
+          {allertClass && (
+            <IconButton className="dream-cart__allert-button">
+              <EmailIcon sx={{ color: "#9fd986" }} />
+            </IconButton>
+          )}
+        </h2>
 
         <p className="dream-cart__description">
           {dream.description}
@@ -89,7 +99,10 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             <strong>more</strong>
           </Link>
         </p>
-        <p className="dream-cart__author-name">{dream.user.first_name}</p>
+        <p className="dream-cart__author-name">
+          {dream.user.first_name}
+          <span>{dream.date_added}</span>
+        </p>
         {dream.category === DreamCategory.Money_donation ? (
           <LinearProgress
             className="dream-cart__progress"
@@ -106,9 +119,19 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             {`$${dream.cost - dream.accumulated} still need`}
           </p>
         ) : (
-          <p className="dream-cart__still-need">{dream.status !== DreamStatus.Completed ? "not come true yet" : "dream come true"}</p>
+          <p className="dream-cart__still-need">
+            {dream.status !== DreamStatus.Completed ? "⌛️" : "🎉"}
+          </p>
         )}
       </div>
+      {/* {allertClass && (
+        <dialog className="dream-cart__dialog" open={true}>
+          <div className="dream-cart__message">
+            <h3>Yor dream can come true</h3>
+            
+          </div>
+        </dialog>
+      )} */}
     </div>
   );
 }
