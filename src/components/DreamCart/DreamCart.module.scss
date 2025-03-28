@@ -3,7 +3,7 @@
 
 @keyframes allertAnimate {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(-15deg);
   }
   35% {
     transform: rotate(15deg);
@@ -12,7 +12,7 @@
     transform: rotate(-15deg);
   }
   100% {
-    transform: rotate(0deg);
+    transform: rotate(15deg);
   }
 }
 
@@ -32,7 +32,7 @@
   }
 
   &__allert-button {
-    animation: allertAnimate 1.2s ease-in-out infinite;
+    animation: allertAnimate 1.2s ease-in-out alternate infinite;
   }
 
   &__image-box {

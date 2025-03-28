@@ -217,9 +217,6 @@ export const DreamPage = () => {
           Donate
         </Button>
       ) : (
-        currentDream?.status === DreamStatus.Pending ? (
-          <p>in progress...</p>
-        ) : (
           <Button
             variant="contained"
             className="dream__help-btn button"
@@ -227,8 +224,7 @@ export const DreamPage = () => {
           >
             I am with you
           </Button>
-        )
-      );
+        );
 
   //#region hooks
 
@@ -513,18 +509,24 @@ export const DreamPage = () => {
                   {!isOwnerHere ? (
                     currentDream.status === DreamStatus.New ? (
                       buttonForRealize
+                    ) : currentDream.category ===
+                      DreamCategory.Money_donation ? (
+                      buttonForRealize
                     ) : (
                       <p>in progress...</p>
                     )
-                  ) : (
-                    currentDream.status === DreamStatus.Pending ? (
-                      <IconButton className="dream-cart__button" size="large">
-                        <EmailIcon sx={{ color: "#9fd986", fontSize: "32px" }} />
-                      </IconButton>
+                  ) : currentDream.status === DreamStatus.Pending ? (
+                    currentDream.category === DreamCategory.Money_donation ? (
+                      buttonForRealize
                     ) : (
-                      <p className="dream__realized">Waiting for answer...</p>
+                      <IconButton className="dream-cart__button" size="large">
+                        <EmailIcon
+                          sx={{ color: "#9fd986", fontSize: "32px" }}
+                        />
+                      </IconButton>
                     )
-
+                  ) : (
+                    <p className="dream__realized">Waiting for answer...</p>
                   )}
                   <div className="dream__date">{currentDream.date_added}</div>
                 </div>
