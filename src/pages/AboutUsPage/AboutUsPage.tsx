@@ -47,7 +47,7 @@ export const AboutUsPage = () => {
             <div className="aboutUs__teamItem">
               <div className="aboutUs__teamSubItem">
                 <img
-                  src="/DAH/src/assets/images/content/aboutUs/Mykhailo.jpeg"
+                  src="/media/uploads/aboutUs/Mykhailo.jpeg"
                   alt=""
                 />
               </div>
