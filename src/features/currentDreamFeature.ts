@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Dream} from "../types/Dream";
-import {createDreamComment, deleteDream, deleteDreamComment, editDream, editDreamComment, getDream, getDreamComments} from "../api/dreams";
+import {confirmUnpaydDream, createDreamComment, deleteDream, deleteDreamComment, editDream, editDreamComment, getDream, getDreamComments, rejectUnpaydDream} from "../api/dreams";
 import {CommentType} from "../types/Comment";
 
 export type currentDreamState = {
@@ -127,7 +127,17 @@ export const editCurrentDream = createAsyncThunk("currentDream/patch", async ({d
   } catch (e) {
     console.error(e)
   }
-})
+});
+
+export const acceptUnpaidDream = createAsyncThunk("currentDream/accceptUnpaid", async ({dreamId, token}: {dreamId: number, token: string}) => {
+  const response = await confirmUnpaydDream(dreamId, token);
+  return response;
+});
+
+export const cancelUnpaidDream = createAsyncThunk("currentDream/accceptUnpaid", async ({dreamId, token}: {dreamId: number, token: string}) => {
+  const response = await rejectUnpaydDream(dreamId, token);
+  return response;
+});
 
 // all about comments
 

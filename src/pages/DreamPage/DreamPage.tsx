@@ -1,36 +1,43 @@
 import {useEffect, useState, useRef} from "react"
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
+
 import {Avatar, Button, CircularProgress, Divider, IconButton, InputAdornment, LinearProgress, OutlinedInput, Snackbar, TextField} from "@mui/material";
 import CreateIcon from '@mui/icons-material/Create';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-import {User} from "../../types/User";
-import {FacebookShareButton} from "react-share";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {closeDream, donateToCurrentDream, dreamsInit} from "../../features/dreamsFeature";
-import {usersInit} from "../../features/users";
-import {Dream, DreamCategory, DreamStatus} from "../../types/Dream";
-import {isImageAvailable} from "../../utils/isImageAvailable";
-import { getDream } from "../../api/dreams";
-import styles from "./DreamPage.module.scss";
-
 import EmailIcon from "@mui/icons-material/Email";
 import SendIcon from "@mui/icons-material/Send";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import InsertCommentIcon from "@mui/icons-material/InsertComment";
-import {commentAdd, commentsInit, removeCurrentDream} from "../../features/currentDreamFeature";
-import {getUser} from "../../api/users";
-import {Comment} from "../../components/Comment/Comment";
+
+import {User} from "../../types/User";
+import { Dream, DreamCategory, DreamStatus } from "../../types/Dream";
+import {useAppDispatch, useAppSelector} from "../../app/hooks";
+import {closeDream, donateToCurrentDream, dreamsInit} from "../../features/dreamsFeature";
+import {usersInit} from "../../features/users";
+import {
+  acceptUnpaidDream,
+  cancelUnpaidDream,
+  commentAdd,
+  commentsInit,
+  removeCurrentDream,
+} from "../../features/currentDreamFeature";
+
+import { Comment } from "../../components/Comment/Comment";
+
+import {isImageAvailable} from "../../utils/isImageAvailable";
+import { getDream } from "../../api/dreams";
+import { getUser } from "../../api/users";
+
+import styles from "./DreamPage.module.scss";
 
 export const DreamPage = () => {
   const {dreams} = useAppSelector(store => store.dreams);
   const {users} = useAppSelector(store => store.users);
-  const {comments, commentsLoading, currentDreamError} = useAppSelector(store => store.currentDream);
+  const {comments, commentsLoading} = useAppSelector(store => store.currentDream);
   const { id } = useParams();
   const userFromLocaleStorage = localStorage.getItem("currentUser");
 
   const [paySuccessSnackbar, setPaySuccessSnackbar] = useState<boolean>(false);
-
   const [status, setStatus] = useState<DreamStatus | null>(null)
   const [postImage, setPostImage] = useState<string>("");
   const [currentDream, setCurrentDream] = useState<Dream | null>(null);
@@ -38,15 +45,22 @@ export const DreamPage = () => {
   const [waitDreamClosing, setWaitDreamClosing] = useState<boolean>(false);
   const [loginedUser, setLoginedUser] = useState<User | null>(null);
   const [isOwnerHere, setIsOwnerHere] = useState<boolean>(false);
-  // const [currentDreamState, setCurrentDreamState] = useState<HTMLElement | null>(null)
   const commentInputRef = useRef<HTMLInputElement>(null);
-  const location = useLocation();
   const navigate = useNavigate();
 
   // * work with dialog
 
   const dialogForHelpRef = useRef<HTMLDialogElement>(null);
   const dialogForDonateRef = useRef<HTMLDialogElement>(null);
+  const dialogForMessageRef = useRef<HTMLDialogElement>(null);
+
+  const openMessageDialog = () => {
+    dialogForMessageRef.current?.showModal();
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+  }
+
   const openDialog = () => {
     dialogForHelpRef.current?.showModal();
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -66,33 +80,32 @@ export const DreamPage = () => {
   const closeDialog = () => {
     dialogForHelpRef.current?.close();
     dialogForDonateRef.current?.close();
+    dialogForMessageRef.current?.close();
     document.body.style.overflow = "auto";
     document.body.style.paddingRight = `0px`;
   }
-
-  const currentUrl = `${window.location.origin}${location.pathname}`;
 
   const dispatch = useAppDispatch();
 
   //#region Handlers
 
-    const handleCloseSnackbar = () => {
-      setPaySuccessSnackbar(false);
-    };
+  const handleCloseSnackbar = () => {
+    setPaySuccessSnackbar(false);
+  };
 
-    const handleRemoveDream = async (id: number) => {
-      try {
-        await dispatch(removeCurrentDream({
-          dreamId: id, 
-          token: localStorage.getItem("access") ?? ""
-        }));
-      } catch (e) {
-        console.error(e)
-      } finally {
-        navigate(`/profile/${userFromLocaleStorage}`);
-      }
+  const handleRemoveDream = async (id: number) => {
+    try {
+      await dispatch(removeCurrentDream({
+        dreamId: id, 
+        token: localStorage.getItem("access") ?? ""
+      }));
+    } catch (e) {
+      console.error(e)
+    } finally {
+      navigate(`/profile/${userFromLocaleStorage}`);
+    }
 
-    };
+  };
 
   // * handler for adding comment to the dream
 
@@ -132,12 +145,16 @@ export const DreamPage = () => {
   const handleBackdropClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const dialog = dialogForHelpRef.current;
     const donateDialog = dialogForDonateRef.current;
+    const messageDialog = dialogForMessageRef.current;
 
     if(dialog && e.target === dialog) {
       closeDialog();
     }
     if(donateDialog && e.target === donateDialog) {
       closeDialog();
+    }
+    if(messageDialog && e.target === messageDialog) {
+      closeDialog()
     }
   }
 
@@ -204,32 +221,68 @@ export const DreamPage = () => {
     }
   }
 
+  const handleDreamAccept = async () => {
+    setWaitDreamClosing(true);
+    if (id) {
+      try {
+        await dispatch(acceptUnpaidDream({dreamId: +id, token: localStorage.getItem("access") ?? ""}));
+      } catch (e) {
+        console.error(e)
+        return
+      }
+    }
+
+    setWaitDreamClosing(false);
+    closeDialog();
+    window.location.reload();
+  }
+
+  const handleDreamReject = async () => {
+    setWaitDreamClosing(true);
+    if (id) {
+      try {
+        await dispatch(
+          cancelUnpaidDream({
+            dreamId: +id,
+            token: localStorage.getItem("access") ?? "",
+          })
+        );
+      } catch (e) {
+        console.error(e);
+        return;
+      }
+    }
+
+    setWaitDreamClosing(false);
+    closeDialog();
+  }
+
   //#endregion
 
-    const buttonForRealize =
-      currentDream && currentDream.category === DreamCategory.Money_donation ? (
-        <Button
+  const buttonForRealize =
+    currentDream && currentDream.category === DreamCategory.Money_donation ? (
+      <Button
+        variant="contained"
+        className="dream__donation-btn button"
+        size="large"
+        onClick={() => openDonateDialog()}
+      >
+        Donate
+      </Button>
+    ) : (
+    <Button
           variant="contained"
-          className="dream__donation-btn button"
-          size="large"
-          onClick={() => openDonateDialog()}
+          className="dream__help-btn button"
+          onClick={() => openDialog()}
         >
-          Donate
+          I am with you
         </Button>
-      ) : (
-          <Button
-            variant="contained"
-            className="dream__help-btn button"
-            onClick={() => openDialog()}
-          >
-            I am with you
-          </Button>
-        );
+  );
 
   //#region hooks
 
-  useEffect(() => {
-  }, [comments])
+  // useEffect(() => {
+  // }, [comments])
 
   useEffect(() => {
     const initializate = async () => {
@@ -241,9 +294,6 @@ export const DreamPage = () => {
       } catch (e) {
         console.error(e);
         console.log(e)
-      } finally {
-        console.log(currentDreamError)
-
       }
     }
 
@@ -264,7 +314,6 @@ export const DreamPage = () => {
     const user = localStorage.getItem("currentUser");
     const dream = dreams.find(dream => dream && id ? +dream.id === +id : null);
 
-    console.log(dream && user && +dream.user.id === +user);
     if (dream && user && +dream.user.id === +user) {
       setIsOwnerHere(true)
     } else {setIsOwnerHere(false)}
@@ -332,6 +381,13 @@ export const DreamPage = () => {
 
   //#endregion
 
+  // console.log(
+  //   currentDream,
+  //   currentDream?.status
+  //     .toLowerCase()
+  //     .localeCompare(DreamStatus.Completed.toLowerCase())
+  // );
+  
   return (
     <section className="dream">
       <div className="container">
@@ -502,9 +558,41 @@ export const DreamPage = () => {
                 </form>
               </dialog>
 
-              {}
+              {/* Dialog for message */}
 
-              {currentDream.status !== DreamStatus.Completed ? (
+              {currentDream.contributions && (
+                <dialog
+                  ref={dialogForMessageRef}
+                  onClick={handleBackdropClick}
+                  className={styles.dialog}
+                >
+                  <div className={styles.dialog__messageContent}>
+                    <h3>{`${currentDream.contributions?.user.first_name} ${currentDream.contributions?.user.last_name}`}</h3>
+                    <p>{currentDream.contributions.description}</p>
+                    <div className={styles.dialog__buttonContainer}>
+                      {waitDreamClosing && <CircularProgress />}
+                      <Button
+                        type="button"
+                        variant="outlined"
+                        onClick={handleDreamReject}
+                      >
+                        Reject
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        onClick={handleDreamAccept}
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  </div>
+                </dialog>
+              )}
+
+              {currentDream.status
+                .toLowerCase()
+                .localeCompare(DreamStatus.Completed.toLowerCase()) ? (
                 <div className="dream__after-info">
                   {!isOwnerHere ? (
                     currentDream.status === DreamStatus.New ? (
@@ -519,7 +607,11 @@ export const DreamPage = () => {
                     currentDream.category === DreamCategory.Money_donation ? (
                       buttonForRealize
                     ) : (
-                      <IconButton className="dream-cart__button" size="large">
+                      <IconButton
+                        className="dream-cart__button"
+                        size="large"
+                        onClick={openMessageDialog}
+                      >
                         <EmailIcon
                           sx={{ color: "#9fd986", fontSize: "32px" }}
                         />
@@ -584,11 +676,6 @@ export const DreamPage = () => {
                 )}
               </div>
             </div>
-            <FacebookShareButton
-              children
-              url={currentUrl}
-              style={{ width: "32px", height: "32px" }}
-            />
           </div>
         ) : (
           <CircularProgress

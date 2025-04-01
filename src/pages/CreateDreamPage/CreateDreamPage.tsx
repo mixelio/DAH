@@ -182,6 +182,7 @@ export const CreateDreamPage = () => {
   const handleCreateDreamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const chekTocken = localStorage.getItem("access");
     e.preventDefault();
+    console.log("create dream");
     const keys = ["name", "category", "cost", "description", "image", "location"];
     const currentData: { [key: string]: string | number | DreamCategory} = {};
 
@@ -487,6 +488,7 @@ export const CreateDreamPage = () => {
               color="primary"
               className="create-dream__button"
               sx={{ mr: ".625rem", width: "135px" }}
+              
             >
               {slug} Dream
             </Button>

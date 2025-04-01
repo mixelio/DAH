@@ -238,6 +238,7 @@ export const SingUpInForm = () => {
   };
 
   const handleLogIn = async (event: FormEvent<HTMLFormElement>) => {
+    console.log("login", window.location);
     event.preventDefault();
 
     if (!emailValidator(loginData.email)) {
@@ -267,8 +268,15 @@ export const SingUpInForm = () => {
               email: "",
               password: "",
             });
+
             setMainFormActive(false);
             setLoginWaiting(false);
+
+            if (window.location.href.includes("reset")) {
+              console.log("reset page");
+              window.location.href = "/";
+            }
+
             return;
           }
         } else {
@@ -281,12 +289,10 @@ export const SingUpInForm = () => {
       }
       setLoginWaiting(false);
     } catch (error) {
-      console.log(error)
+      console.error(error)
       setErrorMessage(Errors.NoServerAnswer)
       setLoginWaiting(false);
     }
-
-
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);

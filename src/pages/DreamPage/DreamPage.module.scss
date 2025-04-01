@@ -254,4 +254,27 @@ $sub-info-width: 40px;
     background-color: #000;
     opacity: 70%;
   }
+
+  &__messageContent {
+    h3 {
+      font-size: 18px;
+      margin-block-end: 8px;
+    }
+
+    p {
+      background-color: $main-background;
+      border-radius: 12px;
+      padding: 10px 20px;
+      margin-block-end: 8px;
+      line-height: 1.3;
+    }
+  }
+
+  &__buttonContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 10px;
+  }
+
 }

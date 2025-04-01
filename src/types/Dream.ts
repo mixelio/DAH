@@ -30,6 +30,16 @@ export type Dream = {
   location: string;
   date_added: string;
   views: number;
-  contributions: number;
+  contributions: {
+    id: number;
+    user: {
+      id: number;
+      first_name: string;
+      last_name: string;
+      photo_url: string;
+    };
+    description: string;
+    date: string;
+  };
 };
 

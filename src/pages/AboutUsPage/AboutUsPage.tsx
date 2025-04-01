@@ -1,11 +1,100 @@
-
+import {useEffect, useState} from "react"
 
 export const AboutUsPage = () => {
+  const [missionImage, setMissionImage] = useState<string | null>(null)
+  
+  useEffect(() => {
+      fetch(
+        "https://pixabay.com/api/?key=4909168-7f27b7a457209e43d27004058&q=happy&category=people&per_page=200"
+      ).then((res) => {
+        res.json().then((res) => {
+          const numOfImg = Math.floor(Math.random() / 0.005);
+          console.log(numOfImg);
+          setMissionImage(res.hits[numOfImg].largeImageURL);
+          return;
+        });
+      });
+  }, [])
+
+
   return (
-    <section className="about-us">
+    <section className="aboutUs">
       <div className="container">
-        <h2 className="title">About Us!</h2>
+        <div className="aboutUs__missionBlock">
+          <div className="aboutUs__missionBlock_item">
+            <h3 className="title">Our mission</h3>
+            <p>
+              Welcome to <strong>Dream Are Here</strong> – the platform where
+              dreams come true! 🌟 We created this space for those who want to
+              share their wishes and find people willing to help make them a
+              reality. Here, you can post your dream – big or small – and
+              receive support from other users. Or, on the other hand, you can
+              be the one who helps someone take a step toward their dream.{" "}
+              <strong>Dream Are Here</strong> is not just a platform, it’s a
+              community where people come together for inspiration, good deeds,
+              and new opportunities. After all, every fulfilled dream brings the
+              world closer to something beautiful! 💫 Join us and make miracles
+              happen together! 🚀
+            </p>
+          </div>
+          <div className="aboutUs__missionBlock_item">
+            <img src={missionImage ?? ""} alt="" />
+          </div>
+        </div>
+        <div className="aboutUs__teamBlock">
+          <h3 className="title">Our team</h3>
+          <div className="aboutUs__teamContainer">
+            <div className="aboutUs__teamItem">
+              <div className="aboutUs__teamSubItem">
+                <img
+                  src="/DAH/src/assets/images/content/aboutUs/Mykhailo.jpeg"
+                  alt=""
+                />
+              </div>
+              <div className="aboutUs__teamSubItem">
+                <h3>Mykhailo</h3>
+                <p>Front-end developer</p>
+              </div>
+            </div>
+            <div className="aboutUs__teamItem">
+              <div className="aboutUs__teamSubItem">
+                <img
+                  src="/DAH/src/assets/images/content/aboutUs/Roma.jpg"
+                  alt=""
+                />
+              </div>
+              <div className="aboutUs__teamSubItem">
+                <h3>Roman</h3>
+                <p>Back-end developer</p>
+              </div>
+            </div>
+            <div className="aboutUs__teamItem">
+              <div className="aboutUs__teamSubItem">
+                <img
+                  src="/DAH/src/assets/images/content/aboutUs/Rusana.jpeg"
+                  alt=""
+                />
+              </div>
+              <div className="aboutUs__teamSubItem">
+                <h3>Rusana</h3>
+                <p>QA-enginier</p>
+              </div>
+            </div>
+            <div className="aboutUs__teamItem">
+              <div className="aboutUs__teamSubItem">
+                <img
+                  src="/DAH/src/assets/images/content/aboutUs/Anastasiia.jpeg"
+                  alt=""
+                />
+              </div>
+              <div className="aboutUs__teamSubItem">
+                <h3>Anastasiia</h3>
+                <p>UI/UX Designer</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
-  )
+  );
 }

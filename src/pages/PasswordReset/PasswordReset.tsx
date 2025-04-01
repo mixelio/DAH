@@ -29,9 +29,6 @@ export const PasswordReset = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch()
   const [whatShow, setWhatShow] = useState<PasswordResetStatus>(PasswordResetStatus.EMAIL_INPUT);
-  
-
-  console.log(whatShow)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

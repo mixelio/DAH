@@ -120,7 +120,9 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
           </p>
         ) : (
           <p className="dream-cart__still-need">
-            {dream.status !== DreamStatus.Completed ? "⌛️" : "🎉"}
+            {dream.status.toLowerCase().localeCompare(DreamStatus.Completed.toLowerCase())
+              ? "⌛️"
+              : "🎉"}
           </p>
         )}
       </div>

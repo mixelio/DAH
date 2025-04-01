@@ -21,7 +21,7 @@ export const createDream = async (
   return response;
 }
 
-// TODO: editDream
+// ? editDream
 
 export const editDream = async (id: number, data: FormData, token: string) => {
   try {
@@ -64,6 +64,22 @@ export const closeUnpaydDream = async ({
   const response = await client.post(`dream/${id}/fulfill/`, data, token);
   return response;
 };
+
+export const confirmUnpaydDream = async (
+  id: number,
+  token: string,
+) => {
+  const response = await client.patch(`dream/${id}/accept-contribution/`,{}, token);
+  return response;
+}
+
+export const rejectUnpaydDream = async (
+  id: number,
+  token: string,
+) => {
+  const response = await client.patch(`dream/${id}/reject-contribution/`, token);
+  return response;
+}
 
 export const donatePaydDream = async ({
   id,
