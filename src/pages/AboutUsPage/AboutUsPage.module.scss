@@ -89,6 +89,13 @@
     }
   }
   &__teamItem {
+    &:not(:last-child) {
+      margin-block-end: 20px;
+
+      @include on-tablet {
+        margin-block-end: 0;
+      }
+    }
     @include on-tablet {
       flex: 1 1 auto;
     }
