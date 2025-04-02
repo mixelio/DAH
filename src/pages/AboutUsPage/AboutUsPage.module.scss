@@ -23,7 +23,13 @@
     }
 
     &_item {
-      
+      &:not(:last-child) {
+        margin-block-end: 26px;
+      }
+
+      @include on-tablet {
+        margin-block-end: 0;
+      }
       .title {
         font-size: clamp(2rem, 4vw, 3.5rem);
         margin-block-end: 8px;
@@ -42,6 +48,10 @@
 
         @include on-tablet {
           text-align: right;
+        }
+
+        &:not(:last-child) {
+          margin-block-end: 18px;
         }
       }
   
