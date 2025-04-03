@@ -170,13 +170,13 @@ class DreamViewSet(viewsets.ModelViewSet):
         """Marks a non-money dream as completed."""
         dream = self.get_object()
 
-        if dream.category == 'MONEY':
+        if dream.category == Dream.CategoryChoices.MONEY:
             return Response({'detail': 'Dream with category "MONEY" unsupported.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if dream.status == 'COMPLETED':
+        if dream.status == Dream.StatusChoices.COMPLETED:
             return Response({'detail': f'Dream {dream.id} is already completed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        dream.status = 'COMPLETED'
+        dream.status = Dream.StatusChoices.COMPLETED
         dream.save(update_fields=['status'])
 
         return Response({'detail': f'Dream {dream.id} marked as completed.'}, status=status.HTTP_200_OK)
@@ -215,10 +215,10 @@ class DreamViewSet(viewsets.ModelViewSet):
         """Change status in non-money dream as NEW and removes the associated contribution."""
         dream = self.get_object()
 
-        if dream.category == 'MONEY':
+        if dream.category == Dream.CategoryChoices.MONEY:
             return Response({'detail': 'Dream with category "MONEY" unsupported.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        dream.status = 'NEW'
+        dream.status = Dream.StatusChoices.NEW
 
         if hasattr(dream, 'contributions') and dream.contributions:
             dream.contributions.delete()

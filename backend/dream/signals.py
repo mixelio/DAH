@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Contribution
+from dream.models import Contribution, Dream
 
 
 @receiver(post_save, sender=Contribution)
@@ -30,4 +30,25 @@ def send_contribution_notification(
         )
         send_mail(
             subject, message, settings.DEFAULT_FROM_EMAIL, [dream_owner.email]
+        )
+
+
+@receiver(post_save, sender=Dream)
+def send_email_to_contributor(
+        sender: Type[Dream],
+        instance: Dream,
+        *args,
+        **kwargs
+):
+    """Sends an email to the contributor when a dream is marked as COMPLETED."""
+    if instance.status == 'COMPLETED':
+        subject = 'Your contribution has been accepted!'
+        message = f'Your contribution to dream {instance.name} has been marked as completed.'
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [instance.contributions.user.email],
+            fail_silently=False,
         )
