@@ -186,7 +186,12 @@
     width: 200px;
 
     &:not(:last-child) {
-      margin-right: 20px;
+      margin-block-end: 20px;
+      margin-inline-end: 20px;
+
+      @include on-tablet {
+        margin-block-end: 0;
+      }
     }
   }
 }

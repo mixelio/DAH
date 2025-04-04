@@ -38,7 +38,7 @@ export const CreateDreamPage = () => {
     name: editingDream?.name ?? "",
     category: editingDream?.category ?? "",
     location: editingDream?.location ?? "",
-    cost: editingDream?.cost ?? 0,
+    cost: editingDream?.cost ?? "",
     description: editingDream?.description ?? ""
   });
 
@@ -81,7 +81,6 @@ export const CreateDreamPage = () => {
   // }, [editingDream])
 
   useEffect(() => {
-    console.log("connect!")
   }, [editingDream])
 
   useEffect(() => {
@@ -139,10 +138,7 @@ export const CreateDreamPage = () => {
           (dream) => dream.user?.id === +user
         );
 
-        if (userDreams.find((dream) => dream.id === +id)) {
-          console.log("dream owner here");
-        } else {
-          console.log("you are not owner of this dream");
+        if (!userDreams.find((dream) => dream.id === +id)) {
           navigate(`/dreams/${id}`);
         }
       }
@@ -182,7 +178,6 @@ export const CreateDreamPage = () => {
   const handleCreateDreamSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const chekTocken = localStorage.getItem("access");
     e.preventDefault();
-    console.log("create dream");
     const keys = ["name", "category", "cost", "description", "image", "location"];
     const currentData: { [key: string]: string | number | DreamCategory} = {};
 
@@ -208,8 +203,6 @@ export const CreateDreamPage = () => {
             formData.append(key, value.toString());
           }
         } else {
-          console.log("image")
-          console.log(selectedFile);
           if (selectedFile) {
             formData.append(key, selectedFile);
           }
@@ -257,8 +250,6 @@ export const CreateDreamPage = () => {
             formData.append(key, value.toString());
           }
         } else {
-          console.log("image");
-          console.log(selectedFile);
           if (selectedFile) {
             formData.append(key, selectedFile);
           }
@@ -291,8 +282,6 @@ export const CreateDreamPage = () => {
       handleCreateDreamSubmit(e);
     }
   }
-
-  console.log(selectedFile, editingData.image)
 
   return (
     <section className="create-dream page__section">
@@ -444,10 +433,15 @@ export const CreateDreamPage = () => {
                   name="cost"
                   type="number"
                   onChange={(e) =>
-                    setEditingData((prev) => ({
-                      ...prev,
-                      cost: +e.target.value,
-                    }))
+                    +e.target.value >= 0
+                      ? setEditingData((prev) => ({
+                          ...prev,
+                          cost: +e.target.value,
+                        }))
+                      : setEditingData((prev) => ({
+                          ...prev,
+                          cost: "",
+                        }))
                   }
                   slotProps={{
                     input: {
@@ -488,7 +482,6 @@ export const CreateDreamPage = () => {
               color="primary"
               className="create-dream__button"
               sx={{ mr: ".625rem", width: "135px" }}
-              
             >
               {slug} Dream
             </Button>

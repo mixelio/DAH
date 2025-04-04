@@ -84,7 +84,13 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
       </div>
       <div className="dream-cart__info-box">
         <h2 className="dream-cart__title">
-          {dream.name}{" "}
+          {dream.name
+            .toString()
+            .split("")
+            .map((item, index) =>
+              index === 0 ? item.toUpperCase() : item.toLowerCase()
+            )
+            .join("")}{" "}
           {allertClass && (
             <IconButton className="dream-cart__allert-button">
               <EmailIcon sx={{ color: "#9fd986" }} />
@@ -120,7 +126,9 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
           </p>
         ) : (
           <p className="dream-cart__still-need">
-            {dream.status.toLowerCase().localeCompare(DreamStatus.Completed.toLowerCase())
+            {dream.status
+              .toLowerCase()
+              .localeCompare(DreamStatus.Completed.toLowerCase())
               ? "⌛️"
               : "🎉"}
           </p>

@@ -60,7 +60,7 @@ export const ProfilePage = () => {
 
   const dreamsOfUser = dreams.filter(
     (dream) => dream.user?.id === currentProfile?.id
-  );
+  ).sort((a, b) => b.status.toLowerCase().localeCompare(a.status.toLowerCase()));
 
   const navigate = useNavigate();
 

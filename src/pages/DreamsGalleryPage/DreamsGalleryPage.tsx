@@ -2,11 +2,12 @@ import {DreamCart} from "../../components/DreamCart/DreamCart"
 import {useAppDispatch, useAppSelector} from "../../app/hooks"
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {dreamsInit} from "../../features/dreamsFeature";
-import {FormControl, IconButton, InputAdornment, MenuItem, OutlinedInput, Pagination, Select, SelectChangeEvent} from "@mui/material";
+import {Checkbox, FormControl, FormControlLabel, IconButton, InputAdornment, MenuItem, OutlinedInput, Pagination, Select, SelectChangeEvent} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import {useSearchParams} from "react-router-dom";
 import {getSearchWith, SearchParams} from "../../utils/searchHelper";
 import SearchIcon from "@mui/icons-material/Search";
-import { Dream, DreamCategory } from "../../types/Dream";
+import { Dream, DreamCategory, DreamStatus } from "../../types/Dream";
 
 // search
 import Fuse from "fuse.js";
@@ -18,25 +19,20 @@ enum PostsPerPage {
 }
 
 export const DreamsGalleryPage = () => {
+  console.log("render")
   //#region declaration
 
   const { dreams } = useAppSelector((store) => store.dreams);
   const [searchParams, setSearchParams] = useSearchParams();
   const [pages, setPages] = useState<number>(0);
   const [currentQuery, setCurrentQuery] = useState<string>("");
+  const [showCompleted, setShowCompleted] = useState<boolean>(false);
   const paginationRef = useRef(null);
   const currentQueryRef = useRef(null);
 
   const dispatch = useAppDispatch();
 
-  // const searchDreams = new Fuse(dreams);
-  // const options = {
-  //   includeScore: true,
-  //   limit: 10, // or any other number you prefer
-  // };
-
-  const perPage =
-    searchParams.get("postsPerPage") || PostsPerPage.six.toString();
+  const perPage = searchParams.get("postsPerPage") || PostsPerPage.six.toString();
   const page = searchParams.get("page")
     ? parseInt(searchParams.get("page") as string, 10)
     : 1;
@@ -44,26 +40,40 @@ export const DreamsGalleryPage = () => {
 
   const [dreamsForShow, setDreamsForShow] = useState<Dream[]>([]);
 
-  //#endregion
-
-  //#region hooks
-
-  useEffect(() => {
-    if (category !== DreamCategory.All && dreams) {
-      const tempDreams = dreams.filter(
-        (dream) => !dream.category.localeCompare(category)
-      );
-      setDreamsForShow([...tempDreams]);
-    } else {
-      setDreamsForShow([...dreams]);
-    }
-  }, [category, dreams]);
-
   const setSearchWith = (params: SearchParams) => {
     const search = getSearchWith(params, searchParams);
 
     setSearchParams(search);
   };
+
+  //#endregion
+
+  //#region hooks
+
+  useEffect(() => {
+    let tempDreams: Dream[] = [...dreams];
+
+    if (!showCompleted) {
+      tempDreams = [
+        ...tempDreams.filter((dream) =>
+          dream.status
+            .toLowerCase()
+            .localeCompare(DreamStatus.Completed.toLowerCase())
+        ),
+      ];
+    }
+
+    if (category !== DreamCategory.All && dreams) {
+      tempDreams = [...tempDreams.filter(
+        (dream) => !dream.category.localeCompare(category)
+      )];
+      setDreamsForShow([...tempDreams]);
+    } else {
+      setDreamsForShow([...dreams]);
+    }
+
+    setDreamsForShow([...tempDreams]);
+  }, [category, dreams, showCompleted]);
 
   useEffect(() => {
     dispatch(dreamsInit());
@@ -104,6 +114,7 @@ export const DreamsGalleryPage = () => {
       page: "1",
       postsPerPage: perPage,
       category: e.target.value.toString(),
+      query: "",
     });
 
     localStorage.setItem("selectedCategory", e.target.value.toString());
@@ -122,16 +133,18 @@ export const DreamsGalleryPage = () => {
 
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentQuery(e.target.value);
-
+    setSearchWith({
+      query: "",
+    })
   };
 
   const handleAplyQuery = () => {
     console.log(currentQuery);
         if (!dreams || dreams.length === 0) return;
-        const keys = Object.keys(dreams[0]);
+        // const keys = Object.keys(dreams[0]);
 
         const searchDreams = new Fuse(dreams, {
-          keys: keys,
+          keys: ["name", "description", "user.first_name", "user.last_name"],
           includeScore: true,
           threshold: 0.2,
         });
@@ -149,7 +162,7 @@ export const DreamsGalleryPage = () => {
   }
 
   //#endregion
-
+console.log(showCompleted)
   return (
     <section className="dreams-gallery">
       <div className="container">
@@ -160,6 +173,11 @@ export const DreamsGalleryPage = () => {
               value={currentQuery}
               placeholder="Search"
               onChange={handleChangeQuery}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleAplyQuery();
+                }
+              }}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton onClick={handleAplyQuery}>
@@ -191,7 +209,7 @@ export const DreamsGalleryPage = () => {
               </MenuItem>
             </Select>
           </FormControl>
-          
+
           <FormControl className="dreams-gallery__filter">
             <Select
               defaultValue={
@@ -211,6 +229,37 @@ export const DreamsGalleryPage = () => {
               </MenuItem>
             </Select>
           </FormControl>
+
+          <div className="dreams-gallery__control-second-line">
+            <FormControl className="dreams-gallery__show-all">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!showCompleted}
+                    onChange={(e) => setShowCompleted(!e.target.checked)}
+                  />
+                }
+                label="hide completed"
+              />
+            </FormControl>
+            {searchParams.get("query") && (
+              <p className="dreams-gallery__search-result">
+                <span>
+                  Results for <strong>{searchParams.get("query")}</strong>
+                </span>
+                <IconButton
+                  size="small"
+                  onClick={() =>{
+                    setSearchWith({ page: "1", query: "" })
+                    window.location.reload();
+                  }
+                  }
+                >
+                  <CloseIcon />
+                </IconButton>
+              </p>
+            )}
+          </div>
         </form>
 
         <div className="dreams-gallery__content">

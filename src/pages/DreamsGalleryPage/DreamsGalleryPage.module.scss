@@ -1,4 +1,5 @@
 @use '../../assets/styles/utils/mixins' as *;
+@use '../../assets/styles/utils/vars' as *;
 
 .dreams-gallery {
   height: 100%;
@@ -83,6 +84,21 @@
     @include on-tablet {
       width: auto;
     }
+  }
+
+  &__control-second-line {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  &__search-result {
+    padding: 0 0 0 8px;
+    background-color: $primary-light;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
   }
 
   &__item {

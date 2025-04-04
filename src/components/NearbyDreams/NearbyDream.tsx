@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {getAdress} from "../../utils/getAdress";
-import {Dream} from "../../types/Dream";
+import {Dream, DreamStatus} from "../../types/Dream";
 import {DreamCart} from "../DreamCart/DreamCart";
 import {dreamsInit} from "../../features/dreamsFeature";
 
@@ -46,14 +46,20 @@ export const NearbyDream = ({ className = "" }) => {
             .filter(
               (dream) =>
                 dream.location.toLowerCase().split(", ")[0] ===
-                adress.city.toLowerCase()
+                  adress.city.toLowerCase() &&
+                dream.status
+                  .toLowerCase()
+                  .localeCompare(DreamStatus.Completed.toLowerCase())
             )
             .slice(0, 3).length > 0
             ? dreams
                 .filter(
                   (dream) =>
                     dream.location.toLowerCase().split(", ")[0] ===
-                    adress.city.toLowerCase()
+                      adress.city.toLowerCase() &&
+                    dream.status
+                      .toLowerCase()
+                      .localeCompare(DreamStatus.Completed.toLowerCase())
                 )
                 .slice(0, 3)
             : dreams.slice(0, 3);

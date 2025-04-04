@@ -400,7 +400,12 @@ export const DreamPage = () => {
         />
         {currentDream && !loading ? (
           <div className="dream__content">
-            <h2 className="dream__title">{currentDream.name} </h2>
+            <h2 className="dream__title">{currentDream.name.toString()
+            .split("")
+            .map((item, index) =>
+              index === 0 ? item.toUpperCase() : item.toLowerCase()
+            )
+            .join("")}</h2>
             {isOwnerHere && id && (
               <div className="dream__root-buttons">
                 <Link
