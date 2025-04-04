@@ -78,7 +78,8 @@ class Contribution(models.Model):
         ordering = ['-date']
 
     def __str__(self) -> str:
-        return f'{self.user.email} - {self.dream.name}'
+        return (f'Contribution {self.description} from '
+                f'{self.user.email} to dream {self.dream.name}')
 
 
 class UserFavorites(models.Model):
