@@ -41,7 +41,7 @@ def send_email_to_contributor(
         **kwargs
 ):
     """Sends an email to the contributor when a dream is marked as COMPLETED."""
-    if instance.status == 'COMPLETED':
+    if instance.status == Dream.StatusChoices.COMPLETED:
         subject = 'Your contribution has been accepted!'
         message = f'Your contribution to dream {instance.name} has been marked as completed.'
 
