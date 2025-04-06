@@ -4,7 +4,7 @@ import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {dreamsInit} from "../../features/dreamsFeature";
 import {Checkbox, FormControl, FormControlLabel, IconButton, InputAdornment, MenuItem, OutlinedInput, Pagination, Select, SelectChangeEvent} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {useSearchParams} from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 import {getSearchWith, SearchParams} from "../../utils/searchHelper";
 import SearchIcon from "@mui/icons-material/Search";
 import { Dream, DreamCategory, DreamStatus } from "../../types/Dream";
@@ -31,6 +31,7 @@ export const DreamsGalleryPage = () => {
   const currentQueryRef = useRef(null);
 
   const dispatch = useAppDispatch();
+  const user = localStorage.getItem("currentUser");
 
   const perPage = searchParams.get("postsPerPage") || PostsPerPage.six.toString();
   const page = searchParams.get("page")
@@ -80,7 +81,7 @@ export const DreamsGalleryPage = () => {
     setSearchParams({
       page: localStorage.getItem("currentPage") || "1",
       postsPerPage:
-        localStorage.getItem("postsPerPage") || PostsPerPage.six.toString(),
+        localStorage.getItem("postsPerPage") || user ? String(+PostsPerPage.six - 1) : String(PostsPerPage.six),
       category:
         (localStorage.getItem("selectedCategory") as DreamCategory) ||
         DreamCategory.All,
@@ -154,7 +155,7 @@ export const DreamsGalleryPage = () => {
         setDreamsForShow(result.map(item => item.item));
         setSearchWith({
           page: "1",
-          postsPerPage: perPage,
+          postsPerPage: String(+perPage - 1),
           category: category,
           query: currentQuery,
         });
@@ -249,11 +250,10 @@ console.log(showCompleted)
                 </span>
                 <IconButton
                   size="small"
-                  onClick={() =>{
-                    setSearchWith({ page: "1", query: "" })
+                  onClick={() => {
+                    setSearchWith({ page: "1", query: "" });
                     window.location.reload();
-                  }
-                  }
+                  }}
                 >
                   <CloseIcon />
                 </IconButton>
@@ -263,11 +263,30 @@ console.log(showCompleted)
         </form>
 
         <div className="dreams-gallery__content">
+          {user && (
+            <div className="dreams-gallery__item">
+              <Link
+                to={`/profile/${user}/create`}
+                className="profile__add-dream-btn dream-cart"
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18",
+                  letterSpacing: "2px",
+                }}
+              >
+                Add a new dream
+              </Link>
+            </div>
+          )}
+
           {dreamsForShow &&
             dreamsForShow
               .slice(
-                +perPage * (+page - 1),
-                Math.min(+page * +perPage, dreams.length)
+                user
+                  ? (+perPage - 1) * (+page - 1)
+                  : (+perPage) * (+page - 1),
+                Math.min(user ? +page * (+perPage - 1) : +page * +perPage, dreams.length)
               )
               .map((dream) => (
                 <div key={dream.id} className="dreams-gallery__item">

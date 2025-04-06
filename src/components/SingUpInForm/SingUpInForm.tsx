@@ -238,7 +238,6 @@ export const SingUpInForm = () => {
   };
 
   const handleLogIn = async (event: FormEvent<HTMLFormElement>) => {
-    console.log("login", window.location);
     event.preventDefault();
 
     if (!emailValidator(loginData.email)) {
@@ -273,8 +272,9 @@ export const SingUpInForm = () => {
             setLoginWaiting(false);
 
             if (window.location.href.includes("reset")) {
-              console.log("reset page");
               window.location.href = "/";
+            } else {
+              window.location.reload();
             }
 
             return;
