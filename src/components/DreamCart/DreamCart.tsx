@@ -68,8 +68,11 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             alt="dream_image"
             loading="lazy"
           />
+          {dream.category && (
+            <p className="dream-cart__category">{dream.category.split("_").join(" ")}</p>
+          )}
         </Link>
-        {localStorage.getItem("currentUser") && (
+        {loginedUser && (
           <IconButton
             className="dream-cart__bookmark"
             onClick={handleAddOrRemoveFavourite}

@@ -33,6 +33,7 @@ export const DreamsGalleryPage = () => {
   const dispatch = useAppDispatch();
   const user = localStorage.getItem("currentUser");
 
+  const query = searchParams.get("query");
   const perPage = searchParams.get("postsPerPage") || PostsPerPage.six.toString();
   const page = searchParams.get("page")
     ? parseInt(searchParams.get("page") as string, 10)
@@ -54,6 +55,19 @@ export const DreamsGalleryPage = () => {
   useEffect(() => {
     let tempDreams: Dream[] = [...dreams];
 
+    if (query) {
+      const searchDreams = new Fuse(dreams, {
+        keys: ["name", "description", "user.first_name", "user.last_name"],
+        includeScore: true,
+        threshold: 0.2,
+      });
+
+      const result = searchDreams.search(query || currentQuery);
+
+      tempDreams = [...result.map((item) => item.item)];
+    }
+
+
     if (!showCompleted) {
       tempDreams = [
         ...tempDreams.filter((dream) =>
@@ -74,14 +88,16 @@ export const DreamsGalleryPage = () => {
     }
 
     setDreamsForShow([...tempDreams]);
-  }, [category, dreams, showCompleted]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, dreams, showCompleted, query]);
 
   useEffect(() => {
     dispatch(dreamsInit());
     setSearchParams({
       page: localStorage.getItem("currentPage") || "1",
       postsPerPage:
-        localStorage.getItem("postsPerPage") || user ? String(+PostsPerPage.six - 1) : String(PostsPerPage.six),
+        localStorage.getItem("postsPerPage") || String(PostsPerPage.six),
       category:
         (localStorage.getItem("selectedCategory") as DreamCategory) ||
         DreamCategory.All,
@@ -115,7 +131,7 @@ export const DreamsGalleryPage = () => {
       page: "1",
       postsPerPage: perPage,
       category: e.target.value.toString(),
-      query: "",
+      query: query ? query : "",
     });
 
     localStorage.setItem("selectedCategory", e.target.value.toString());
@@ -134,36 +150,46 @@ export const DreamsGalleryPage = () => {
 
   const handleChangeQuery = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentQuery(e.target.value);
-    setSearchWith({
-      query: "",
-    })
+    // setSearchWith({
+    //   query: "",
+    // })
   };
 
   const handleAplyQuery = () => {
-    console.log(currentQuery);
-        if (!dreams || dreams.length === 0) return;
-        // const keys = Object.keys(dreams[0]);
+    if (!dreamsForShow || dreamsForShow.length === 0) {
+      setSearchParams({
+        query: currentQuery,
+        page: "1",
+      })
+    }
+    // const keys = Object.keys(dreams[0]);
+    const searchDreams = new Fuse(dreamsForShow, {
+      keys: ["name", "description", "user.first_name", "user.last_name"],
+      includeScore: true,
+      threshold: 0.2,
+    });
 
-        const searchDreams = new Fuse(dreams, {
-          keys: ["name", "description", "user.first_name", "user.last_name"],
-          includeScore: true,
-          threshold: 0.2,
-        });
+    const result = searchDreams.search(currentQuery);
+    setDreamsForShow(result.map(item => item.item));
+    setSearchWith({
+      page: "1",
+      postsPerPage: perPage,
+      category: category,
+      query: currentQuery,
+    });
+    setCurrentQuery('');
+  }
 
-        const result = searchDreams.search(currentQuery);
-        console.log(result, dreamsForShow)
-        setDreamsForShow(result.map(item => item.item));
-        setSearchWith({
-          page: "1",
-          postsPerPage: String(+perPage - 1),
-          category: category,
-          query: currentQuery,
-        });
-        setCurrentQuery('');
+  const handleVisibilityCompleted = (e: ChangeEvent<HTMLInputElement>) => {
+    
+    setShowCompleted(!e.target.checked);
+    setSearchWith({
+      page: "1",
+      query: query ? query : "",
+    });
   }
 
   //#endregion
-console.log(showCompleted)
   return (
     <section className="dreams-gallery">
       <div className="container">
@@ -237,7 +263,7 @@ console.log(showCompleted)
                 control={
                   <Checkbox
                     checked={!showCompleted}
-                    onChange={(e) => setShowCompleted(!e.target.checked)}
+                    onChange={handleVisibilityCompleted}
                   />
                 }
                 label="hide completed"
@@ -252,12 +278,16 @@ console.log(showCompleted)
                   size="small"
                   onClick={() => {
                     setSearchWith({ page: "1", query: "" });
-                    window.location.reload();
+                    // window.location.reload();
                   }}
                 >
                   <CloseIcon />
                 </IconButton>
               </p>
+              
+            )}
+            {dreamsForShow.length === 0 && (
+              <p>no results for show</p>
             )}
           </div>
         </form>
