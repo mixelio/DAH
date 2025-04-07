@@ -216,7 +216,11 @@ class DreamViewSet(viewsets.ModelViewSet):
         dream = self.get_object()
 
         if dream.category == Dream.CategoryChoices.MONEY:
-            return Response({'detail': 'Dream with category "MONEY" unsupported.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    'detail': 'Dream with category "MONEY" unsupported.'
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
         dream.status = Dream.StatusChoices.NEW
 
@@ -225,8 +229,12 @@ class DreamViewSet(viewsets.ModelViewSet):
 
         dream.save(update_fields=['status'])
 
-        return Response({'detail': f'Dream {dream.id} marked as rejected and contribution removed.'},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {
+                'detail': f'Dream {dream.id} marked '
+                          f'as rejected and contribution removed.'
+            }, status=status.HTTP_200_OK
+        )
 
     @extend_schema(
         parameters=[

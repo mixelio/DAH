@@ -50,8 +50,6 @@ class Dream(models.Model):
             else:
                 self.status = self.StatusChoices.NEW
 
-            7
-
 
 class Comment(models.Model):
     dream = models.ForeignKey(Dream, on_delete=models.CASCADE)
