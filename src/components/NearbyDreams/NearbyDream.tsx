@@ -37,12 +37,13 @@ export const NearbyDream = ({ className = "" }) => {
 
   useEffect(() => {
     const featchNearbyDreams = async () => {
+      let updatedDreams = [...dreams];
       setDreamsLoading(true);
       try {
         await dispatch(dreamsInit());
 
-        const updatedDreams =
-          dreams
+        updatedDreams =
+          updatedDreams
             .filter(
               (dream) =>
                 dream.location.toLowerCase().split(", ")[0] ===
@@ -72,8 +73,12 @@ export const NearbyDream = ({ className = "" }) => {
     };
 
     featchNearbyDreams();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, adress]);
+    
+  }, [dispatch, adress, dreams]);
+
+  // useEffect(() => {
+  //   console.log("dreams loaded")
+  // }, [dreams])
 
   return (
     <section className={`nearby-dreams ${className}`}>

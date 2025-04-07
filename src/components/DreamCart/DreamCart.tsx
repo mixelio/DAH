@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Dream, DreamCategory, DreamStatus} from "../../types/Dream";
 import { Divider, IconButton, LinearProgress } from "@mui/material";
@@ -7,6 +7,7 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {userFavouriteAdd, userFavoriteRemove, userFavouritesInit} from "../../features/users";
 import EmailIcon from "@mui/icons-material/Email";
+import {ContributionMessage} from "../ContributionMessage/ContributionMessage";
 
 
 type Props = {
@@ -19,6 +20,8 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   const loginedUser = localStorage.getItem("currentUser");
   const access = localStorage.getItem("access");
   const allertClass = !dream.status.localeCompare(DreamStatus.Pending) && loginedUser && +dream.user.id === +loginedUser && dream.category !== DreamCategory.Money_donation ? "_pending" : "";
+
+  const [openMessage, setOpenMessage] = useState(false)
 
   const handleAddOrRemoveFavourite =async () => {
 
@@ -51,6 +54,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
 
   return (
     <div className={`dream-cart ${allertClass}`}>
+      <ContributionMessage dream={dream} isOpen={openMessage} setOpenState={setOpenMessage}/>
       <div className="dream-cart__image-box">
         <Link
           to={`/dreams/${dream.id}`}
@@ -69,7 +73,9 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             loading="lazy"
           />
           {dream.category && (
-            <p className="dream-cart__category">{dream.category.split("_").join(" ")}</p>
+            <p className="dream-cart__category">
+              {dream.category.split("_").join(" ")}
+            </p>
           )}
         </Link>
         {loginedUser && (
@@ -95,7 +101,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             )
             .join("")}{" "}
           {allertClass && (
-            <IconButton className="dream-cart__allert-button">
+            <IconButton className="dream-cart__allert-button" onClick={() => setOpenMessage(true)}>
               <EmailIcon sx={{ color: "#9fd986" }} />
             </IconButton>
           )}

@@ -38,7 +38,7 @@ export const CreateDreamPage = () => {
     name: editingDream?.name ?? "",
     category: editingDream?.category ?? "",
     location: editingDream?.location ?? "",
-    cost: editingDream?.cost ?? "",
+    cost: editingDream?.cost ?? "1",
     description: editingDream?.description ?? ""
   });
 
@@ -419,39 +419,44 @@ export const CreateDreamPage = () => {
                   )}
                 />
               </FormControl>
-              <FormControl fullWidth className="create-dream__form-control">
-                <InputLabel
-                  htmlFor="dream-cost"
-                  sx={{ border: "none", borderRadius: "20" }}
-                ></InputLabel>
-                <TextField
-                  required
-                  id="dream-cost"
-                  value={editingData.cost}
-                  label="Dream cost"
-                  variant="outlined"
-                  name="cost"
-                  type="number"
-                  onChange={(e) =>
-                    +e.target.value >= 0
-                      ? setEditingData((prev) => ({
-                          ...prev,
-                          cost: +e.target.value,
-                        }))
-                      : setEditingData((prev) => ({
-                          ...prev,
-                          cost: "",
-                        }))
-                  }
-                  slotProps={{
-                    input: {
-                      endAdornment: (
-                        <InputAdornment position="end">$</InputAdornment>
-                      ),
-                    },
-                  }}
-                />
-              </FormControl>
+              {!editingData.category
+                ?.toLowerCase()
+                .localeCompare(DreamCategory.Money_donation.toLowerCase()) && (
+                <FormControl fullWidth className="create-dream__form-control">
+                  <InputLabel
+                    htmlFor="dream-cost"
+                    sx={{ border: "none", borderRadius: "20" }}
+                  ></InputLabel>
+                  <TextField
+                    required
+                    id="dream-cost"
+                    value={editingData.cost}
+                    label="Dream cost"
+                    variant="outlined"
+                    name="cost"
+                    type="number"
+                    onChange={(e) =>
+                      +e.target.value >= 0
+                        ? setEditingData((prev) => ({
+                            ...prev,
+                            cost: +e.target.value,
+                          }))
+                        : setEditingData((prev) => ({
+                            ...prev,
+                            cost: "",
+                          }))
+                    }
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">$</InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </FormControl>
+              )}
+
               <FormControl fullWidth className="create-dream__form-control">
                 <InputLabel
                   htmlFor="dream-description"

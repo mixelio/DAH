@@ -77,6 +77,10 @@ export const ProfilePage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // useEffect(() => {
+  //   console.log("dreams chenged");
+  // }, [dreams])
+
   // #endregion
 
   return (

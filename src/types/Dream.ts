@@ -11,6 +11,18 @@ export enum DreamStatus {
   Completed = "Completed",
 }
 
+export type Contribution = {
+  id: number;
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    photo_url: string;
+  };
+  description?: string;
+  date: string;
+};
+
 export type Dream = {
   id: number;
   user: {
@@ -30,16 +42,6 @@ export type Dream = {
   location: string;
   date_added: string;
   views: number;
-  contributions: {
-    id: number;
-    user: {
-      id: number;
-      first_name: string;
-      last_name: string;
-      photo_url: string;
-    };
-    description: string;
-    date: string;
-  };
+  contributions: Contribution;
 };
 
