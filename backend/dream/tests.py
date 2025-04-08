@@ -171,6 +171,7 @@ class FulfillDreamViewTest(TestCase):
                 'first_name': self.user.first_name,
                 'last_name': self.user.last_name,
                 'photo_url': None,
+                'email': self.user.email,
             },
         )
 
@@ -208,3 +209,82 @@ class FulfillDreamViewTest(TestCase):
         response = self.client.post(url, {})
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class AcceptAndRejectDreamContributionTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = sample_user(email='testuser@mail.com')
+        self.client.force_authenticate(user=self.user)
+
+        self.dream = Dream.objects.create(
+            name='test dream',
+            description='test description',
+            category=Dream.CategoryChoices.GIFTS,
+            user=self.user,
+        )
+        self.contribution = Contribution.objects.create(
+            user=sample_user(email='sam@mail.com'),
+            dream=self.dream,
+            description='test description',
+        )
+
+    def test_accept_contribution_succes(self):
+        url = reverse('dream:dream-accept-contribution', kwargs={'pk': self.dream.id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['detail'], f'Dream {self.dream.id} marked as completed.')
+
+    def test_accept_contribution_with_unsupported_category(self):
+        dream = Dream.objects.create(
+            name='test dream',
+            description='test description',
+            category=Dream.CategoryChoices.MONEY,
+            user=self.user,
+        )
+
+        url = reverse('dream:dream-accept-contribution', kwargs={'pk': dream.id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['detail'], 'Dream with category "MONEY" unsupported.')
+
+    def test_accept_contribution_with_completed_status(self):
+        dream = Dream.objects.create(
+            name='test dream',
+            description='test description',
+            category=Dream.CategoryChoices.GIFTS,
+            status=Dream.StatusChoices.COMPLETED,
+            user=self.user,
+        )
+
+        url = reverse('dream:dream-accept-contribution', kwargs={'pk': dream.id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['detail'], f'Dream {dream.id} is already completed.')
+
+    def test_reject_contribution_succes(self):
+        url = reverse('dream:dream-reject-contribution', kwargs={'pk': self.dream.id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data['detail'],
+            f'Dream {self.dream.id} marked as rejected and contribution removed.'
+        )
+
+    def test_reject_contribution_with_unsupported_category(self):
+        dream = Dream.objects.create(
+            name='test dream',
+            description='test description',
+            category=Dream.CategoryChoices.MONEY,
+            user=self.user,
+        )
+
+        url = reverse('dream:dream-reject-contribution', kwargs={'pk': dream.id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['detail'], 'Dream with category "MONEY" unsupported.')
