@@ -9,7 +9,7 @@ class UserDreamRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'photo_url']
+        fields = ['id', 'first_name', 'last_name', 'photo_url', 'email']
 
     def get_photo_url(self, obj: get_user_model()) -> str | None:
         """Create user photo url"""
@@ -21,7 +21,7 @@ class UserDreamRetrieveSerializer(serializers.ModelSerializer):
 class UserDreamListSerializer(UserDreamRetrieveSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email']
+        fields = ['id', 'first_name', 'last_name',]
 
 
 class ContributionSerializer(serializers.ModelSerializer):
