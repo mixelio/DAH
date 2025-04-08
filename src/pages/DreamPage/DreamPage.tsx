@@ -171,7 +171,7 @@ export const DreamPage = () => {
             id: +id,
             data: {contribution_description: `${formData.get(
               "contribution_description"
-            )}, email: ${loginedUser?.email}`},
+            )}`},
             token: localStorage.getItem("access") ?? "",
           })
         )
@@ -575,7 +575,7 @@ export const DreamPage = () => {
                     <h3>{`${currentDream.contributions?.user.first_name} ${currentDream.contributions?.user.last_name}`}</h3>
                     <p>{currentDream.contributions.description}</p>
                     <div className={styles.dialog__buttonContainer}>
-                      {waitDreamClosing && <CircularProgress />}
+                      {waitDreamClosing && <CircularProgress size="small" />}
                       <Button
                         type="button"
                         variant="outlined"

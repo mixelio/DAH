@@ -107,7 +107,7 @@ export const ContributionMessage: React.FC<Props> = ({
           <p>{dream.contributions.description}</p>
         )}
         <div className={styles.contributionMessage__buttonContainer}>
-          {waiting && <CircularProgress />}
+          {waiting && <CircularProgress size="small"/>}
           <Button type="button" variant="outlined" onClick={handleDreamReject}>
             Reject
           </Button>

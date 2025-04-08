@@ -74,7 +74,7 @@ export const AboutUsPage = () => {
               </div>
               <div className="aboutUs__teamSubItem">
                 <h3>Rusana</h3>
-                <p>QA-enginier</p>
+                <p>QA-engineer</p>
               </div>
             </div>
             <div className="aboutUs__teamItem">

@@ -17,6 +17,7 @@ export type Contribution = {
     id: number;
     first_name: string;
     last_name: string;
+    email: string;
     photo_url: string;
   };
   description?: string;

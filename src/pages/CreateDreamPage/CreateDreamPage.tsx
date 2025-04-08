@@ -38,7 +38,7 @@ export const CreateDreamPage = () => {
     name: editingDream?.name ?? "",
     category: editingDream?.category ?? "",
     location: editingDream?.location ?? "",
-    cost: editingDream?.cost ?? "1",
+    cost: editingDream?.cost ?? "",
     description: editingDream?.description ?? ""
   });
 

@@ -7,7 +7,9 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {userFavouriteAdd, userFavoriteRemove, userFavouritesInit} from "../../features/users";
 import EmailIcon from "@mui/icons-material/Email";
-import {ContributionMessage} from "../ContributionMessage/ContributionMessage";
+import InfoIcon from "@mui/icons-material/Info";
+import {ContributionMessage} from "../ContributionMessage/ContributionMessage.tsx";
+import {ContributionInfo} from "../ContributionInfo/ContributionInfo.tsx";
 
 
 type Props = {
@@ -22,6 +24,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   const allertClass = !dream.status.localeCompare(DreamStatus.Pending) && loginedUser && +dream.user.id === +loginedUser && dream.category !== DreamCategory.Money_donation ? "_pending" : "";
 
   const [openMessage, setOpenMessage] = useState(false)
+  const [openInfo, setOpenInfo] = useState(false)
 
   const handleAddOrRemoveFavourite =async () => {
 
@@ -54,7 +57,16 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
 
   return (
     <div className={`dream-cart ${allertClass}`}>
-      <ContributionMessage dream={dream} isOpen={openMessage} setOpenState={setOpenMessage}/>
+      <ContributionMessage
+        dream={dream}
+        isOpen={openMessage}
+        setOpenState={setOpenMessage}
+      />
+      <ContributionInfo
+        dream={dream}
+        isOpen={openInfo}
+        setOpenState={setOpenInfo}
+      />
       <div className="dream-cart__image-box">
         <Link
           to={`/dreams/${dream.id}`}
@@ -100,10 +112,22 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
               index === 0 ? item.toUpperCase() : item.toLowerCase()
             )
             .join("")}{" "}
-          {allertClass && (
-            <IconButton className="dream-cart__allert-button" onClick={() => setOpenMessage(true)}>
+          {allertClass ? (
+            <IconButton
+              className="dream-cart__allert-button"
+              onClick={() => setOpenMessage(true)}
+            >
               <EmailIcon sx={{ color: "#9fd986" }} />
             </IconButton>
+          ) : (
+            loginedUser && +loginedUser === dream.user.id && dream.contributions && 
+              <IconButton
+                className="dream-cart__allert-button"
+                onClick={() => setOpenInfo(true)}
+                style={{ animation: "none"}}
+              >
+                <InfoIcon sx={{ color: "#9fd986" }} />
+              </IconButton>
           )}
         </h2>
 
