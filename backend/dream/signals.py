@@ -42,13 +42,14 @@ def send_email_to_contributor(
 ):
     """Sends an email to the contributor when a dream is marked as COMPLETED."""
     if instance.status == Dream.StatusChoices.COMPLETED and instance.category != Dream.CategoryChoices.MONEY:
-        subject = 'Your contribution has been accepted!'
-        message = f'Your contribution to dream {instance.name} has been marked as completed.'
+        if hasattr(instance, 'contributions') and instance.contributions:
+            subject = 'Your contribution has been accepted!'
+            message = f'Your contribution to dream {instance.name} has been marked as completed.'
 
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [instance.contributions.user.email],
-            fail_silently=False,
-        )
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [instance.contributions.user.email],
+                fail_silently=False,
+            )
