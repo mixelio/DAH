@@ -21,7 +21,7 @@ class UserDreamRetrieveSerializer(serializers.ModelSerializer):
 class UserDreamListSerializer(UserDreamRetrieveSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name']
+        fields = ['id', 'first_name', 'last_name', 'email']
 
 
 class ContributionSerializer(serializers.ModelSerializer):
