@@ -18,6 +18,18 @@ export const NearbyDream = ({ className = "" }) => {
   const [dreamsNearby, setDreamsNearby] = useState<Dream[]>([]);
 
   useEffect(() => {
+    const fetchDreams = async () => {
+      try {
+        await dispatch(dreamsInit());
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchDreams();
+  }, [])
+
+  useEffect(() => {
     setAdressLoading(true);
     const fetchAdress = async () => {
       try {
@@ -36,49 +48,41 @@ export const NearbyDream = ({ className = "" }) => {
   }, []);
 
   useEffect(() => {
-    const featchNearbyDreams = async () => {
+
+  }, )
+
+  useEffect(() => {
+    const getNearbyDreams = () => {
       let updatedDreams = [...dreams];
-      setDreamsLoading(true);
-      try {
-        await dispatch(dreamsInit());
+      
+      updatedDreams =
+        updatedDreams
+          .filter(
+            dream =>
+              dream.location.toLowerCase().split(", ")[0] ===
+                adress.city.toLowerCase() &&
+              dream.status
+                .toLowerCase()
+                .localeCompare(DreamStatus.Completed.toLowerCase()))
+          .slice(0, 3).length > 0
+          ? dreams
+              .filter(
+                (dream) =>
+                  dream.location.toLowerCase().split(", ")[0] ===
+                    adress.city.toLowerCase() &&
+                  dream.status
+                    .toLowerCase()
+                    .localeCompare(DreamStatus.Completed.toLowerCase())
+              )
+              .slice(0, 3)
+          : dreams.slice(0, 3);
 
-        updatedDreams =
-          updatedDreams
-            .filter(
-              (dream) =>
-                dream.location.toLowerCase().split(", ")[0] ===
-                  adress.city.toLowerCase() &&
-                dream.status
-                  .toLowerCase()
-                  .localeCompare(DreamStatus.Completed.toLowerCase())
-            )
-            .slice(0, 3).length > 0
-            ? dreams
-                .filter(
-                  (dream) =>
-                    dream.location.toLowerCase().split(", ")[0] ===
-                      adress.city.toLowerCase() &&
-                    dream.status
-                      .toLowerCase()
-                      .localeCompare(DreamStatus.Completed.toLowerCase())
-                )
-                .slice(0, 3)
-            : dreams.slice(0, 3);
-
-        setDreamsNearby(updatedDreams);
-        setDreamsLoading(false);
-      } catch (error) {
-        console.error(error);
-      }
+      setDreamsNearby(updatedDreams);
     };
 
-    featchNearbyDreams();
+    getNearbyDreams();
     
-  }, [dispatch, adress, dreams]);
-
-  // useEffect(() => {
-  //   console.log("dreams loaded")
-  // }, [dreams])
+  }, [adress, dreams]);
 
   return (
     <section className={`nearby-dreams ${className}`}>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Dream, DreamCategory, DreamStatus} from "../../types/Dream";
 import { Divider, IconButton, LinearProgress } from "@mui/material";
@@ -54,7 +54,7 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
+  console.log("dream card render");
   return (
     <div className={`dream-cart ${allertClass}`}>
       <ContributionMessage
