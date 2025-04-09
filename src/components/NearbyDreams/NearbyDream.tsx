@@ -4,6 +4,7 @@ import {getAdress} from "../../utils/getAdress";
 import {Dream, DreamStatus} from "../../types/Dream";
 import {DreamCart} from "../DreamCart/DreamCart";
 import {dreamsInit} from "../../features/dreamsFeature";
+import {CircularProgress} from "@mui/material";
 
 export const NearbyDream = ({ className = "" }) => {
   const { dreams } = useAppSelector((store) => store.dreams);
@@ -19,10 +20,14 @@ export const NearbyDream = ({ className = "" }) => {
 
   useEffect(() => {
     const fetchDreams = async () => {
+      setDreamsLoading(true);
       try {
         await dispatch(dreamsInit());
+
       } catch (error) {
         console.error(error);
+      } finally {
+        setDreamsLoading(false);
       }
     }
 
@@ -106,7 +111,7 @@ export const NearbyDream = ({ className = "" }) => {
               </div>
             ))
           ) : (
-            <p className="nearby-dreams__empty">No dreams nearby</p>
+            dreamsLoading ? <CircularProgress sx={{marginInline: "auto"}} /> :<p className="nearby-dreams__empty" style={{marginInline: "auto"}}>No dreams nearby</p>
           )}
         </div>
       </div>
