@@ -151,7 +151,7 @@ class GoogleLoginAPIView(APIView):
     If successful, it returns JWT authentication tokens.
     """
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         token = request.data.get('token')
         if not token:
             return Response({
