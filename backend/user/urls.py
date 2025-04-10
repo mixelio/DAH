@@ -10,7 +10,7 @@ from user.views import (
     RetrieveDetailUserView,
     ListUserView,
     PasswordResetRequestView,
-    PasswordResetConfirmView,
+    PasswordResetConfirmView, GoogleLoginAPIView,
 )
 
 app_name = 'user'
@@ -34,4 +34,5 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
+    path('oauth/google/', GoogleLoginAPIView.as_view(), name='google_login'),
 ]

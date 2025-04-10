@@ -1,3 +1,4 @@
+import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
@@ -10,6 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from user.serializers import (
     UserSerializer,
@@ -138,3 +140,61 @@ class PasswordResetConfirmView(APIView):
         return Response(
             {'message': 'Password reset successful'}, status=status.HTTP_200_OK
         )
+
+
+class GoogleLoginAPIView(APIView):
+    """
+    API endpoint for user authentication via Google OAuth.
+
+    This view accepts a Google OAuth token, verifies it with Google,
+    retrieves user information, and either logs in or registers the user.
+    If successful, it returns JWT authentication tokens.
+    """
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({
+                'error': 'Access token is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        google_user_info_url = (f'https://oauth2.googleapis'
+                                f'.com/tokeninfo?id_token={token}')
+        response = requests.get(google_user_info_url)
+
+        if response.status_code != 200:
+            return Response({
+                'error': 'Invalid token'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user_data = response.json()
+        email = user_data.get('email')
+        first_name = user_data.get('given_name', '')
+        last_name = user_data.get('family_name', '')
+
+        if not email:
+            return Response({
+                'error': 'Email not found in token'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user, created = get_user_model().objects.get_or_create(
+            email=email,
+            defaults={'first_name': first_name, 'last_name': last_name}
+        )
+
+        if not user.is_active:
+            return Response({
+                'error': 'User account is inactive'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': {
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name
+            }
+        })
