@@ -120,8 +120,9 @@ class DreamViewSet(viewsets.ModelViewSet):
         """Retrieve a dream and increment its views count."""
         instance = self.get_object()
 
-        Dream.objects.filter(id=instance.id).update(views=F('views') + 1)
-        instance.refresh_from_db()
+        if instance.user != self.request.user:
+            Dream.objects.filter(id=instance.id).update(views=F('views') + 1)
+            instance.refresh_from_db()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
