@@ -13,9 +13,11 @@ import { theme } from "../../utils/theme";
 import {User} from '../../types/User';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import {usersInit} from '../../features/users';
-import {createUser, getLoginedUser, loginUser, verifyUser} from '../../api/users';
+import {createUser, getLoginedUser, loginUser, loginUserWithGoogle, verifyUser} from '../../api/users';
 import LoadingButton from "@mui/lab/LoadingButton";
 import { SnackbarProvider, useSnackbar } from "notistack";
+
+import { GoogleLogin } from "@react-oauth/google";
 
 const colorsPrimary = theme.palette.primary;
 const colorsSecondary = theme.palette.secondary;
@@ -107,12 +109,6 @@ export const SingUpInForm = () => {
   // #endregion
   
   // #region hooks
-  useEffect(() => {
-    // const fetchUsers = async () => {
-    //   await dispatch(usersInit());
-    // }
-    // fetchUsers();
-  }, [dispatch]);
 
   useEffect(() => {
     if (contentRef.current) {
@@ -582,11 +578,53 @@ export const SingUpInForm = () => {
                     Submit
                   </LoadingButton>
                 )}
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    console.log(credentialResponse);
+                    const token = credentialResponse.credential;
+                    console.log(token);
+                    try {
+                      const {access, refresh} = await loginUserWithGoogle({token: token as string});
+                      if (access && refresh) {
+                        localStorage.setItem("access", access);
+                        localStorage.setItem("refresh", refresh);
 
-                <Link to="/pass-reset" className="sign-up-in-form__foget" onClick={() => {
-                  setErrorMessage("");
-                  setMainFormActive(false);
-                }}>
+                        const verifyResponse = await verifyUser(access);
+                        if (verifyResponse) {
+                          const currUser = await getLoginedUser(access);
+                          localStorage.setItem("currentUser", currUser.id.toString());
+                          setMainFormActive(false);
+
+                          if (
+                            window.location.href.includes("reset")
+                          ) {
+                            window.location.href = "/";
+                          } else {
+                            window.location.reload();
+                          }
+
+                          return;
+                        }
+                      }
+
+                    } catch (e) {
+                      console.error(e);
+                      setErrorMessage(Errors.NoServerAnswer);
+                      setLoginWaiting(false);
+                    }
+                  }}
+                  onError={() => {
+                    console.log("Login Failed");
+                  }}
+                />
+                <Link
+                  to="/pass-reset"
+                  className="sign-up-in-form__foget"
+                  onClick={() => {
+                    setErrorMessage("");
+                    setMainFormActive(false);
+                  }}
+                >
                   forget password?
                 </Link>
               </Box>
@@ -606,7 +644,7 @@ export const SingUpInForm = () => {
           </Box>
         </TabContext>
       </div>
-      
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}

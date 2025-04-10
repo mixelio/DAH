@@ -32,7 +32,7 @@ export const NearbyDream = ({ className = "" }) => {
     }
 
     fetchDreams();
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     setAdressLoading(true);

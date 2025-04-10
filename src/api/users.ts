@@ -45,6 +45,10 @@ export const loginUser = (data: {"email": string, "password": string}) =>{
   return client.post<{access: string, refresh: string}>('user/token/', data)
 };
 
+export const loginUserWithGoogle = (data: {"token": string}) => {
+  return client.post<{access: string, refresh: string}>("user/oauth/google/", data);
+}
+
 export const verifyUser = (token: string) => {
   return client.post<{success: boolean}>('user/token/verify/', {token: token}, token);
 };

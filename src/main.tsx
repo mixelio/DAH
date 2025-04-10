@@ -19,6 +19,10 @@ import {ProfileEdit} from './pages/ProfileEdit/ProfileEdit.tsx'
 import {CreateDreamPage} from './pages/CreateDreamPage/CreateDreamPage.tsx'
 import {FavoritePage} from './pages/FavoritePage/FavoritePage.tsx'
 import {PasswordReset} from './pages/PasswordReset/PasswordReset.tsx'
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const CLIENT_ID =
+  "481622529798-iaribr4blec6nafim0hjamha8i04aupt.apps.googleusercontent.com";
 
 
 createRoot(document.getElementById("root")!).render(
@@ -26,28 +30,30 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <DreamsProvider>
         <ThemeProvider theme={theme}>
-          <HashRouter>
-            <Routes>
-              <Route path="/" element={<App />}>
-                <Route index element={<HomePage />} />
-                <Route path="dreams">
-                  <Route index element={<DreamsGalleryPage />} />
-                  <Route path=":id?" element={<DreamPage />} />
-                  <Route path=":id/edit" element={<CreateDreamPage />} />
+          <GoogleOAuthProvider clientId={CLIENT_ID}>
+            <HashRouter>
+              <Routes>
+                <Route path="/" element={<App />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="dreams">
+                    <Route index element={<DreamsGalleryPage />} />
+                    <Route path=":id?" element={<DreamPage />} />
+                    <Route path=":id/edit" element={<CreateDreamPage />} />
+                  </Route>
+                  <Route path="aboutus" element={<AboutUsPage />} />
+                  <Route path="contacts" element={<ContactsPage />} />
+                  <Route path="profile/:id?">
+                    <Route index element={<ProfilePage />} />
+                    <Route path="edit" element={<ProfileEdit />} />
+                    <Route path="create" element={<CreateDreamPage />} />
+                    <Route path="favorites" element={<FavoritePage />} />
+                  </Route>
+                  <Route path="pass-reset" element={<PasswordReset />} />
+                  <Route path="*" element={<NotFoundPage />} />
                 </Route>
-                <Route path="aboutus" element={<AboutUsPage />} />
-                <Route path="contacts" element={<ContactsPage />} />
-                <Route path="profile/:id?">
-                  <Route index element={<ProfilePage />} />
-                  <Route path="edit" element={<ProfileEdit />} />
-                  <Route path="create" element={<CreateDreamPage />} />
-                  <Route path="favorites" element={<FavoritePage />} />
-                </Route>
-                <Route path="pass-reset" element={<PasswordReset/>} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Route>
-            </Routes>
-          </HashRouter>
+              </Routes>
+            </HashRouter>
+          </GoogleOAuthProvider>
         </ThemeProvider>
       </DreamsProvider>
     </Provider>
