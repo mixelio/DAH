@@ -64,8 +64,7 @@ export const NearbyDream = ({ className = "" }) => {
         updatedDreams
           .filter(
             dream =>
-              dream.location.toLowerCase().split(", ")[0] ===
-                adress.city.toLowerCase() &&
+              dream.location?.toLowerCase().split(", ")[0].localeCompare(adress.city?.toLowerCase()) &&
               dream.status
                 .toLowerCase()
                 .localeCompare(DreamStatus.Completed.toLowerCase()))
