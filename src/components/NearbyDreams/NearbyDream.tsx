@@ -64,16 +64,15 @@ export const NearbyDream = ({ className = "" }) => {
         updatedDreams
           .filter(
             dream =>
-              dream.location?.toLowerCase().split(", ")[0].localeCompare(adress.city?.toLowerCase()) &&
-              dream.status.toLowerCase().localeCompare(DreamStatus.Completed.toLowerCase())).slice(0, 3).length > 0
+              dream.location?.split(", ")[0].localeCompare(adress.city) &&
+              dream.status.localeCompare(DreamStatus.Completed)).slice(0, 3).length > 0
           ? dreams
               .filter(
                 (dream) =>
-                  dream.location.toLowerCase().split(", ")[0] ===
-                    adress.city.toLowerCase() &&
+                  dream.location.split(", ")[0] ===
+                    adress.city &&
                   dream.status
-                    .toLowerCase()
-                    .localeCompare(DreamStatus.Completed.toLowerCase())
+                    .localeCompare(DreamStatus.Completed)
               )
               .slice(0, 3)
           : dreams.slice(0, 3);
