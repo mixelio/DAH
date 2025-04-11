@@ -391,6 +391,7 @@ export const SingUpInForm = () => {
                     sx={{ margin: "0 auto" }}
                     className="sign-up-in-form__login"
                     onChange={handleChangeReg}
+                    autoComplete="username"
                   />
                   <TextField
                     error={errorMessege.length > 0}
@@ -401,6 +402,7 @@ export const SingUpInForm = () => {
                     sx={{ margin: "0 auto" }}
                     className="sign-up-in-form__login"
                     onChange={handleChangeReg}
+                    autoComplete="email"
                   />
                 </div>
                 <Divider style={{ opacity: "0" }} />
@@ -434,6 +436,7 @@ export const SingUpInForm = () => {
                         </InputAdornment>
                       }
                       label="Password"
+                      autoComplete="new-password"
                     />
                   </FormControl>
 
@@ -475,6 +478,7 @@ export const SingUpInForm = () => {
                         </InputAdornment>
                       }
                       label="Password_repeat"
+                      autoComplete="new-password"
                     />
                   </FormControl>
                 </div>
@@ -529,6 +533,7 @@ export const SingUpInForm = () => {
                   sx={{ margin: "0 auto" }}
                   onChange={handleChangeLogIn}
                   onFocus={handleAutoComplete}
+                  autoComplete="email"
                 />
                 {/* <Divider /> */}
                 <FormControl sx={{ m: 1 }} variant="outlined">
@@ -558,6 +563,7 @@ export const SingUpInForm = () => {
                       </InputAdornment>
                     }
                     label="Password"
+                    autoComplete="current-password"
                   />
                 </FormControl>
                 {!loginWaiting ? (
@@ -658,7 +664,11 @@ export const SingUpInForm = () => {
           borderRadius: "8px",
         }}
       >
-        <Alert onClose={() => setOpen(false)} variant="filled" severity="success">
+        <Alert
+          onClose={() => setOpen(false)}
+          variant="filled"
+          severity="success"
+        >
           Registration success
         </Alert>
       </Snackbar>
