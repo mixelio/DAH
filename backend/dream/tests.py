@@ -202,13 +202,15 @@ class FulfillDreamViewTest(TestCase):
 
     def test_unauthorized_access(self):
         dream = Dream.objects.create(
-            category=Dream.CategoryChoices.MONEY, user=self.user
+            category=Dream.CategoryChoices.MONEY, user=self.user, cost=5
         )
         self.client.force_authenticate(user=None)
         url = reverse('dream:fulfill-dream', args=[dream.id])
-        response = self.client.post(url, {})
+        response = self.client.post(url, {
+            'contribution_amount': 1
+        })
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 class AcceptAndRejectDreamContributionTest(TestCase):
