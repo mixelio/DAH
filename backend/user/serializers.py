@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_photo_url(self, obj: get_user_model()) -> str | None:
         """Create user photo url"""
         if obj.photo:
-            return obj.photo.url
+            return obj.photo.url.replace('http://', 'https://')
         return None
 
     def create(self, validated_data: dict) -> get_user_model():

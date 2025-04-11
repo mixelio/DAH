@@ -14,7 +14,7 @@ class UserDreamRetrieveSerializer(serializers.ModelSerializer):
     def get_photo_url(self, obj: get_user_model()) -> str | None:
         """Create user photo url"""
         if obj.photo:
-            return obj.photo.url
+            return obj.photo.url.replace('http://', 'https://')
         return None
 
 
@@ -74,7 +74,7 @@ class DreamListSerializer(DreamCreateSerializer):
 
     def get_image_url(self, obj: Dream) -> str | None:
         if obj.image:
-            return obj.image.url
+            return obj.image.url.replace('http://', 'https://')
         return None
 
 
