@@ -78,7 +78,7 @@ export const dreamsInit = createAsyncThunk("dreams/fetch", async () => {
 });
 
 export const currentDreamInit = createAsyncThunk("currDream/fetch", async (id: number) => {
-  const dream = await getDream(id);
+  const dream = await getDream(+id, localStorage.getItem("access") ?? "");
   return dream;
 })
 
