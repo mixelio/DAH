@@ -20,6 +20,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import (
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
+    AllowAny,
 )
 from rest_framework.request import Request
 from rest_framework.serializers import ModelSerializer
@@ -355,7 +356,7 @@ class NonMoneyDreamHandler(DreamHandler):
 
 
 class FulfillDreamView(views.APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     @extend_schema(
         request=PolymorphicProxySerializer(
@@ -377,7 +378,7 @@ class FulfillDreamView(views.APIView):
     )
     def post(self, request: Request, dream_id: int) -> Response:
         dream = get_object_or_404(Dream, id=dream_id)
-        user = request.user
+        user = request.user or None
 
         if dream.status == Dream.StatusChoices.COMPLETED:
             return Response(
@@ -406,9 +407,10 @@ class FulfillDreamView(views.APIView):
             )
 
         dream.save()
-        user.num_of_dreams = F('num_of_dreams') + 1
-        user.save()
-        user.refresh_from_db()
+        if user.is_authenticated:
+            user.num_of_dreams = F('num_of_dreams') + 1
+            user.save()
+            user.refresh_from_db()
         if isinstance(response, Payment):
             serializer = PaymentSerializer(response)
         elif isinstance(response, Contribution):

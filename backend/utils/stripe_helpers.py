@@ -3,6 +3,7 @@ from decimal import Decimal
 import stripe
 from django.conf import settings
 from django.urls import reverse
+from rest_framework.request import Request
 
 from dream.models import Dream
 from payment.models import Payment
@@ -11,7 +12,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def create_stripe_session(
-    dream_id: int, total_amount: Decimal, request
+    dream_id: int, total_amount: Decimal, request: Request
 ) -> Payment:
     dream = Dream.objects.get(id=dream_id)
 
@@ -44,7 +45,7 @@ def create_stripe_session(
     )
 
     payment = Payment.objects.create(
-        user_id=request.user.id,
+        user_id=request.user.id if request.user.is_authenticated else 0,
         status=Payment.StatusChoices.PENDING,
         session_id=checkout_session.id,
         session_url=checkout_session.url,
