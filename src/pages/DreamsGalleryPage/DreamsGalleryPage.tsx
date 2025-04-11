@@ -19,9 +19,7 @@ enum PostsPerPage {
 }
 
 export const DreamsGalleryPage = () => {
-  console.log("render")
   //#region declaration
-
   const { dreams } = useAppSelector((store) => store.dreams);
   const [searchParams, setSearchParams] = useSearchParams();
   const [pages, setPages] = useState<number>(0);

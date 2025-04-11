@@ -107,7 +107,6 @@
     font-weight: 400;
     color: $text-color-light;
     margin-bottom: 36px;
-    word-break: break-all;
   }
 
   &__more {
@@ -146,6 +145,8 @@
   &__bookmark {
     &.MuiIconButton-root {
       position: absolute;
+      width: 40px;
+      height: 40px;
       top: 10px;
       left: 10px;
       z-index: 2;

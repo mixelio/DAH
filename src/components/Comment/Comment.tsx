@@ -1,6 +1,6 @@
-import {IconButton, LinearProgress} from "@mui/material";
+import {Avatar, IconButton, LinearProgress} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 import DoneIcon from "@mui/icons-material/Done";
 import {CommentType} from "../../types/Comment";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
@@ -75,11 +75,16 @@ export const Comment: React.FC<Props> = ({ comment }) => {
     <div ref={commentRef} className={`comment comment--${comment.id}`}>
       <div className="comment-author">
         <div className="comment__personal-info">
-          <img
-            src={comment.user?.photo_url}
-            alt=""
-            className="comment__author-image"
-          />
+          {comment.user.photo_url ? (
+            <Avatar
+              src={comment.user?.photo_url}
+              alt=""
+              className="comment__author-image"
+            />
+          ) : (
+            <Avatar />
+          )}
+
           {comment.user?.first_name}
         </div>
         {currentUser && comment.user?.id === +currentUser ? (
@@ -107,7 +112,7 @@ export const Comment: React.FC<Props> = ({ comment }) => {
               sx={{ padding: 0.5 }}
               onClick={handleDelete}
             >
-              <RemoveCircleOutlineIcon />
+              <DeleteIcon />
             </IconButton>
           </div>
         ) : null}
@@ -117,7 +122,7 @@ export const Comment: React.FC<Props> = ({ comment }) => {
           <input
             ref={inputForChangeRef}
             className="comment-editInput"
-            defaultValue={comment.text} 
+            defaultValue={comment.text}
             type="text"
           />
         ) : (

@@ -1,4 +1,5 @@
 import {ChangeEvent, useEffect, useRef, useState} from "react";
+import heic2any from "heic2any";
 
 interface OptionType {
   description: string;
@@ -25,10 +26,6 @@ export const CreateDreamPage = () => {
   const location = useLocation();
   const pathSegments = location.pathname.split("/");
   const slug = pathSegments[pathSegments.length - 1];
-
-  // const [category, setCategory] = useState<DreamCategory>(
-  //   DreamCategory.Money_donation
-  // );
 
   const [options, setOptions] = useState<OptionType[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
@@ -64,21 +61,6 @@ export const CreateDreamPage = () => {
     }
     
   }, [id, dispatch])
-
-  // useEffect(() => {
-  //   if(editingDream) {
-  //       setEditingData((prevState) => ({
-  //         ...prevState,
-  //         image: editingDream.image_url ?? "",
-  //         name: editingDream.name ?? "",
-  //         category: editingDream.category ?? "",
-  //         location: editingDream.location ?? "",
-  //         cost: editingDream.cost ?? 0,
-  //         description: editingDream.description ?? "",
-  //       }));
-  //       setInputValue(editingDream.location)
-  //   }
-  // }, [editingDream])
 
   useEffect(() => {
   }, [editingDream])
@@ -153,22 +135,69 @@ export const CreateDreamPage = () => {
     }
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    // Отримуємо перший вибраний файл із інпуту
     const file = event.target.files?.[0];
-    
 
-    if (file) {
-      setSelectedFile(file);
+    if (!file) return; // Якщо файл не вибрано — виходимо
 
-      const reader = new FileReader();
+    let imageBlob: Blob;
 
-      reader.onload = () => {
-        setPreviewUrl(reader.result as string);
-      };
+    if (file.type === "image/heic" || file.name.endsWith(".heic")) {
+      try {
+        const converted = await heic2any({
+          blob: file,
+          toType: "image/jpeg", // або "image/webp"
+          quality: 0.9,
+        });
 
-      reader.readAsDataURL(file);
+        imageBlob = Array.isArray(converted)
+          ? converted[0]
+          : (converted as Blob);
+      } catch (error) {
+        console.error("Помилка конвертації HEIC:", error);
+        return;
+      }
+    } else {
+      imageBlob = file;
     }
-  };
+
+    // Створюємо зображення з файлу (асинхронно)
+    const imageBitmap = await createImageBitmap(imageBlob);
+
+    // Створюємо HTML canvas елемент
+    const canvas = document.createElement("canvas");
+
+    // Встановлюємо розміри canvas відповідно до зображення
+    canvas.width = imageBitmap.width;
+    canvas.height = imageBitmap.height;
+
+    // Отримуємо 2D-контекст для малювання на canvas
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return; // Якщо не вдалось отримати контекст — виходимо
+
+    // Малюємо зображення на canvas (від 0,0 до повного розміру)
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    // Конвертуємо вміст canvas у формат WebP (асинхронно)
+    canvas.toBlob((blob) => {
+    if (!blob) return; // Якщо не вдалося створити blob — виходимо
+
+    // Створюємо новий об'єкт File з отриманим WebP-blob
+    const webpFile = new File([blob], file.name.replace(/\.\w+$/, '.webp'), {
+      type: "image/webp", // MIME-тип WebP
+    });
+    
+    setSelectedFile(webpFile);
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setPreviewUrl(reader.result as string);
+    };
+
+    reader.readAsDataURL(webpFile);
+  }, "image/webp", 0.9)};
 
   const handleChangeCategory = (event: SelectChangeEvent) => {
     setEditingData(prev => ({...prev, category: event.target.value}))
@@ -395,16 +424,12 @@ export const CreateDreamPage = () => {
                   getOptionLabel={(option) => option.description}
                   inputValue={inputValue}
                   onInputChange={(_event, value) => {
-                    if (value) {
+                    
                       setInputValue(value);
-                    }
+                    
                   }}
                   onChange={(_event, value) => {
                     setInputValue(value?.description || "");
-                    // setDataForCreate((prev) => ({
-                    //   ...prev,
-                    //   location: sity || "",
-                    // }));
                   }}
                   renderInput={(params) => (
                     <TextField
@@ -436,7 +461,7 @@ export const CreateDreamPage = () => {
                     name="cost"
                     type="number"
                     onChange={(e) =>
-                      +e.target.value >= 0
+                      +e.target.value > 0
                         ? setEditingData((prev) => ({
                             ...prev,
                             cost: +e.target.value,

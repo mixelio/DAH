@@ -107,8 +107,8 @@ export const {actions} = currentDreamSlice;
 
 // all about current dream
 
-export const currentDreamInit = createAsyncThunk("currentDream/fetch", async (dreamId: string) => {
-  const dream = await getDream(+dreamId);
+export const currentDreamInit = createAsyncThunk("currentDream/fetch", async ({dreamId, token}: {dreamId: string, token: string}) => {
+  const dream = await getDream(+dreamId, token);
   return dream;
 });
 

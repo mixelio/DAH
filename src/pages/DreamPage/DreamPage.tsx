@@ -341,7 +341,7 @@ export const DreamPage = () => {
       if (id) {
         setLoading(true);
         try {
-          const dream = await getDream(+id);
+          const dream = await getDream(+id, localStorage.getItem("access") ?? "");
 
           setCurrentDream(dream);
         } catch (e) {
@@ -382,7 +382,6 @@ export const DreamPage = () => {
   //#endregion
 
   // console.log(
-  //   currentDream,
   //   currentDream?.status
   //     .toLowerCase()
   //     .localeCompare(DreamStatus.Completed.toLowerCase())
@@ -530,7 +529,7 @@ export const DreamPage = () => {
                     </form>
                   </>
                 ) : (
-                  <p className={styles.dialog__text}>
+                  <p className={styles.dialog__text} style={{ marginBlockEnd: "0px", textAlign: "center" }}>
                     Only authorized users can help
                   </p>
                 )}

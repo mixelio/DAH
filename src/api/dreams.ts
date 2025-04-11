@@ -8,8 +8,8 @@ export const getDreams = async () => {
   return response;
 }
 
-export const getDream = async (id: number) => {
-  const response = await client.get<Dream>(`dream/${id}`);
+export const getDream = async (id: number, token: string) => {
+  const response = await client.get<Dream>(`dream/${id}/`, token);
   return response;
 }
 

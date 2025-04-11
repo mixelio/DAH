@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {currentUserInit, currentUserUpdate, userPhotoUpdate, usersInit} from "../../features/users";
 import {Button, CircularProgress} from "@mui/material";
 import {useNavigate} from "react-router-dom";
+import heic2any from "heic2any";
 
 export const ProfileEdit = () => {
   const { loginedUser } = useAppSelector((store) => store.users);
@@ -115,21 +116,78 @@ export const ProfileEdit = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+      // Отримуємо перший вибраний файл із інпуту
+      const file = event.target.files?.[0];
 
-    if (file) {
-      setSelectedFile(file);
+      if (!file) return; // Якщо файл не вибрано — виходимо
 
-      const reader = new FileReader();
+      let imageBlob: Blob;
 
-      reader.onload = () => {
-        setPreviewUrl(reader.result as string);
-      };
+      if (file.type === "image/heic" || file.name.endsWith(".heic")) {
+        try {
+          const converted = await heic2any({
+            blob: file,
+            toType: "image/jpeg", // або "image/webp"
+            quality: 0.9,
+          });
 
-      reader.readAsDataURL(file);
-    }
-  };
+          imageBlob = Array.isArray(converted)
+            ? converted[0]
+            : (converted as Blob);
+        } catch (error) {
+          console.error("Помилка конвертації HEIC:", error);
+          return;
+        }
+      } else {
+        imageBlob = file;
+      }
+
+      // Створюємо зображення з файлу (асинхронно)
+      const imageBitmap = await createImageBitmap(imageBlob);
+
+      // Створюємо HTML canvas елемент
+      const canvas = document.createElement("canvas");
+
+      // Встановлюємо розміри canvas відповідно до зображення
+      canvas.width = imageBitmap.width;
+      canvas.height = imageBitmap.height;
+
+      // Отримуємо 2D-контекст для малювання на canvas
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return; // Якщо не вдалось отримати контекст — виходимо
+
+      // Малюємо зображення на canvas (від 0,0 до повного розміру)
+      ctx.drawImage(imageBitmap, 0, 0);
+
+      // Конвертуємо вміст canvas у формат WebP (асинхронно)
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return; // Якщо не вдалося створити blob — виходимо
+
+          // Створюємо новий об'єкт File з отриманим WebP-blob
+          const webpFile = new File(
+            [blob],
+            file.name.replace(/\.\w+$/, ".webp"),
+            {
+              type: "image/webp", // MIME-тип WebP
+            }
+          );
+
+          setSelectedFile(webpFile);
+
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            setPreviewUrl(reader.result as string);
+          };
+
+          reader.readAsDataURL(webpFile);
+        },
+        "image/webp",
+        0.9
+      );
+    };
 
   const handleChangeProfileData = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDataForChange((prev) => (

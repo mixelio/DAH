@@ -26,6 +26,19 @@ export const ProfilePage = () => {
   const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
+    const initializate = async () => {
+      try {
+        await Promise.all([dispatch(usersInit()).unwrap()]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    initializate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const getCurrentDreams = async () => {
       
       try {
@@ -64,25 +77,11 @@ export const ProfilePage = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const initializate = async () => {
-      try {
-        await Promise.all([dispatch(usersInit()).unwrap()]);
-      } catch (error) {
-        console.error(error);
-      }
-  }
-
-    initializate();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // useEffect(() => {
-  //   console.log("dreams chenged");
-  // }, [dreams])
-
   // #endregion
 
+  console.log(
+    !!currentProfile?.photo_url && currentProfile?.photo_url.length > 0
+  );
   return (
     <>
       {loader ? (
@@ -97,15 +96,15 @@ export const ProfilePage = () => {
               {/* avatar and user info */}
 
               <div className="profile__image-box">
-                {currentProfile && (
+                {!!currentProfile?.photo_url && currentProfile?.photo_url.length > 0 ? (
                   <Avatar
                     alt=""
                     src={currentProfile.photo_url}
                     sx={{ width: "100%", height: "100%" }}
                     className="profile__avatar"
-                  >
-                    {!currentProfile.photo_url && <AccountCircleIcon />}
-                  </Avatar>
+                  />
+                ) : (
+                  <AccountCircleIcon sx={{width: "100%", height: "100%"}}/>
                 )}
               </div>
 
@@ -125,10 +124,16 @@ export const ProfilePage = () => {
                     </IconButton>
                   )}
                 </h2>
-                <p className="profile__location">{currentProfile?.location}</p>
-                <p className="profile__description">
-                  {currentProfile?.about_me}
-                </p>
+                {currentProfile?.location && (
+                  <p className="profile__location">
+                    {currentProfile?.location}
+                  </p>
+                )}
+                {currentProfile?.about_me && (
+                  <p className="profile__description">
+                    {currentProfile?.about_me}
+                  </p>
+                )}
               </div>
             </div>
             <div className="profile__dreams-container">
@@ -137,7 +142,16 @@ export const ProfilePage = () => {
                   <DreamCart key={dream.id} dream={dream} />
                 ))}
               {currentUserId === id && (
-                <Link to="create" className="profile__add-dream-btn dream-cart" style={{alignItems: "center", justifyContent: "center", fontSize: "18", letterSpacing: "2px"}}>
+                <Link
+                  to="create"
+                  className="profile__add-dream-btn dream-cart"
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "18",
+                    letterSpacing: "2px",
+                  }}
+                >
                   Add a new dream
                 </Link>
               )}

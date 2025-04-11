@@ -3,7 +3,10 @@ import { createRoot } from 'react-dom/client'
 import './index.scss'
 import App from './App.tsx'
 import {DreamsProvider} from './DreamsContext.tsx'
-import {Route, HashRouter, Routes} from 'react-router-dom'
+import {
+  createHashRouter,
+  RouterProvider,
+} from "react-router-dom";
 import {HomePage} from './pages/HomePage/HomePage.tsx'
 import {DreamsGalleryPage} from './pages/DreamsGalleryPage/DreamsGalleryPage.tsx'
 import {AboutUsPage} from './pages/AboutUsPage/AboutUsPage.tsx'
@@ -21,6 +24,37 @@ import {FavoritePage} from './pages/FavoritePage/FavoritePage.tsx'
 import {PasswordReset} from './pages/PasswordReset/PasswordReset.tsx'
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+const router = createHashRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      { index: true, element: <HomePage /> },
+      {
+        path: "dreams",
+        children: [
+          { index: true, element: <DreamsGalleryPage /> },
+          { path: ":id", element: <DreamPage /> },
+          { path: ":id/edit", element: <CreateDreamPage /> },
+        ],
+      },
+      { path: "aboutus", element: <AboutUsPage /> },
+      { path: "contacts", element: <ContactsPage /> },
+      {
+        path: "profile/:id?",
+        children: [
+          { index: true, element: <ProfilePage /> },
+          { path: "edit", element: <ProfileEdit /> },
+          { path: "create", element: <CreateDreamPage /> },
+          { path: "favorites", element: <FavoritePage /> },
+        ],
+      },
+      { path: "pass-reset", element: <PasswordReset /> },
+      { path: "*", element: <NotFoundPage /> },
+    ],
+  },
+]);
+
 const CLIENT_ID =
   "481622529798-iaribr4blec6nafim0hjamha8i04aupt.apps.googleusercontent.com";
 
@@ -31,7 +65,7 @@ createRoot(document.getElementById("root")!).render(
       <DreamsProvider>
         <ThemeProvider theme={theme}>
           <GoogleOAuthProvider clientId={CLIENT_ID}>
-            <HashRouter>
+            {/* <HashRouter future={{ v7_startTransition: true }}>
               <Routes>
                 <Route path="/" element={<App />}>
                   <Route index element={<HomePage />} />
@@ -52,7 +86,11 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
               </Routes>
-            </HashRouter>
+            </HashRouter> */}
+            <RouterProvider
+              router={router}
+              future={{ v7_startTransition: true }}
+            />
           </GoogleOAuthProvider>
         </ThemeProvider>
       </DreamsProvider>

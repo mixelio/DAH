@@ -1,7 +1,7 @@
-import React, { useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import {Dream, DreamCategory, DreamStatus} from "../../types/Dream";
-import { Divider, IconButton, LinearProgress } from "@mui/material";
+import { CircularProgress, Divider, IconButton, LinearProgress } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
@@ -26,13 +26,16 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
   const [openMessage, setOpenMessage] = useState(false)
   const [openInfo, setOpenInfo] = useState(false)
 
-  const handleAddOrRemoveFavourite =async () => {
+  const [waitForFavourite, setWaitForFavourite] = useState(false)
 
+  const handleAddOrRemoveFavourite = async () => {
+    
     if(!loginedUser) {
       return
     }
     
     if(userFavouriteList.find(item => item.id === dream.id)) {
+      setWaitForFavourite(true);
       await dispatch(
         userFavoriteRemove({
           dream_id: dream.id,
@@ -40,21 +43,18 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
         })
       );
       await dispatch(userFavouritesInit(access ?? ""));
-      return
+      setWaitForFavourite(false);
+      return;
     }
-    dispatch(userFavouriteAdd({
+    setWaitForFavourite(true);
+    await dispatch(userFavouriteAdd({
       dream_id: dream.id,
       token: access ?? "",
     }));
     dispatch(userFavouritesInit(access ?? ""));
+    setWaitForFavourite(false);
   }
 
-  useEffect(() => {
-    console.log(dream.contributions)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  console.log("dream card render");
   return (
     <div className={`dream-cart ${allertClass}`}>
       <ContributionMessage
@@ -92,14 +92,14 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
         </Link>
         {loginedUser && (
           <IconButton
-            className="dream-cart__bookmark"
+            className={`dream-cart__bookmark`}
             onClick={handleAddOrRemoveFavourite}
           >
-            {userFavouriteList.find((item) => item.id === dream.id) ? (
+            {waitForFavourite ? <CircularProgress sx={{width: "100%", height: "100%", position: "absolute", top: "0", left: "0"}} /> : (userFavouriteList.find((item) => item.id === dream.id) ? (
               <BookmarkIcon />
             ) : (
               <BookmarkBorderIcon />
-            )}
+            ))}
           </IconButton>
         )}
       </div>
@@ -114,20 +114,24 @@ export const DreamCart: React.FC<Props> = ({ dream }) => {
             .join("")}{" "}
           {allertClass ? (
             <IconButton
+              
               className="dream-cart__allert-button"
               onClick={() => setOpenMessage(true)}
             >
               <EmailIcon sx={{ color: "#9fd986" }} />
             </IconButton>
           ) : (
-            loginedUser && +loginedUser === dream.user.id && dream.contributions && 
+            loginedUser &&
+            +loginedUser === dream.user.id &&
+            dream.contributions && (
               <IconButton
                 className="dream-cart__allert-button"
                 onClick={() => setOpenInfo(true)}
-                style={{ animation: "none"}}
+                style={{ animation: "none" }}
               >
                 <InfoIcon sx={{ color: "#9fd986" }} />
               </IconButton>
+            )
           )}
         </h2>
 

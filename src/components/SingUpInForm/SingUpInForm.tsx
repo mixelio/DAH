@@ -1,5 +1,5 @@
 import { Visibility, VisibilityOff} from '@mui/icons-material'
-import {Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Snackbar, TextField} from '@mui/material'
+import {Alert, Box, Button, CircularProgress, Divider, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, Snackbar, TextField} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -584,7 +584,9 @@ export const SingUpInForm = () => {
                     const token = credentialResponse.credential;
                     console.log(token);
                     try {
-                      const {access, refresh} = await loginUserWithGoogle({token: token as string});
+                      const { access, refresh } = await loginUserWithGoogle({
+                        token: token as string,
+                      });
                       if (access && refresh) {
                         localStorage.setItem("access", access);
                         localStorage.setItem("refresh", refresh);
@@ -592,12 +594,13 @@ export const SingUpInForm = () => {
                         const verifyResponse = await verifyUser(access);
                         if (verifyResponse) {
                           const currUser = await getLoginedUser(access);
-                          localStorage.setItem("currentUser", currUser.id.toString());
+                          localStorage.setItem(
+                            "currentUser",
+                            currUser.id.toString()
+                          );
                           setMainFormActive(false);
 
-                          if (
-                            window.location.href.includes("reset")
-                          ) {
+                          if (window.location.href.includes("reset")) {
                             window.location.href = "/";
                           } else {
                             window.location.reload();
@@ -606,7 +609,6 @@ export const SingUpInForm = () => {
                           return;
                         }
                       }
-
                     } catch (e) {
                       console.error(e);
                       setErrorMessage(Errors.NoServerAnswer);
@@ -650,8 +652,16 @@ export const SingUpInForm = () => {
         open={open}
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
-        message="Registration success"
-      />
+        sx={{
+          backgroundColor: colorsPrimary.light,
+          color: colorsPrimary.light,
+          borderRadius: "8px",
+        }}
+      >
+        <Alert onClose={() => setOpen(false)} variant="filled" severity="success">
+          Registration success
+        </Alert>
+      </Snackbar>
     </SnackbarProvider>
   );
 }
