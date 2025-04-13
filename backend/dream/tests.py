@@ -195,10 +195,13 @@ class FulfillDreamViewTest(TestCase):
             category='UNSUPPORTED_CATEGORY', user=self.user
         )
         url = reverse('dream:fulfill-dream', args=[dream.id])
-        response = self.client.post(url, {})
+        with self.assertRaises(ValueError) as context:
+            self.client.post(url, {})
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('Unsupported dream category', response.data['error'])
+        self.assertEqual(
+            str(context.exception),
+            'Unsupported dream category: UNSUPPORTED_CATEGORY'
+        )
 
     def test_unauthorized_access(self):
         dream = Dream.objects.create(
