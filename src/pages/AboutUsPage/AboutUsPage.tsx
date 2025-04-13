@@ -9,11 +9,10 @@ export const AboutUsPage = () => {
   
   useEffect(() => {
       fetch(
-        "https://pixabay.com/api/?key=4909168-7f27b7a457209e43d27004058&q=happy&category=people&per_page=200"
+        "https://pixabay.com/api/?key=4909168-7f27b7a457209e43d27004058&q=happy+summer&category=people&per_page=200"
       ).then((res) => {
         res.json().then((res) => {
           const numOfImg = Math.floor(Math.random() / 0.005);
-          console.log(numOfImg);
           setMissionImage(res.hits[numOfImg].largeImageURL);
           return;
         });

@@ -46,7 +46,7 @@ export const Comment: React.FC<Props> = ({ comment }) => {
         }))
       }
     } catch (e) {
-      console.log(e)
+      console.error(e)
     } finally {
       await dispatch(commentsInit(comment.dream.toString())).unwrap();
       setEditingComment(false)
@@ -65,7 +65,7 @@ export const Comment: React.FC<Props> = ({ comment }) => {
         }));
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally{
       await dispatch(commentsInit(comment.dream.toString())).unwrap();
     }

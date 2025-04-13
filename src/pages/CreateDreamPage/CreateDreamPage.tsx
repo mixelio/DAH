@@ -91,10 +91,7 @@ export const CreateDreamPage = () => {
       navigate(`/profile/${id}`);
     }
     
-    if (slug === "create") {
-      console.log("create page");
-    } else {
-      console.log("edit page");
+    if (slug.localeCompare("create")) {
       const editingDream = dreams.find((dream) =>
         dream && id ? +dream.id === +id : null
       );
@@ -112,8 +109,6 @@ export const CreateDreamPage = () => {
         setPreviewUrl(editingDream.image_url);
         setInputValue(editingDream.location);
       }
-
-      
 
       if (user && id && dreams.length > 0) {
         const userDreams = dreams.filter(

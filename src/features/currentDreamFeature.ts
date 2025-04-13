@@ -41,24 +41,21 @@ export const currentDreamSlice = createSlice({
       state.currentDreamLoading = false;
     }).addCase(currentDreamInit.rejected, (state) => {
       state.currentDreamLoading = false;
-      console.log("error is here")
       state.currentDreamError = "Failed to load dream";
     });
 
     // * Dream edit
     builder.addCase(editCurrentDream.pending, state => {
       state.currentDreamLoading = true
-    }).addCase(editCurrentDream.fulfilled, (state, action) => {
+    }).addCase(editCurrentDream.fulfilled, (state) => {
       state.currentDreamLoading = false;
-      console.log(action.payload)
     })
 
     // * Dream remove
     builder.addCase(removeCurrentDream.pending, state => {
       state.currentDreamLoading = true;
-    }).addCase(removeCurrentDream.fulfilled, (state, action) => {
+    }).addCase(removeCurrentDream.fulfilled, (state) => {
       state.currentDreamLoading = false;
-      console.log(action.payload)
     })
 
     // * Comment init
@@ -172,6 +169,6 @@ export const commentRemove = createAsyncThunk("currentDream/commentRemove", asyn
     await deleteDreamComment(dreamId, commentId, token);
     return commentId;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 });

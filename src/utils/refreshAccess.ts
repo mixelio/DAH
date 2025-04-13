@@ -29,7 +29,7 @@ export const refreshAccess = async (): Promise<string | null> => {
     localStorage.setItem("access", access);
     return access;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 };

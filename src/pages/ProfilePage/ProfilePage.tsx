@@ -79,9 +79,6 @@ export const ProfilePage = () => {
 
   // #endregion
 
-  console.log(
-    !!currentProfile?.photo_url && currentProfile?.photo_url.length > 0
-  );
   return (
     <>
       {loader ? (

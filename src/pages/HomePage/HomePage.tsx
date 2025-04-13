@@ -19,7 +19,7 @@ export const HomePage = () => {
       try {
         await dispatch(usersInit());
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         if (url && url.localeCompare(window.location.href) === 0) {
           window.scrollTo({

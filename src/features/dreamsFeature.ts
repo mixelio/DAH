@@ -63,7 +63,6 @@ const dreamsSlice = createSlice({
         state.dreamsLoading = true;
       }).addCase(currentDreamInit.fulfilled, (state, action) => {
         state.dreamsLoading = false;
-        console.log(action.payload)
         state.currentDream = action.payload;
       })
   },
@@ -104,7 +103,6 @@ export const dreamCreateInit = createAsyncThunk("dreams/create", async ({data, t
       }
       
 }});
-    console.log("name", formData.get("name"), "category", formData.get("category"), "cost", formData.get("cost"), "description", formData.get("description"),"image", formData.get("image"));
     const response = await createDream(formData, token);
 
     return response;

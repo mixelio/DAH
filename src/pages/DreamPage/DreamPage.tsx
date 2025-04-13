@@ -293,7 +293,6 @@ export const DreamPage = () => {
         }
       } catch (e) {
         console.error(e);
-        console.log(e)
       }
     }
 
@@ -380,12 +379,6 @@ export const DreamPage = () => {
   }, [id, dreams, users, setCurrentDream, postImage]);
 
   //#endregion
-
-  // console.log(
-  //   currentDream?.status
-  //     .toLowerCase()
-  //     .localeCompare(DreamStatus.Completed.toLowerCase())
-  // );
   
   return (
     <section className="dream">

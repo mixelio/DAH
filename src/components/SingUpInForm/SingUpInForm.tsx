@@ -191,7 +191,7 @@ export const SingUpInForm = () => {
             };
           }
         } catch (error) {
-          console.log(error, "user not created");
+          console.error(error, "user not created");
         } finally {
           setRegisterData({
             first_name: '',
@@ -586,9 +586,7 @@ export const SingUpInForm = () => {
                 )}
                 <GoogleLogin
                   onSuccess={async (credentialResponse) => {
-                    console.log(credentialResponse);
                     const token = credentialResponse.credential;
-                    console.log(token);
                     try {
                       const { access, refresh } = await loginUserWithGoogle({
                         token: token as string,
@@ -622,7 +620,7 @@ export const SingUpInForm = () => {
                     }
                   }}
                   onError={() => {
-                    console.log("Login Failed");
+                    console.error("Login Failed");
                   }}
                 />
                 <Link

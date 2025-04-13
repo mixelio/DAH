@@ -36,7 +36,7 @@ export const ProfileEdit = () => {
         dispatch(usersInit());
         dispatch(currentUserInit(chekTocken));
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
@@ -239,7 +239,7 @@ export const ProfileEdit = () => {
         })
       );
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("Error uploading file!" + error);
     } finally {
       setTimeout(() => {
@@ -295,6 +295,7 @@ export const ProfileEdit = () => {
                     className="profile-edit__input-text"
                     placeholder="enter your first name"
                     onChange={handleChangeProfileData}
+                    autoComplete="first_name"
                   />
                 </label>
                 <label className="profile-edit__input-box">
@@ -306,6 +307,7 @@ export const ProfileEdit = () => {
                     className="profile-edit__input-text"
                     placeholder="enter your last name"
                     onChange={handleChangeProfileData}
+                    autoComplete="last_name"
                   />
                 </label>
               </div>
@@ -324,6 +326,7 @@ export const ProfileEdit = () => {
                     }}
                     onBlur={handleBlurOrEnter}
                     onKeyDown={handleKeyPress}
+                    autoComplete="new-location"
                   />
                 </label>
                 <label className="profile-edit__input-box">

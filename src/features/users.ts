@@ -52,11 +52,9 @@ const usersSlice = createSlice({
     // geting logined user
     builder
       .addCase(currentUserInit.pending, (state) => {
-        console.log()
         state.usersLoading = true;
       })
       .addCase(currentUserInit.fulfilled, (state, action) => {
-        console.log();
         state.loginedUser = action.payload;
         state.usersLoading = false;
       });
@@ -122,7 +120,6 @@ const usersSlice = createSlice({
       builder
         .addCase(userPasswordUpdate.fulfilled, (state, action) => {
           const payload = action.payload as { message: string };
-          console.log(payload.message)
           if (!payload.message.toLowerCase().includes("error")) {
             state.error = payload.message;
           }

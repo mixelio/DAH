@@ -1,9 +1,6 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import {User} from './types/User';
-import {getUsers} from './services/users';
 import {Dream} from './types/Dream';
-import {getDreams} from './services/dreams';
-import {getComments} from './services/comments';
 import {CommentType} from './types/Comment';
 
 type Props = {
@@ -66,30 +63,6 @@ export const DreamsProvider: React.FC<Props> = ({children}) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [logginedUserId, setLogginedUserId] = useState<string | null>(localStorage.getItem('currentUser'));
 
-  useEffect(() => {
-    setLoader(true);
-    getUsers()
-    .then((res) => setUsers([...res]));
-    getDreams()
-    .then((res) => setDreams([...res]));
-    getComments()
-      .then((res) => setComments([...res]));
-  }, [])
-
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'currentUser') {
-        setLogginedUserId(e.newValue)
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-    }
-    
-  }, [])
 
   const value = useMemo(() => ({
     loader,
