@@ -1,50 +1,68 @@
-# React + TypeScript + Vite
+# Dream are Here
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project was created as a team pet project with a focus on supporting people in fulfilling their dreams.
 
-Currently, two official plugins are available:
+[DEMO Dream are Here](https://dream-are-here.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# 💫 Project Overview
 
-## Expanding the ESLint configuration
+**Dream are Here** is a web platform that allows users to publish their dreams, share them with others, and receive support. The platform offers an intuitive interface for browsing dreams, reading descriptions, commenting, and adding dreams to favorites. The goal is to create a positive and inspiring community.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 🚀 Features
 
-- Configure the top-level `parserOptions` property like this:
+- Browse and view dreams shared by the community  
+- Search and filter dreams using fuzzy search (Fuse.js)  
+- View detailed information including title, description, images, and tags  
+- Mark dreams as favorites  
+- Leave comments and engage with other users  
+- Responsive design for desktop and mobile  
+- Minimal Stripe logic is prepared *(checkout not implemented on frontend)*
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Requirements
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+To run this project locally, you will need:
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+- Node.js v18 or higher  
+- npm or yarn
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Technologies
+
++ Vite  
++ React  
++ TypeScript  
++ Redux Toolkit  
++ React Router  
++ SCSS  
++ Material UI  
++ Fuse.js  
++ GitHub Pages (for frontend preview)  
++ Django REST Framework (backend)  
+
+## Installation
+
+1. Clone the repository:
+
+    #### `git clone https://github.com/your-username/dream-are-here.git`
+
+2. Navigate to the project directory:
+
+    #### `cd dream-are-here`
+
+3. Install the dependencies:
+
+    #### `npm install`
+
+4. Start the development server:
+
+    #### `npm run dev`
+
+## Author
+
+Frontend developed by Mykhailo Hubko.  
+Contact: [Linkedin](https://www.linkedin.com/in/michael-hubko/)  
+Email: mixelios@gmail.com
+
+## Additional Information
+
+- More about React: [react.dev](https://react.dev/)  
+- More about TypeScript: [typescriptlang.org](https://www.typescriptlang.org/)
