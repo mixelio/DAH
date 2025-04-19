@@ -2,7 +2,7 @@
 
 This project was created as a team pet project with a focus on supporting people in fulfilling their dreams.
 
-[DEMO Dream are Here](https://dream-are-here.vercel.app/)
+[DEMO Dream are Here](https://mixelio.github.io/DAH/)
 
 # 💫 Project Overview
 
@@ -16,7 +16,8 @@ This project was created as a team pet project with a focus on supporting people
 - Mark dreams as favorites  
 - Leave comments and engage with other users  
 - Responsive design for desktop and mobile  
-- Minimal Stripe logic is prepared *(checkout not implemented on frontend)*
+- Authorization
+- Create/Edit/Delete Dreams
 
 ## Requirements
 
@@ -42,7 +43,7 @@ To run this project locally, you will need:
 
 1. Clone the repository:
 
-    #### `git clone https://github.com/your-username/dream-are-here.git`
+    #### `git clone https://github.com/mixelio/DAH.git`
 
 2. Navigate to the project directory:
 
@@ -66,3 +67,7 @@ Email: mixelios@gmail.com
 
 - More about React: [react.dev](https://react.dev/)  
 - More about TypeScript: [typescriptlang.org](https://www.typescriptlang.org/)
+- More about Styles [css-tricks](https://css-tricks.com/)
+- More about Vite [Vite](https://vite.dev/)
+
+Good luck!
